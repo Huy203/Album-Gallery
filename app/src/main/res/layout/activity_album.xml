@@ -17,7 +17,4 @@
             android:layout_marginTop="8dp"
             android:layout_marginBottom="8dp"/>
     </Button>
-
-
-
 </androidx.constraintlayout.widget.ConstraintLayout>

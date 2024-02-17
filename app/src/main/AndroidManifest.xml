@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools" >
-
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <application
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
@@ -11,10 +11,12 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.AlbumGallery"
-        tools:targetApi="31" >
-        <activity android:name=".view.AlbumActivity"
+        tools:targetApi="31"
+        android:requestLegacyExternalStorage="true"
+        >
+        <activity android:name=".view.HomeScreen"
             android:exported="true"
-            android:theme="@style/Theme.AlbumGallery" />
+            android:windowSoftInputMode="adjustResize" />
         <activity
             android:name=".MainActivity"
             android:exported="true"
@@ -30,5 +32,4 @@
 
 
     </application>
-
 </manifest>
