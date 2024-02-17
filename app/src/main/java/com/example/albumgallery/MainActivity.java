@@ -1,7 +1,6 @@
 package com.example.albumgallery;
 
 import android.Manifest;
-import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.content.Intent;
 import android.widget.TextView;
@@ -9,14 +8,9 @@ import android.widget.TextView;
 import androidx.activity.ComponentActivity;
 import androidx.annotation.Nullable;
 
-import com.google.firebase.FirebaseApp;
-import com.google.firebase.analytics.FirebaseAnalytics;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
+import android.view.View;
+import android.widget.Button;
 
-import com.example.albumgallery.view.AlbumActivity;
-
-//import compose
 public class MainActivity extends ComponentActivity {
     private static final String[] PERMISSIONS = {
             Manifest.permission.READ_EXTERNAL_STORAGE,
@@ -35,10 +29,24 @@ public class MainActivity extends ComponentActivity {
 
         // Start Album Activity
         firebaseManager.setValue(test());
+
+        Button editImageButton = findViewById(R.id.editImageButton);
+        editImageButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                openEditImageActivity();
+            }
+        });
     }
-    String test(){
+
+    String test() {
         TextView textView = findViewById(R.id.textView);
         textView.setText("Hello World");
         return "Hello World";
+    }
+
+    private void openEditImageActivity() {
+        Intent intent = new Intent(this, com.example.albumgallery.view.EditImageActivity.class);
+        startActivity(intent);
     }
 }
