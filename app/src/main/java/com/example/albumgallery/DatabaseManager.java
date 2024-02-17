@@ -19,6 +19,10 @@ public class DatabaseManager {
         return this;
     }
 
+    public void insert(String name, String email, String password){
+        dbHelper.insert(name, email, password);
+    }
+
     public void close(){
         dbHelper.close();
     }
