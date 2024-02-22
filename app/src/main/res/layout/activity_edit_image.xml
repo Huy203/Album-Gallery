@@ -20,6 +20,31 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
+    <TextView
+        android:id="@+id/dateTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="7th February, 2024"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        app:layout_constraintStart_toEndOf="@id/backButton"
+        app:layout_constraintTop_toTopOf="@id/backButton"
+        app:layout_constraintBottom_toTopOf="@id/timeTextView"
+        android:paddingTop="30dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginBottom="4dp"/>
+
+
+    <TextView
+        android:id="@+id/timeTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="10:24"
+        android:textSize="16sp"
+        app:layout_constraintTop_toBottomOf="@id/dateTextView"
+        app:layout_constraintStart_toStartOf="@id/dateTextView"
+        app:layout_constraintBottom_toBottomOf="@id/backButton"/>
+
     <ImageView
         android:id="@+id/memeImageView"
         android:layout_width="400dp"
@@ -29,5 +54,71 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/backButton" />
+
+    <!-- Button Share -->
+    <ImageView
+        android:id="@+id/shareButton"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:src="@drawable/share_square"
+        app:layout_constraintTop_toBottomOf="@id/memeImageView"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/pencilButton"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="16dp"
+        android:layout_marginStart="16dp"/>
+
+    <!-- Button Pencil -->
+    <ImageView
+        android:id="@+id/pencilButton"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:src="@drawable/pencil"
+        app:layout_constraintTop_toBottomOf="@id/memeImageView"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/shareButton"
+        app:layout_constraintEnd_toStartOf="@+id/heartButton"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="16dp"/>
+
+    <!-- Button Heart -->
+    <ImageView
+        android:id="@+id/heartButton"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:src="@drawable/heart"
+        app:layout_constraintTop_toBottomOf="@id/memeImageView"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/pencilButton"
+        app:layout_constraintEnd_toStartOf="@+id/trashButton"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="16dp"/>
+
+    <!-- Button Trash -->
+    <ImageView
+        android:id="@+id/trashButton"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:src="@drawable/trash"
+        app:layout_constraintTop_toBottomOf="@id/memeImageView"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/heartButton"
+        app:layout_constraintEnd_toStartOf="@+id/ellipsisButton"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="16dp"/>
+
+    <!-- Button Ellipsis -->
+    <ImageView
+        android:id="@+id/ellipsisButton"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:src="@drawable/circle_ellipsis"
+        app:layout_constraintTop_toBottomOf="@id/memeImageView"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/trashButton"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="16dp"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
