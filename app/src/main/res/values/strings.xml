@@ -1,5 +1,6 @@
 <resources>
     <string name="app_name">AlbumGallery</string>
+    <string name="test">String test</string>
     <string name="title_activity_album">AlbumActivity</string>
     <string name="title_activity_album_activity.java">AlbumActivity.java</string>
 </resources>

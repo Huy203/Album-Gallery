@@ -33,12 +33,18 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         String imagePath = imagePaths.get(position);
+        if(imagePath == null) {
+            return;
+        }
         Glide.with(context).load(imagePath).into(holder.imageView);
     }
 
     @Override
     public int getItemCount() {
-        return imagePaths.size();
+        if(imagePaths != null)
+            return imagePaths.size();
+        else
+            return 0;
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
