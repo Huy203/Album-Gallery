@@ -20,6 +20,8 @@ public class HomeScreen extends AppCompatActivity {
     private RecyclerView recyclerMediaView;
     private List<String> imagePaths;
 
+    final private int CAMERA_REQUEST_CODE = 100;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -45,11 +47,17 @@ public class HomeScreen extends AppCompatActivity {
         btnCamera.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
+                openCamera();
             }
         });
     }
 
     // function to open camera on Emulator
+    private void openCamera() {
+        Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        if(intent.resolveActivity(getPackageManager())!= null) {
+            startActivityForResult(intent, CAMERA_REQUEST_CODE);
+        }
+    }
 
 }
