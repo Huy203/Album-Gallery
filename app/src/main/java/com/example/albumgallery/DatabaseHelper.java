@@ -23,7 +23,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 + "id INTEGER PRIMARY KEY AUTOINCREMENT, "
                 + "name TEXT, "
                 + "email TEXT, "
-                + "password TEXT);");
+                + "password TEXT);" +
+                "");
        println("Table Created");
     }
 
