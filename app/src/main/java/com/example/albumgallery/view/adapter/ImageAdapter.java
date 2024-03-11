@@ -1,6 +1,7 @@
 package com.example.albumgallery.view.adapter;
 
 import android.content.Context;
+import android.net.Uri;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -36,7 +37,9 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> 
         if(imagePath == null) {
             return;
         }
-        Glide.with(context).load(imagePath).into(holder.imageView);
+//        Glide.with(context).load(imagePath).into(holder.imageView);
+        Glide.with(context).load(Uri.parse(imagePath)).into(holder.imageView);
+
     }
 
     @Override

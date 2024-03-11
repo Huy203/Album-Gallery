@@ -13,7 +13,7 @@
 
         <androidx.appcompat.widget.SearchView
             android:id="@+id/searchView"
-            android:layout_width="wrap_content"
+            android:layout_width="301dp"
             android:layout_height="wrap_content"
             android:layout_margin="8dp"
             android:background="@drawable/search_view_bg"
@@ -128,5 +128,21 @@
                 android:text="Favorites"/>
         </LinearLayout>
     </LinearLayout>
+
+    <RelativeLayout
+        android:layout_width="100dp"
+        android:layout_height="50dp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="100dp"
+        >
+
+        <Button
+            android:id="@+id/btnPickImage"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:text="Choose"
+            android:padding="8dp"/>
+    </RelativeLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
