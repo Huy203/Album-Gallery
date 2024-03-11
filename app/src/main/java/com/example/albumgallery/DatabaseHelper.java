@@ -26,7 +26,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         initialize_all_schemas(db);
         try {
             db.execSQL("DROP TABLE IF EXISTS android_metadata");
-
         } catch (SQLiteException e) {
             e.printStackTrace();
         }

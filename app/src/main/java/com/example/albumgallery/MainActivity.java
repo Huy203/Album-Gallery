@@ -25,7 +25,7 @@ public class MainActivity extends ComponentActivity {
             startActivity(intent);
         });
         editButton.setOnClickListener(v -> {
-            Intent intent = new Intent(this, com.example.albumgallery.view.EditImageActivity.class);
+            Intent intent = new Intent(this, com.example.albumgallery.view.DetailPicture.class);
             startActivity(intent);
         });
 
