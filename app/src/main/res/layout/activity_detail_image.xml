@@ -14,8 +14,8 @@
         android:focusable="true"
         android:padding="5dp"
         android:src="@drawable/back_arrow"
-        app:layout_constraintBottom_toTopOf="@id/memeScrollView"
-        app:layout_constraintEnd_toStartOf="@id/memeScrollView"
+        app:layout_constraintBottom_toTopOf="@id/memeImageView"
+        app:layout_constraintEnd_toStartOf="@id/memeImageView"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -34,6 +34,7 @@
         android:layout_marginStart="8dp"
         android:layout_marginBottom="4dp"/>
 
+
     <TextView
         android:id="@+id/timeTextView"
         android:layout_width="wrap_content"
@@ -44,89 +45,78 @@
         app:layout_constraintStart_toStartOf="@id/dateTextView"
         app:layout_constraintBottom_toBottomOf="@id/backButton"/>
 
-    <!-- Button Zoom In -->
-    <androidx.core.widget.NestedScrollView
-        android:id="@+id/memeScrollView"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:layout_marginTop="32dp"
-        android:layout_marginBottom="8dp"
-        android:fillViewport="true"
-        app:layout_constraintBottom_toTopOf="@id/zoomInButton"
+    <ImageView
+        android:id="@+id/memeImageView"
+        android:layout_width="400dp"
+        android:layout_height="442dp"
+        android:layout_marginTop="12dp"
+        android:src="@drawable/meme"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/backButton">
+        app:layout_constraintTop_toBottomOf="@id/backButton" />
 
-        <ImageView
-            android:id="@+id/memeImageView"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:adjustViewBounds="true"
-            android:src="@drawable/meme" />
-    </androidx.core.widget.NestedScrollView>
-
-    <!-- Button Zoom Out -->
-
+    <!-- Button Share -->
     <ImageView
-        android:id="@+id/zoomInButton"
+        android:id="@+id/shareButton"
         android:layout_width="30dp"
         android:layout_height="30dp"
-        android:layout_marginEnd="16dp"
-        android:layout_marginBottom="20dp"
-        android:src="@drawable/zoom_in"
+        android:src="@drawable/share_square"
+        app:layout_constraintTop_toBottomOf="@id/memeImageView"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/zoomOutButton"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/memeScrollView" />
-
-    <ImageView
-        android:id="@+id/zoomOutButton"
-        android:layout_width="30dp"
-        android:layout_height="30dp"
+        app:layout_constraintEnd_toStartOf="@+id/pencilButton"
         android:layout_marginEnd="16dp"
         android:layout_marginBottom="16dp"
-        android:src="@drawable/zoom_out"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/rotateButton"
-        app:layout_constraintStart_toEndOf="@+id/zoomInButton"
-        app:layout_constraintTop_toBottomOf="@id/memeScrollView" />
+        android:layout_marginStart="16dp"/>
 
-    <!-- Button Rotate -->
+    <!-- Button Pencil -->
     <ImageView
-        android:id="@+id/rotateButton"
+        android:id="@+id/pencilButton"
         android:layout_width="30dp"
         android:layout_height="30dp"
-        android:src="@drawable/refresh"
-        app:layout_constraintTop_toBottomOf="@id/memeScrollView"
+        android:src="@drawable/pencil"
+        app:layout_constraintTop_toBottomOf="@id/memeImageView"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/zoomOutButton"
-        app:layout_constraintEnd_toStartOf="@+id/cutButton"
+        app:layout_constraintStart_toEndOf="@+id/shareButton"
+        app:layout_constraintEnd_toStartOf="@+id/heartButton"
         android:layout_marginEnd="16dp"
         android:layout_marginBottom="16dp"/>
 
-    <!-- Button Cut -->
+    <!-- Button Heart -->
     <ImageView
-        android:id="@+id/cutButton"
+        android:id="@+id/heartButton"
         android:layout_width="30dp"
         android:layout_height="30dp"
-        android:src="@drawable/crop"
-        app:layout_constraintTop_toBottomOf="@id/memeScrollView"
+        android:src="@drawable/heart"
+        app:layout_constraintTop_toBottomOf="@id/memeImageView"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/rotateButton"
-        app:layout_constraintEnd_toStartOf="@+id/beautifyButton"
+        app:layout_constraintStart_toEndOf="@+id/pencilButton"
+        app:layout_constraintEnd_toStartOf="@+id/trashButton"
         android:layout_marginEnd="16dp"
         android:layout_marginBottom="16dp"/>
 
-    <!-- Button Beautify -->
+    <!-- Button Trash -->
     <ImageView
-        android:id="@+id/beautifyButton"
+        android:id="@+id/trashButton"
         android:layout_width="30dp"
         android:layout_height="30dp"
-        android:src="@drawable/beautiful"
-        app:layout_constraintTop_toBottomOf="@id/memeScrollView"
+        android:src="@drawable/trash"
+        app:layout_constraintTop_toBottomOf="@id/memeImageView"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/cutButton"
+        app:layout_constraintStart_toEndOf="@+id/heartButton"
+        app:layout_constraintEnd_toStartOf="@+id/ellipsisButton"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="16dp"/>
+
+    <!-- Button Ellipsis -->
+    <ImageView
+        android:id="@+id/ellipsisButton"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:src="@drawable/circle_ellipsis"
+        app:layout_constraintTop_toBottomOf="@id/memeImageView"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/trashButton"
         app:layout_constraintEnd_toEndOf="parent"
         android:layout_marginEnd="16dp"
         android:layout_marginBottom="16dp"/>
