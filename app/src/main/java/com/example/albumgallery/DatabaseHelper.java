@@ -1,22 +1,31 @@
 package com.example.albumgallery;
 import android.content.Context;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.util.Log;
+import android.widget.Toast;
+
+import com.example.albumgallery.model.Model;
+
+import java.util.ArrayList;
+import java.util.List;
+
 public class DatabaseHelper extends SQLiteOpenHelper {
-//    static final String DATABASE_NAME = "album_gallery.db";
-    static final String DATABASE_NAME = "AlbumGallery.db";
-    static final int DATABASE_VERSION = 1;
-    static final String TAG_TABLE = "Tag";
-    static final String SIZE_TABLE = "Size";
-    static final String USERS_TABLE = "Users";
-    static final String ALBUM_TABLE = "Album";
-    static final String IMAGE_TABLE = "Image";
-    static final String IMAGE_ALBUM_TABLE = "Image_Album";
-    static final String IMAGE_TAG_TABLE = "Image_Tag";
-    static final String VIDEO_TABLE = "Video";
-    static final String VIDEO_ALBUM_TABLE = "Video_Album";
-    static final String VIDEO_TAG_TABLE = "Video_Tag";
+//    public static final String DATABASE_NAME = "album_gallery.db";
+    public static final String DATABASE_NAME = "AlbumGallery.db";
+    public static final int DATABASE_VERSION = 1;
+    public static final String TAG_TABLE = "Tag";
+    public static final String SIZE_TABLE = "Size";
+    public static final String USERS_TABLE = "Users";
+    public static final String ALBUM_TABLE = "Album";
+    public static final String IMAGE_TABLE = "Image";
+    public static final String IMAGE_ALBUM_TABLE = "Image_Album";
+    public static final String IMAGE_TAG_TABLE = "Image_Tag";
+    public static final String VIDEO_TABLE = "Video";
+    public static final String VIDEO_ALBUM_TABLE = "Video_Album";
+    public static final String VIDEO_TAG_TABLE = "Video_Tag";
 
     public DatabaseHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -118,8 +127,13 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             e.printStackTrace();
         }
     }
-    public void insert(String name, String email, String password) {
+    public void insert(String table, Model model) {
+        Log.v("DatabaseHelper", "Inserting data");
         SQLiteDatabase db = getWritableDatabase();
-        db.execSQL("INSERT INTO " + USERS_TABLE + " (name, email, password) VALUES ('" + name + "', '" + email + "', '" + password + "');");
+        db.execSQL("INSERT INTO " + table + " VALUES (" + model.insert() + ")");
+    }
+
+    public void getConnection () {
+        SQLiteDatabase db = getWritableDatabase();
     }
 }

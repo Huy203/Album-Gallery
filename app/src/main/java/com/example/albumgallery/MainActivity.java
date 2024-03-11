@@ -13,6 +13,7 @@ import com.example.albumgallery.view.HomeScreen;
 public class MainActivity extends ComponentActivity {
 
     DatabaseManager db;
+    FirebaseManager firebase;
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -38,7 +39,7 @@ public class MainActivity extends ComponentActivity {
         }
 
         // set up
-//        FirebaseManager firebaseManager = new FirebaseManage  r(this);
+        firebase = new FirebaseManager(this);
 //        DatabaseManager databaseManager = new DatabaseManager(this);
     }
 }

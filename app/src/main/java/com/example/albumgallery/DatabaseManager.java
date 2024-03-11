@@ -19,16 +19,12 @@ public class DatabaseManager {
     public DatabaseManager open() throws SQLiteException {
         dbHelper = new DatabaseHelper(context);
         database = dbHelper.getWritableDatabase();
-//        if(database != null) {
-//            Log.e("Database Manager", "Database connected");
-//        } else {
-//            Log.e("Database Manger", "Failed to connect to database");
-//        }
+        if(database != null) {
+            Log.e("Database Manager", "Database connected");
+        } else {
+            Log.e("Database Manager", "Failed to connect to database");
+        }
         return this;
-    }
-
-    public void insert(String name, String email, String password){
-        dbHelper.insert(name, email, password);
     }
 
     public void close(){
