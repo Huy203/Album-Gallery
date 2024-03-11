@@ -5,7 +5,7 @@ import android.content.ClipData;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.view.View;
+import android.provider.MediaStore;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.Toast;
@@ -27,6 +27,7 @@ public class HomeScreen extends AppCompatActivity {
     private List<String> imagePaths; //contains the list of image encoded.
     private ImageAdapter imageAdapter;
     private static final int REQUEST_CODE_PICK_MULTIPLE_IMAGES = 101;
+    private static final int CAMERA_REQUEST_CODE = 100;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,18 +40,14 @@ public class HomeScreen extends AppCompatActivity {
         recyclerMediaView = findViewById(R.id.recyclerMediaView);
 
         ImageButton btnCamera = findViewById(R.id.btnCamera);
-        btnCamera.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-
-            }
-        });
+        btnCamera.setOnClickListener(view -> openCamera());
 
         Button btnPickImage = findViewById(R.id.btnPickImage);
 
         btnPickImage.setOnClickListener(view -> pickMultipleImages());
 
     }
+
     @SuppressLint("NotifyDataSetChanged")
     @Override
     protected void onResume() {
@@ -91,7 +88,15 @@ public class HomeScreen extends AppCompatActivity {
         intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
         startActivityForResult(intent, REQUEST_CODE_PICK_MULTIPLE_IMAGES);
     }
+    // function to open camera on Emulator
+    private void openCamera() {
+        Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        if(intent.resolveActivity(getPackageManager())!= null) {
+            startActivityForResult(intent, CAMERA_REQUEST_CODE);
+        }
+    }
 }
+
 
 
 
