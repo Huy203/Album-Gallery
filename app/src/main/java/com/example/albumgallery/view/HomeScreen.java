@@ -6,17 +6,31 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.util.Log;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.albumgallery.FirebaseManager;
 import com.example.albumgallery.R;
+import com.example.albumgallery.controller.MainController;
+import com.example.albumgallery.model.ImageModel;
 import com.example.albumgallery.view.adapter.ImageAdapter;
+import com.google.android.gms.tasks.Continuation;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageMetadata;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,12 +42,16 @@ public class HomeScreen extends AppCompatActivity {
     private ImageAdapter imageAdapter;
     private static final int REQUEST_CODE_PICK_MULTIPLE_IMAGES = 101;
     private static final int CAMERA_REQUEST_CODE = 100;
+    private MainController mainController;
+    private FirebaseManager firebaseManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Objects.requireNonNull(getSupportActionBar()).hide();
         setContentView(R.layout.activity_home_screen);
+
+        mainController = new MainController(this);
 
         imagePaths = new ArrayList<>();
         imageAdapter = new ImageAdapter(this, imagePaths);
@@ -44,7 +62,15 @@ public class HomeScreen extends AppCompatActivity {
 
         Button btnPickImage = findViewById(R.id.btnPickImage);
 
-        btnPickImage.setOnClickListener(view -> pickMultipleImages());
+        btnPickImage.setOnClickListener(view -> {
+            pickMultipleImages();
+//            ImageModel image= new ImageModel(2, "image1", 100, 100);
+//            Log.v("Image", "Image added");
+//            mainController.getImageController().add(image);
+//            mainController.getImageController().getAll();
+
+            firebaseManager = new FirebaseManager(this);
+        });
 
     }
 
@@ -53,9 +79,12 @@ public class HomeScreen extends AppCompatActivity {
     protected void onResume() {
         Toast.makeText(this, "onResume", Toast.LENGTH_SHORT).show();
         super.onResume();
+
         imageAdapter = new ImageAdapter(this, imagePaths);
         recyclerMediaView.setLayoutManager(new GridLayoutManager(this, 3));
         recyclerMediaView.setAdapter(imageAdapter);
+        imageAdapter.notifyDataSetChanged();
+
     }
 
     // function to pick multiple images from gallery
@@ -76,7 +105,50 @@ public class HomeScreen extends AppCompatActivity {
             for (int i = 0; i < clipData.getItemCount(); i++) {
                 ClipData.Item item = clipData.getItemAt(i);
                 Uri uri = item.getUri();
+                Log.v("Image", "Image: " + uri.toString());
                 imagePaths.add(uri.toString());
+
+
+                // Create file metadata including the content type
+                StorageMetadata metadata = new StorageMetadata.Builder()
+                        .setContentType("image/jpg")
+                        .build();
+                // Upload file and metadata to the path 'images/filepath'
+                StorageReference riversRef = firebaseManager.getStorage().getReference().child("images/"+uri.getLastPathSegment());
+                UploadTask uploadTask = riversRef.putFile(uri, metadata);
+
+                // Register observers to listen for when the download is done or if it fails
+                uploadTask.addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception exception) {
+                        // Handle unsuccessful uploads
+                    }
+                }).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                    @Override
+                    public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                        taskSnapshot.getMetadata();
+                    }
+                });
+                Task<Uri> urlTask = uploadTask.continueWithTask((Continuation<UploadTask.TaskSnapshot, Task<Uri>>) task -> {
+                    if (!task.isSuccessful()) {
+                        throw task.getException();
+                    }
+
+                    // Continue with the task to get the download URL
+                    return riversRef.getDownloadUrl();
+                }).addOnCompleteListener(new OnCompleteListener<Uri>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Uri> task) {
+                        if (task.isSuccessful()) {
+                            Uri downloadUri = task.getResult();
+                            Log.v("Image", "Image: " + downloadUri.toString());
+                        } else {
+                            // Handle failures
+                            // ...
+                        }
+                    }
+                });
+
             }
         }
     }

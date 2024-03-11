@@ -9,11 +9,11 @@ import androidx.activity.ComponentActivity;
 import androidx.annotation.Nullable;
 
 import com.example.albumgallery.view.HomeScreen;
+import com.google.firebase.auth.FirebaseAuth;
 
 public class MainActivity extends ComponentActivity {
 
     DatabaseManager db;
-    FirebaseManager firebase;
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -37,9 +37,5 @@ public class MainActivity extends ComponentActivity {
         } catch (Exception e) {
             Log.d(e.getMessage(), "onCreate: ");
         }
-
-        // set up
-        firebase = new FirebaseManager(this);
-//        DatabaseManager databaseManager = new DatabaseManager(this);
     }
 }
