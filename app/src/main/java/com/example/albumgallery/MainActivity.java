@@ -2,6 +2,7 @@ package com.example.albumgallery;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.Button;
 
 import androidx.activity.ComponentActivity;
@@ -10,6 +11,8 @@ import androidx.annotation.Nullable;
 import com.example.albumgallery.view.HomeScreen;
 
 public class MainActivity extends ComponentActivity {
+
+    DatabaseManager db;
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -26,8 +29,16 @@ public class MainActivity extends ComponentActivity {
             startActivity(intent);
         });
 
+        try {
+            db = new DatabaseManager(this);
+            db.open();
+
+        } catch (Exception e) {
+            Log.d(e.getMessage(), "onCreate: ");
+        }
+
         // set up
-//        FirebaseManager firebaseManager = new FirebaseManager(this);
+//        FirebaseManager firebaseManager = new FirebaseManage  r(this);
 //        DatabaseManager databaseManager = new DatabaseManager(this);
     }
 }

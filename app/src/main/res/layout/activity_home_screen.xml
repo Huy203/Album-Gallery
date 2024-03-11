@@ -26,12 +26,12 @@
         <ImageButton
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:src="@android:drawable/ic_menu_camera"
+            android:src="@drawable/camera_icon"
             android:padding="8dp"
             android:background="?attr/selectableItemBackgroundBorderless"
             android:contentDescription="camera"
-            android:id="@+id/btnCamera"/>
-
+            android:id="@+id/btnCamera"
+            android:scaleType="fitCenter"/>
     </LinearLayout>
 
 

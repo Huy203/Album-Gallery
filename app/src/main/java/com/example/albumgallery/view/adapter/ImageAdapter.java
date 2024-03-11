@@ -1,6 +1,7 @@
 package com.example.albumgallery.view.adapter;
 
 import android.content.Context;
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,6 +12,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.example.albumgallery.R;
+import com.example.albumgallery.view.EditImageActivity;
 
 import java.util.List;
 
@@ -37,6 +39,13 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> 
             return;
         }
         Glide.with(context).load(imagePath).into(holder.imageView);
+        holder.itemView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(view.getContext(), EditImageActivity.class);
+                view.getContext().startActivity(intent);
+            }
+        });
     }
 
     @Override

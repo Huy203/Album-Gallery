@@ -14,13 +14,13 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.albumgallery.R;
 import com.example.albumgallery.model.ImageModel;
 import com.example.albumgallery.view.adapter.ImageAdapter;
-
 import java.util.List;
 
 public class HomeScreen extends AppCompatActivity {
     private RecyclerView recyclerMediaView;
     private List<String> imagePaths;
-    private ImageAdapter imageAdapter;
+
+    final private int CAMERA_REQUEST_CODE = 100;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,12 +32,13 @@ public class HomeScreen extends AppCompatActivity {
         recyclerMediaView = findViewById(R.id.recyclerMediaView);
         recyclerMediaView.setLayoutManager(new GridLayoutManager(this, 3));
 
-        imageAdapter = new ImageAdapter(this, imagePaths);
+        ImageAdapter imageAdapter = new ImageAdapter(this, imagePaths);
         recyclerMediaView.setAdapter(imageAdapter);
 
-        if (imageAdapter.getItemCount() == 0) {
+        if(imageAdapter.getItemCount() == 0){
             Toast.makeText(this, "No images found", Toast.LENGTH_SHORT).show();
-        } else {
+        }
+        else {
             Toast.makeText(this, "Images found", Toast.LENGTH_SHORT).show();
         }
 
@@ -46,17 +47,17 @@ public class HomeScreen extends AppCompatActivity {
         btnCamera.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
+                openCamera();
             }
         });
     }
+
     // function to open camera on Emulator
-    @Override
-    protected void onResume() {
-        super.onResume();
-        // Refresh the data when the activity is resumed
-        imagePaths.clear();
-        imagePaths.addAll(ImageModel.getAllImages(this));
-        imageAdapter.notifyDataSetChanged();
+    private void openCamera() {
+        Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        if(intent.resolveActivity(getPackageManager())!= null) {
+            startActivityForResult(intent, CAMERA_REQUEST_CODE);
+        }
     }
+
 }
