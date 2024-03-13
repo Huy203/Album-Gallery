@@ -1,7 +1,9 @@
 package com.example.albumgallery.view;
+import com.bumptech.glide.Glide;
 import com.example.albumgallery.R;
 
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.widget.ImageView;
 import androidx.appcompat.app.AppCompatActivity;
@@ -34,6 +36,11 @@ public class DetailPicture extends AppCompatActivity {
             // Hiển thị menu hoặc dialog chọn tùy chọn
             showOptionsDialog();
         });
+
+        // Lấy ảnh từ image adapter, hiển thị vào edit image screen.
+        String imagePath = getIntent().getStringExtra("imagePath");
+        ImageView imageView = findViewById(R.id.memeImageView);
+        Glide.with(this).load(Uri.parse(imagePath)).into(imageView);
 
     }
 
