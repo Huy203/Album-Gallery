@@ -1,17 +1,13 @@
 package com.example.albumgallery.view;
 
 import android.annotation.SuppressLint;
-import android.content.ClipData;
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
-import android.util.Log;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.Toast;
 
-import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.GridLayoutManager;
@@ -20,30 +16,19 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.albumgallery.FirebaseManager;
 import com.example.albumgallery.R;
 import com.example.albumgallery.controller.MainController;
-import com.example.albumgallery.model.ImageModel;
 import com.example.albumgallery.view.adapter.ImageAdapter;
-import com.google.android.gms.tasks.Continuation;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
-import com.google.firebase.storage.FirebaseStorage;
-import com.google.firebase.storage.StorageMetadata;
-import com.google.firebase.storage.StorageReference;
-import com.google.firebase.storage.UploadTask;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
 public class HomeScreen extends AppCompatActivity {
+    private static final int CAMERA_REQUEST_CODE = 100;
     private RecyclerView recyclerMediaView;
     private List<String> imagePaths; //contains the list of image encoded.
-    private ImageAdapter imageAdapter;
-    private static final int REQUEST_CODE_PICK_MULTIPLE_IMAGES = 101;
-    private static final int CAMERA_REQUEST_CODE = 100;
-    private MainController mainController;
-    private FirebaseManager firebaseManager;
+    private ImageAdapter imageAdapter; //adapter for the recycler view
+    private MainController mainController; //controller contains other controllers
+    private FirebaseManager firebaseManager; //firebase manager to handle firebase operations
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,15 +48,9 @@ public class HomeScreen extends AppCompatActivity {
         Button btnPickImage = findViewById(R.id.btnPickImage);
 
         btnPickImage.setOnClickListener(view -> {
-            pickMultipleImages();
-//            ImageModel image= new ImageModel(2, "image1", 100, 100);
-//            Log.v("Image", "Image added");
-//            mainController.getImageController().add(image);
-//            mainController.getImageController().getAll();
-
-            firebaseManager = new FirebaseManager(this);
+            firebaseManager = FirebaseManager.getInstance(this);
+            mainController.getImageController().pickMultipleImages();
         });
-
     }
 
     @SuppressLint("NotifyDataSetChanged")
@@ -84,30 +63,18 @@ public class HomeScreen extends AppCompatActivity {
         recyclerMediaView.setLayoutManager(new GridLayoutManager(this, 3));
         recyclerMediaView.setAdapter(imageAdapter);
         imageAdapter.notifyDataSetChanged();
-
     }
 
-    // function to pick multiple images from gallery
     @Override
-    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == REQUEST_CODE_PICK_MULTIPLE_IMAGES && resultCode == RESULT_OK && data != null) {
-            mainController.getImageController().handleImagePicked(data, imagePaths, firebaseManager);
-        }
+        mainController.getImageController().onActivityResult(requestCode, resultCode, data);
     }
 
-
-    private void pickMultipleImages() {
-        Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
-        intent.setType("image/*");
-        intent.setAction(Intent.ACTION_PICK);
-        intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
-        startActivityForResult(intent, REQUEST_CODE_PICK_MULTIPLE_IMAGES);
-    }
     // function to open camera on Emulator
     private void openCamera() {
         Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-        if(intent.resolveActivity(getPackageManager())!= null) {
+        if (intent.resolveActivity(getPackageManager()) != null) {
             startActivityForResult(intent, CAMERA_REQUEST_CODE);
         }
     }
