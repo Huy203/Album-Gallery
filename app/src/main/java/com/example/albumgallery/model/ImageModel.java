@@ -1,33 +1,34 @@
 package com.example.albumgallery.model;
 
-public class ImageModel implements Model{
-    private int id;
+public class ImageModel implements Model {
+    private long id;
     private String name;
-    private int id_size;
-    private int capacity;
+    private int width;
+    private int height;
+    private long capacity;
     private String created_at;
     private String notice;
     private String remain_time;
     private boolean is_deleted;
     private boolean is_favourited;
 
-    public ImageModel(int id, String name, int id_size, int capacity){
-        this.id = id;
+    public ImageModel(String name, int width, int height, long capacity, String created_at) {
         this.name = name;
-        this.id_size = id_size;
+        this.width = width;
+        this.height = height;
         this.capacity = capacity;
         this.created_at = created_at;
-        this.notice = notice;
-        this.remain_time = remain_time;
-        this.is_deleted = is_deleted;
-        this.is_favourited = is_favourited;
+        this.notice = "";
+        this.remain_time = "";
+        this.is_deleted = false;
+        this.is_favourited = false;
     }
 
-    public int getId() {
+    public long getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(long id) {
         this.id = id;
     }
 
@@ -39,15 +40,15 @@ public class ImageModel implements Model{
         this.name = name;
     }
 
-    public int getId_size() {
-        return id_size;
+    public int getWidth() {
+        return width;
     }
 
-    public void setId_size(int id_size) {
-        this.id_size = id_size;
+    public void setWidth(int width) {
+        this.width = width;
     }
 
-    public int getCapacity() {
+    public long getCapacity() {
         return capacity;
     }
 
@@ -97,22 +98,12 @@ public class ImageModel implements Model{
 
     @Override
     public String toString() {
-        return "ImageModel{" +
-                "id=" + id +
-                ", name='" + name + '\'' +
-                ", id_size=" + id_size +
-                ", capacity=" + capacity +
-                ", created_at='" + created_at + '\'' +
-                ", notice='" + notice + '\'' +
-                ", remain_time='" + remain_time + '\'' +
-                ", is_deleted=" + is_deleted +
-                ", is_favourited=" + is_favourited +
-                '}';
+        return "ImageModel{" + ", name='" + name + '\'' + ", id_size=" + width + ", capacity=" + capacity + ", created_at='" + created_at + '\'' + ", notice='" + notice + '\'' + ", remain_time='" + remain_time + '\'' + ", is_deleted=" + is_deleted + ", is_favourited=" + is_favourited + '}';
     }
 
     @Override
     public String insert() {
-        return "'" + id + "', '" + name + "', '" + id_size + "', '" + capacity + "', '" + created_at + "', '" + notice + "', '" + remain_time + "', '" + is_deleted + "', '" + is_favourited + "'";
+        return "INSERT INTO Image (name, width, height, capacity, created_at, notice, remain_time, is_deleted, is_favourited) VALUES ('" + name + "', " + width + ", " + height + ", " + capacity + ", '" + created_at + "', '" + notice + "', '" + remain_time + "', " + (is_deleted ? 1 : 0) + ", " + (is_favourited ? 1 : 0) + ");";
     }
 
     @Override

@@ -9,7 +9,6 @@ import androidx.activity.ComponentActivity;
 import androidx.annotation.Nullable;
 
 import com.example.albumgallery.view.HomeScreen;
-import com.google.firebase.auth.FirebaseAuth;
 
 public class MainActivity extends ComponentActivity {
 
@@ -26,7 +25,7 @@ public class MainActivity extends ComponentActivity {
             startActivity(intent);
         });
         editButton.setOnClickListener(v -> {
-            Intent intent = new Intent(this, com.example.albumgallery.view.DetailPicture.class);
+            Intent intent = new Intent(this, com.example.albumgallery.view.LoginScreen.class);
             startActivity(intent);
         });
 
