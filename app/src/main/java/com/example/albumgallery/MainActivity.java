@@ -9,7 +9,6 @@ import androidx.activity.ComponentActivity;
 import androidx.annotation.Nullable;
 
 import com.example.albumgallery.view.HomeScreen;
-import com.google.firebase.auth.FirebaseAuth;
 
 public class MainActivity extends ComponentActivity {
 
