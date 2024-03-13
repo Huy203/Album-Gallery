@@ -144,8 +144,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         } else {
             db.execSQL("UPDATE " + table + " SET " + column + " = " + value + " WHERE " + where);
         }
-
-        public void getConnection () {
-            SQLiteDatabase db = getWritableDatabase();
-        }
     }
+
+    public void getConnection() {
+        SQLiteDatabase db = getWritableDatabase();
+    }
+}
