@@ -63,6 +63,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                     "    capacity INTEGER,\n" +
                     "    created_at TIMESTAMP,\n" +
                     "    notice TEXT,\n" +
+                    "    ref TEXT,\n" +
                     "    user_id INTEGER,\n" +
                     "    password TEXT\n" +
                     ");");
@@ -73,6 +74,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                     "    capacity INTEGER,\n" +
                     "    created_at TIMESTAMP,\n" +
                     "    notice TEXT,\n" +
+                    "    ref TEXT,\n" +
                     "    remain_time TEXT,\n" +
                     "    is_deleted INTEGER,\n" +
                     "    is_favourited INTEGER\n" +
@@ -94,6 +96,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                     "    capacity INTEGER,\n" +
                     "    created_at TIMESTAMP,\n" +
                     "    notice TEXT,\n" +
+                    "    ref TEXT,\n" +
                     "    remain_time TEXT,\n" +
                     "    is_deleted INTEGER,\n" +
                     "    is_favourited INTEGER\n" +
