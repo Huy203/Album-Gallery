@@ -23,7 +23,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-public class HomeScreen extends AppCompatActivity {
+public class AlbumActivity extends AppCompatActivity {
     private RecyclerView recyclerMediaView;
     private List<String> imagePaths; //contains the list of image encoded.
     private ImageAdapter imageAdapter;
@@ -48,15 +48,13 @@ public class HomeScreen extends AppCompatActivity {
         btnPickImage.setOnClickListener(view -> pickMultipleImages());
 
         // Trong phương thức onCreate của HomeScreen.java
-        TextView textAlbums = findViewById(R.id.textAlbums);
+        TextView textAlbums = findViewById(R.id.textPhotos);
         textAlbums.setOnClickListener(view -> {
             // Chuyển sang màn hình mới
-            Intent intent = new Intent(HomeScreen.this, AlbumActivity.class);
+            Intent intent = new Intent(AlbumActivity.this, HomeScreen.class);
             startActivity(intent);
             finish();
         });
-
-
 
     }
 
@@ -108,7 +106,3 @@ public class HomeScreen extends AppCompatActivity {
         }
     }
 }
-
-
-
-
