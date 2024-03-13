@@ -1,19 +1,15 @@
 package com.example.albumgallery;
+
 import android.content.Context;
-import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
-import android.widget.Toast;
 
 import com.example.albumgallery.model.Model;
 
-import java.util.ArrayList;
-import java.util.List;
-
 public class DatabaseHelper extends SQLiteOpenHelper {
-//    public static final String DATABASE_NAME = "album_gallery.db";
+    //    public static final String DATABASE_NAME = "album_gallery.db";
     public static final String DATABASE_NAME = "AlbumGallery.db";
     public static final int DATABASE_VERSION = 1;
     public static final String TAG_TABLE = "Tag";
@@ -30,6 +26,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public DatabaseHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
     }
+
     @Override
     public void onCreate(SQLiteDatabase db) {
         initialize_all_schemas(db);
@@ -39,6 +36,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             e.printStackTrace();
         }
     }
+
     private void initialize_all_schemas(SQLiteDatabase db) {
         try {
             db.execSQL("CREATE TABLE " + TAG_TABLE + " (\n" +
@@ -110,9 +108,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             e.printStackTrace();
         }
     }
+
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        try{
+        try {
             db.execSQL("DROP TABLE IF EXISTS " + USERS_TABLE);
             db.execSQL("DROP TABLE IF EXISTS " + TAG_TABLE);
             db.execSQL("DROP TABLE IF EXISTS " + SIZE_TABLE);
@@ -127,13 +126,23 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             e.printStackTrace();
         }
     }
+
     public void insert(String table, Model model) {
         Log.v("DatabaseHelper", "Inserting data");
         SQLiteDatabase db = getWritableDatabase();
         db.execSQL("INSERT INTO " + table + " VALUES (" + model.insert() + ")");
     }
 
-    public void getConnection () {
+    public void update(String table, String column, String value, String where) {
+        Log.v("DatabaseHelper", "Updating data");
         SQLiteDatabase db = getWritableDatabase();
+        if (where == null) {
+            db.execSQL("UPDATE " + table + " SET " + column + " = " + value);
+        } else {
+            db.execSQL("UPDATE " + table + " SET " + column + " = " + value + " WHERE " + where);
+        }
+
+        public void getConnection () {
+            SQLiteDatabase db = getWritableDatabase();
+        }
     }
-}

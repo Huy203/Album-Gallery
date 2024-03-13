@@ -92,66 +92,10 @@ public class HomeScreen extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == REQUEST_CODE_PICK_MULTIPLE_IMAGES && resultCode == RESULT_OK && data != null) {
-            handleImagePicked(data);
+            mainController.getImageController().handleImagePicked(data, imagePaths, firebaseManager);
         }
     }
 
-    private void handleImagePicked(Intent data) {
-        if (data.getData() != null) {
-            Uri uri = data.getData();
-            imagePaths.add(uri.toString());
-        } else if (data.getClipData() != null) {
-            ClipData clipData = data.getClipData();
-            for (int i = 0; i < clipData.getItemCount(); i++) {
-                ClipData.Item item = clipData.getItemAt(i);
-                Uri uri = item.getUri();
-                Log.v("Image", "Image: " + uri.toString());
-                imagePaths.add(uri.toString());
-
-
-                // Create file metadata including the content type
-                StorageMetadata metadata = new StorageMetadata.Builder()
-                        .setContentType("image/jpg")
-                        .build();
-                // Upload file and metadata to the path 'images/filepath'
-                StorageReference riversRef = firebaseManager.getStorage().getReference().child("images/"+uri.getLastPathSegment());
-                UploadTask uploadTask = riversRef.putFile(uri, metadata);
-
-                // Register observers to listen for when the download is done or if it fails
-                uploadTask.addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception exception) {
-                        // Handle unsuccessful uploads
-                    }
-                }).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-                    @Override
-                    public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                        taskSnapshot.getMetadata();
-                    }
-                });
-                Task<Uri> urlTask = uploadTask.continueWithTask((Continuation<UploadTask.TaskSnapshot, Task<Uri>>) task -> {
-                    if (!task.isSuccessful()) {
-                        throw task.getException();
-                    }
-
-                    // Continue with the task to get the download URL
-                    return riversRef.getDownloadUrl();
-                }).addOnCompleteListener(new OnCompleteListener<Uri>() {
-                    @Override
-                    public void onComplete(@NonNull Task<Uri> task) {
-                        if (task.isSuccessful()) {
-                            Uri downloadUri = task.getResult();
-                            Log.v("Image", "Image: " + downloadUri.toString());
-                        } else {
-                            // Handle failures
-                            // ...
-                        }
-                    }
-                });
-
-            }
-        }
-    }
 
     private void pickMultipleImages() {
         Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
