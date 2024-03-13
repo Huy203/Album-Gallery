@@ -67,6 +67,7 @@ dependencies {
     implementation("com.google.firebase:firebase-analytics:21.5.1")
 //    don't specify the version when using the BoM
     implementation("com.google.firebase:firebase-auth")
+    implementation("com.google.firebase:firebase-storage")
 //    Database
     implementation("com.google.firebase:firebase-database:20.3.0")
 //    Google Play services location APIs

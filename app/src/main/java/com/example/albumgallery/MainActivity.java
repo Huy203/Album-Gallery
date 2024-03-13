@@ -36,9 +36,5 @@ public class MainActivity extends ComponentActivity {
         } catch (Exception e) {
             Log.d(e.getMessage(), "onCreate: ");
         }
-
-        // set up
-//        FirebaseManager firebaseManager = new FirebaseManage  r(this);
-//        DatabaseManager databaseManager = new DatabaseManager(this);
     }
 }
