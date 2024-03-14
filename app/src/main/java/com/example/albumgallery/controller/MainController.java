@@ -1,0 +1,31 @@
+package com.example.albumgallery.controller;
+
+import android.app.Activity;
+
+import com.example.albumgallery.DatabaseHelper;
+import com.example.albumgallery.model.Model;
+
+public class MainController {
+    private final DatabaseHelper dbHelper;
+    private final AlbumController albumController;
+    private final ImageController imageController;
+
+    public MainController(Activity activity) {
+        dbHelper = new DatabaseHelper(activity);
+        albumController = new AlbumController(activity);
+        imageController = new ImageController(activity);
+    }
+
+    public void insert(String table, Model model) {
+        // Insert data
+        dbHelper.insert(table, model);
+    }
+
+    public AlbumController getAlbumController() {
+        return albumController;
+    }
+
+    public ImageController getImageController() {
+        return imageController;
+    }
+}
