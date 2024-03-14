@@ -10,6 +10,7 @@ import android.util.Log;
 import com.example.albumgallery.model.Model;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class DatabaseHelper extends SQLiteOpenHelper {
     //    public static final String DATABASE_NAME = "album_gallery.db";
@@ -148,8 +149,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.execSQL("UPDATE " + table + " SET " + column + " = " + "'" + value + "'" + " WHERE " + where);
     }
 
-    public String select(String table, String column, String where) {
-        String data = "";
+    public List<String> select(String table, String column, String where) {
+        List<String> data = new ArrayList<>();
         Log.v("DatabaseHelper", "Selecting data");
         SQLiteDatabase db = getWritableDatabase();
         Cursor cursor = (column == null)
@@ -161,7 +162,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 : db.rawQuery("SELECT " + column + " FROM " + table + " WHERE " + where, null);
         if (cursor.moveToFirst()) {
             while (!cursor.isAfterLast()) {
-                data += cursor.getString(0) + "\n";
+                data.add(cursor.getString(0));
                 cursor.moveToNext();
             }
         } else {
@@ -206,5 +207,18 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             return cursor.getLong(0);
         }
         return -1;
+    }
+
+    public List<String> getAll(String table) {
+        List<String> data = new ArrayList<>();
+        SQLiteDatabase db = getWritableDatabase();
+        Cursor cursor = db.rawQuery("SELECT * FROM " + table, null);
+        if (cursor.moveToFirst()) {
+            while (!cursor.isAfterLast()) {
+                data.add(cursor.getString(0));
+                cursor.moveToNext();
+            }
+        }
+        return data;
     }
 }

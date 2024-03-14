@@ -6,7 +6,7 @@ import com.example.albumgallery.DatabaseHelper;
 
 import java.util.Date;
 import java.util.Calendar;
-public class AlbumModel {
+public class AlbumModel implements Model{
     // AlbumModel class is used to store the data of the album.
     private DatabaseHelper dbHelper;
     private int id; // id of the album
@@ -31,5 +31,25 @@ public class AlbumModel {
         this.remain_time = "";
         this.is_deleted = false;
         this.is_favourited = false;
+    }
+
+    @Override
+    public String insert() {
+        return null;
+    }
+
+    @Override
+    public void delete() {
+
+    }
+
+    @Override
+    public void update() {
+
+    }
+
+    @Override
+    public void select() {
+
     }
 }

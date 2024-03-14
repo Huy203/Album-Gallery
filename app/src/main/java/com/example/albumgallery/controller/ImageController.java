@@ -38,6 +38,7 @@ public class ImageController implements Controller {
     private final Activity activity;
     private final DatabaseHelper dbHelper;
     private final FirebaseManager firebaseManager;
+    private final List<String> imageURIs = new ArrayList<>();
 
     public ImageController(Activity activity) {
         this.activity = activity;
@@ -45,7 +46,14 @@ public class ImageController implements Controller {
         this.firebaseManager = FirebaseManager.getInstance(activity);
     }
 
-    @Override
+    public void setImageURIs(List<String> imageURIs) {
+        this.imageURIs.addAll(imageURIs);
+    }
+
+    public List<String> getImageURIs() {
+        return imageURIs;
+    }
+
     public void create(String name, int width, int height, long capacity, String dateAdded) {
         ImageModel imageModel = new ImageModel(name, width, height, capacity, dateAdded);
         this.insert(imageModel);
@@ -72,6 +80,7 @@ public class ImageController implements Controller {
     }
 
     public void pickMultipleImages() {
+        imageURIs.clear(); // Clear the list of image URIs previously selected
         Intent intent = new Intent(Intent.ACTION_GET_CONTENT, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
         intent.setAction(Intent.ACTION_PICK);
         intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
@@ -98,13 +107,14 @@ public class ImageController implements Controller {
         }
 
         for (Uri uri : imageUris) {
-            retrieveDataImage(uri);
+            retrieveDataImageFromURL(uri);
             uploadImage(uri);
+            imageURIs.add(uri.toString());
         }
     }
 
     @SuppressLint("Range")
-    private void retrieveDataImage(Uri uri) {
+    private void retrieveDataImageFromURL(Uri uri) {
         try (Cursor cursor = activity.getContentResolver().query(uri, PROJECTION, null, null, null)) {
             long id;
             String name;
@@ -167,8 +177,6 @@ public class ImageController implements Controller {
                     update("ref", uriImage.toString(), "id = " + dbHelper.getLastId("Image")); // Update the reference of the image
                     Log.v("Image", "Image uploaded" + " " + uriImage.toString());
                 } else {
-                    // Handle failures
-                    // ...
                 }
             }
         });
@@ -179,6 +187,16 @@ public class ImageController implements Controller {
         return fileName.split("\\.")[fileName.split("\\.").length - 1];
     }
 
-
-    // https://firebasestorage.googleapis.com/v0/b/album-gallery-70d05.appspot.com/o/images%2Fimage2045421098?alt=media&token=83d0bf36-1a8f-4b7a-9bb5-03930a0a9f3f
+    public List<ImageModel> getAllImages(){
+        List<String> data = dbHelper.getAll("Image");
+        List<ImageModel> imageModels = new ArrayList<>();
+        for (String s : data) {
+            String[] temp = s.split(",");
+            imageModels.add(new ImageModel(temp[1], Integer.parseInt(temp[2]), Integer.parseInt(temp[3]), Long.parseLong(temp[4]), temp[5], temp[6], temp[7], Boolean.parseBoolean(temp[8]), Boolean.parseBoolean(temp[9])));
+        }
+        return imageModels;
+    }
+    public List<String> getAllImageURLs(){
+        return dbHelper.select("Image", "ref", null);
+    }
 }

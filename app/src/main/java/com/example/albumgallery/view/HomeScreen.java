@@ -9,7 +9,6 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -17,6 +16,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.albumgallery.FirebaseManager;
 import com.example.albumgallery.R;
 import com.example.albumgallery.controller.MainController;
+import com.example.albumgallery.model.ImageModel;
 import com.example.albumgallery.view.adapter.ImageAdapter;
 
 import java.util.ArrayList;
@@ -26,7 +26,7 @@ import java.util.Objects;
 public class HomeScreen extends AppCompatActivity {
     private static final int CAMERA_REQUEST_CODE = 100;
     private RecyclerView recyclerMediaView;
-    private List<String> imagePaths; //contains the list of image encoded.
+    private List<String> imageURIs; //contains the list of image encoded.
     private ImageAdapter imageAdapter; //adapter for the recycler view
     private MainController mainController; //controller contains other controllers
     private FirebaseManager firebaseManager; //firebase manager to handle firebase operations
@@ -39,8 +39,11 @@ public class HomeScreen extends AppCompatActivity {
 
         mainController = new MainController(this);
 
-        imagePaths = new ArrayList<>();
-        imageAdapter = new ImageAdapter(this, imagePaths);
+        // Fetch images from DB
+        imageURIs = new ArrayList<>();
+        imageURIs.addAll(mainController.getImageController().getAllImageURLs());
+
+        imageAdapter = new ImageAdapter(this, imageURIs);
         recyclerMediaView = findViewById(R.id.recyclerMediaView);
 
         ImageButton btnCamera = findViewById(R.id.btnCamera);
@@ -58,7 +61,6 @@ public class HomeScreen extends AppCompatActivity {
         });
 
         btnPickImage.setOnClickListener(view -> {
-            firebaseManager = FirebaseManager.getInstance(this);
             mainController.getImageController().pickMultipleImages();
         });
     }
@@ -69,7 +71,9 @@ public class HomeScreen extends AppCompatActivity {
         Toast.makeText(this, "onResume", Toast.LENGTH_SHORT).show();
         super.onResume();
 
-        imageAdapter = new ImageAdapter(this, imagePaths);
+        imageURIs.addAll(mainController.getImageController().getImageURIs());
+
+        imageAdapter = new ImageAdapter(this, imageURIs);
         recyclerMediaView.setLayoutManager(new GridLayoutManager(this, 3));
         recyclerMediaView.setAdapter(imageAdapter);
         imageAdapter.notifyDataSetChanged();

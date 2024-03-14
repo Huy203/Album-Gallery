@@ -1,7 +1,6 @@
 package com.example.albumgallery.model;
 
 public class ImageModel implements Model {
-    private long id;
     private String name;
     private int width;
     private int height;
@@ -24,12 +23,16 @@ public class ImageModel implements Model {
         this.is_favourited = false;
     }
 
-    public long getId() {
-        return id;
-    }
-
-    public void setId(long id) {
-        this.id = id;
+    public ImageModel(String name, int width, int height, long capacity, String created_at, String notice, String remain_time, boolean is_deleted, boolean is_favourited) {
+        this.name = name;
+        this.width = width;
+        this.height = height;
+        this.capacity = capacity;
+        this.created_at = created_at;
+        this.notice = notice;
+        this.remain_time = remain_time;
+        this.is_deleted = is_deleted;
+        this.is_favourited = is_favourited;
     }
 
     public String getName() {
