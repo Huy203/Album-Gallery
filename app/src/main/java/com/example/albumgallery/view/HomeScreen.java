@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.util.Log;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.TextView;
@@ -13,18 +14,20 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.albumgallery.BackgroundProcessingCallback;
 import com.example.albumgallery.FirebaseManager;
 import com.example.albumgallery.R;
 import com.example.albumgallery.controller.MainController;
-import com.example.albumgallery.model.ImageModel;
 import com.example.albumgallery.view.adapter.ImageAdapter;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-public class HomeScreen extends AppCompatActivity {
+public class HomeScreen extends AppCompatActivity implements BackgroundProcessingCallback {
     private static final int CAMERA_REQUEST_CODE = 100;
+
+    private boolean isBackgroundTaskCompleted = true;
     private RecyclerView recyclerMediaView;
     private List<String> imageURIs; //contains the list of image encoded.
     private ImageAdapter imageAdapter; //adapter for the recycler view
@@ -41,7 +44,6 @@ public class HomeScreen extends AppCompatActivity {
 
         // Fetch images from DB
         imageURIs = new ArrayList<>();
-        imageURIs.addAll(mainController.getImageController().getAllImageURLs());
 
         imageAdapter = new ImageAdapter(this, imageURIs);
         recyclerMediaView = findViewById(R.id.recyclerMediaView);
@@ -61,7 +63,8 @@ public class HomeScreen extends AppCompatActivity {
         });
 
         btnPickImage.setOnClickListener(view -> {
-            mainController.getImageController().pickMultipleImages();
+            isBackgroundTaskCompleted = false;
+            mainController.getImageController().pickMultipleImages(this);
         });
     }
 
@@ -70,13 +73,8 @@ public class HomeScreen extends AppCompatActivity {
     protected void onResume() {
         Toast.makeText(this, "onResume", Toast.LENGTH_SHORT).show();
         super.onResume();
-
-        imageURIs.addAll(mainController.getImageController().getImageURIs());
-
-        imageAdapter = new ImageAdapter(this, imageURIs);
-        recyclerMediaView.setLayoutManager(new GridLayoutManager(this, 3));
-        recyclerMediaView.setAdapter(imageAdapter);
-        imageAdapter.notifyDataSetChanged();
+        if (isBackgroundTaskCompleted)
+            updateUI();
     }
 
     @Override
@@ -91,6 +89,24 @@ public class HomeScreen extends AppCompatActivity {
         if (intent.resolveActivity(getPackageManager()) != null) {
             startActivityForResult(intent, CAMERA_REQUEST_CODE);
         }
+    }
+
+    private void updateUI() {
+        imageURIs.clear();
+        imageURIs.addAll(mainController.getImageController().getAllImageURLs());
+        Log.v("ImageURIs", mainController.getImageController().getAllImageURLs().toString());
+
+        imageAdapter = new ImageAdapter(this, imageURIs);
+        recyclerMediaView.setLayoutManager(new GridLayoutManager(this, 3));
+        recyclerMediaView.setAdapter(imageAdapter);
+        imageAdapter.notifyDataSetChanged();
+    }
+
+    @Override
+    public void onBackgroundTaskCompleted() {
+        Log.v("HomeScreen", "onBackgroundTaskCompleted");
+        isBackgroundTaskCompleted = true;
+        updateUI();
     }
 }
 

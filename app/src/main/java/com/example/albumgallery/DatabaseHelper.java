@@ -137,10 +137,13 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         }
     }
 
-    public void insert(String table, Model model) {
+    public long insert(String table, Model model) {
         Log.v("DatabaseHelper", "Inserting data");
         SQLiteDatabase db = getWritableDatabase();
+        Log.v("DatabaseHelper", "LastID: "+ getLastId(table));
         db.execSQL(model.insert());
+        Log.v("DatabaseHelper", "LastID: "+ getLastId(table));
+        return getLastId(table);
     }
 
     public void update(String table, String column, String value, String where) {

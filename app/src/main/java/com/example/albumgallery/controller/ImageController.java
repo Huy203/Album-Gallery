@@ -15,11 +15,12 @@ import android.util.Log;
 
 import androidx.annotation.NonNull;
 
+import com.example.albumgallery.BackgroundProcessingCallback;
 import com.example.albumgallery.DatabaseHelper;
 import com.example.albumgallery.FirebaseManager;
 import com.example.albumgallery.model.ImageModel;
 import com.example.albumgallery.model.Model;
-import com.google.android.gms.tasks.OnCompleteListener;
+import com.example.albumgallery.view.HomeScreen;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
@@ -38,20 +39,12 @@ public class ImageController implements Controller {
     private final Activity activity;
     private final DatabaseHelper dbHelper;
     private final FirebaseManager firebaseManager;
-    private final List<String> imageURIs = new ArrayList<>();
+    private final List<Long> idSelectedImages = new ArrayList<>();
 
     public ImageController(Activity activity) {
         this.activity = activity;
         this.dbHelper = new DatabaseHelper(activity);
         this.firebaseManager = FirebaseManager.getInstance(activity);
-    }
-
-    public void setImageURIs(List<String> imageURIs) {
-        this.imageURIs.addAll(imageURIs);
-    }
-
-    public List<String> getImageURIs() {
-        return imageURIs;
     }
 
     public void create(String name, int width, int height, long capacity, String dateAdded) {
@@ -61,7 +54,7 @@ public class ImageController implements Controller {
 
     @Override
     public void insert(Model model) {
-        dbHelper.insert("Image", model);
+        idSelectedImages.add(dbHelper.insert("Image", model));
         dbHelper.close();
     }
 
@@ -79,8 +72,8 @@ public class ImageController implements Controller {
         dbHelper.close();
     }
 
-    public void pickMultipleImages() {
-        imageURIs.clear(); // Clear the list of image URIs previously selected
+    public void pickMultipleImages(BackgroundProcessingCallback callback) {
+        idSelectedImages.clear(); // Clear the list of image previously selected
         Intent intent = new Intent(Intent.ACTION_GET_CONTENT, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
         intent.setAction(Intent.ACTION_PICK);
         intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
@@ -106,10 +99,32 @@ public class ImageController implements Controller {
             }
         }
 
+        List<Task<Uri>> uploadTasks = new ArrayList<>();
         for (Uri uri : imageUris) {
             retrieveDataImageFromURL(uri);
-            uploadImage(uri);
-            imageURIs.add(uri.toString());
+            uploadTasks.add(uploadImage(uri));
+        }
+
+        for (Task<Uri> task : uploadTasks) {
+
+            task.addOnCompleteListener(task1 -> {
+                if (task1.isSuccessful()) {
+                    try {
+                        Uri uriImage = task1.getResult(); // The uri with the location of the file in firebase
+                        update("ref", uriImage.toString(), "id = " + idSelectedImages.get(uploadTasks.indexOf(task1))); // Update the reference of the image
+                        Log.v("Image", "Image uploaded" + " at " + idSelectedImages.get(uploadTasks.indexOf(task1)));
+                        if(allTasksCompleted(uploadTasks)){
+                            activity.runOnUiThread(() -> {
+                                ((HomeScreen) activity).onBackgroundTaskCompleted();
+                            });
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                } else {
+
+                }
+            });
         }
     }
 
@@ -139,7 +154,7 @@ public class ImageController implements Controller {
         }
     }
 
-    private void uploadImage(Uri uri) {
+    private Task<Uri> uploadImage(Uri uri) {
         String extensionName = getExtensionName(uri);
 
         // Create file metadata including the content type
@@ -161,7 +176,7 @@ public class ImageController implements Controller {
                 taskSnapshot.getMetadata();
             }
         });
-        Task<Uri> urlTask = uploadTask.continueWithTask(task -> {
+        return uploadTask.continueWithTask(task -> {
             if (!task.isSuccessful()) {
                 throw Objects.requireNonNull(task.getException());
             }
@@ -169,17 +184,16 @@ public class ImageController implements Controller {
             // Continue with the task to get the download URL
             return imageRef.getDownloadUrl();
 
-        }).addOnCompleteListener(new OnCompleteListener<Uri>() {
-            @Override
-            public void onComplete(@NonNull Task<Uri> task) {
-                if (task.isSuccessful()) {
-                    Uri uriImage = task.getResult(); // The uri with the location of the file in firebase
-                    update("ref", uriImage.toString(), "id = " + dbHelper.getLastId("Image")); // Update the reference of the image
-                    Log.v("Image", "Image uploaded" + " " + uriImage.toString());
-                } else {
-                }
-            }
         });
+    }
+
+    private boolean allTasksCompleted(List<Task<Uri>> tasks) {
+        for (Task<Uri> task : tasks) {
+            if (!task.isSuccessful()) {
+                return false;
+            }
+        }
+        return true;
     }
 
     public String getExtensionName(Uri uri) {
@@ -187,7 +201,7 @@ public class ImageController implements Controller {
         return fileName.split("\\.")[fileName.split("\\.").length - 1];
     }
 
-    public List<ImageModel> getAllImages(){
+    public List<ImageModel> getAllImages() {
         List<String> data = dbHelper.getAll("Image");
         List<ImageModel> imageModels = new ArrayList<>();
         for (String s : data) {
@@ -196,7 +210,14 @@ public class ImageController implements Controller {
         }
         return imageModels;
     }
-    public List<String> getAllImageURLs(){
+
+    public List<String> getAllImageURLs() {
         return dbHelper.select("Image", "ref", null);
+    }
+
+    public List<String> getSelectedImageURLs() {
+        final String replace = idSelectedImages.toString().replace("[", "").replace("]", "");
+        Log.v("Image", "Selected images: " + "ref" + "id IN (" + replace + ")");
+        return dbHelper.select("Image", "ref", "id IN (" + replace + ")");
     }
 }

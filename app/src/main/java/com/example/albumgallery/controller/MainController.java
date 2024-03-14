@@ -16,11 +16,6 @@ public class MainController {
         imageController = new ImageController(activity);
     }
 
-    public void insert(String table, Model model) {
-        // Insert data
-        dbHelper.insert(table, model);
-    }
-
     public AlbumController getAlbumController() {
         return albumController;
     }
