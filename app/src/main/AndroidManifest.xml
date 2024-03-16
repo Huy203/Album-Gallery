@@ -32,7 +32,9 @@
         </activity>
         <activity android:name=".view.EditImageActivity" />
         <activity android:name=".view.DetailPicture" />
-
+        <activity android:name=".view.AlbumActivity" />
+        <activity android:name=".view.LoginScreen" />
+        <activity android:name=".view.RegisterScreen" />
 
     </application>
 </manifest>

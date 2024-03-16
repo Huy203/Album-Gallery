@@ -2,6 +2,7 @@ package com.example.albumgallery.view;
 import com.bumptech.glide.Glide;
 import com.example.albumgallery.R;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
@@ -9,9 +10,9 @@ import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.widget.ImageView;
-import androidx.appcompat.app.AppCompatActivity;
+
 import androidx.appcompat.app.AlertDialog;
-import android.content.DialogInterface;
+import androidx.appcompat.app.AppCompatActivity;
 
 public class DetailPicture extends AppCompatActivity {
 
@@ -24,7 +25,7 @@ public class DetailPicture extends AppCompatActivity {
         ImageView pencilButton = findViewById(R.id.pencilButton);
         ImageView ellipsisButton = findViewById(R.id.ellipsisButton);
 
-        pencilButton.setOnClickListener(v->{
+        pencilButton.setOnClickListener(v -> {
             Intent intent = new Intent(DetailPicture.this, EditImageActivity.class);
             // truyền ảnh sang edit image activity
             String imagePath = getIntent().getStringExtra("imagePath");

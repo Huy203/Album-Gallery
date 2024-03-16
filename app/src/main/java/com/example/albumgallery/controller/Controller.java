@@ -1,19 +1,11 @@
 package com.example.albumgallery.controller;
 
-import android.content.Context;
-
-import com.example.albumgallery.DatabaseHelper;
 import com.example.albumgallery.model.Model;
 
-public class Controller {
-    private DatabaseHelper dbHelper;
+public interface Controller {
+    void insert(Model model); // Insert a model
 
-    public Controller(Context context) {
-        dbHelper = new DatabaseHelper(context);
-    }
+    void update(String column, String value, String where); // Update a model
 
-    public void insert (String table, Model model) {
-        // Insert data
-        dbHelper.insert(table, model);
-    }
+    void delete(String where); // Delete a model
 }
