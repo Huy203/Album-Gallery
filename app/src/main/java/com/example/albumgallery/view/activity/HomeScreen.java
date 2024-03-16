@@ -1,4 +1,4 @@
-package com.example.albumgallery.view;
+package com.example.albumgallery.view.activity;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;
@@ -14,25 +14,23 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.albumgallery.BackgroundProcessingCallback;
-import com.example.albumgallery.FirebaseManager;
 import com.example.albumgallery.R;
 import com.example.albumgallery.controller.MainController;
 import com.example.albumgallery.view.adapter.ImageAdapter;
+import com.example.albumgallery.view.adapter.ImageAdapterListener;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-public class HomeScreen extends AppCompatActivity implements BackgroundProcessingCallback {
+public class HomeScreen extends AppCompatActivity implements BackgroundProcessingCallback, ImageAdapterListener {
     private static final int CAMERA_REQUEST_CODE = 100;
-
     private boolean isBackgroundTaskCompleted = true;
     private RecyclerView recyclerMediaView;
     private List<String> imageURIs; //contains the list of image encoded.
     private ImageAdapter imageAdapter; //adapter for the recycler view
     private MainController mainController; //controller contains other controllers
-    private FirebaseManager firebaseManager; //firebase manager to handle firebase operations
+    TextView numberOfImagesSelected;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,7 +39,6 @@ public class HomeScreen extends AppCompatActivity implements BackgroundProcessin
         setContentView(R.layout.activity_home_screen);
 
         mainController = new MainController(this);
-
         // Fetch images from DB
         imageURIs = new ArrayList<>();
 
@@ -51,7 +48,10 @@ public class HomeScreen extends AppCompatActivity implements BackgroundProcessin
         ImageButton btnCamera = findViewById(R.id.btnCamera);
         btnCamera.setOnClickListener(view -> openCamera());
 
-        Button btnPickImage = findViewById(R.id.btnPickImage);
+        Button btnPickImageFromDevice = findViewById(R.id.btnPickImageFromDevice);
+        Button btnPickMultipleImages = findViewById(R.id.btnPickMultipleImages);
+
+        numberOfImagesSelected = findViewById(R.id.numberOfSelectedImages);
 
         // Trong phương thức onCreate của HomeScreen.java
         TextView textAlbums = findViewById(R.id.textAlbums);
@@ -62,9 +62,21 @@ public class HomeScreen extends AppCompatActivity implements BackgroundProcessin
             finish();
         });
 
-        btnPickImage.setOnClickListener(view -> {
+        btnPickImageFromDevice.setOnClickListener(view -> {
             isBackgroundTaskCompleted = false;
             mainController.getImageController().pickMultipleImages(this);
+        });
+
+        btnPickMultipleImages.setOnClickListener(view -> {
+            if (imageAdapter.toggleMultipleChoiceImagesEnabled()) {
+                btnPickMultipleImages.setText("Cancel");
+                numberOfImagesSelected.setVisibility(TextView.VISIBLE);
+                numberOfImagesSelected.setText("0 images selected");
+            } else {
+                btnPickMultipleImages.setText("Select");
+                numberOfImagesSelected.setVisibility(TextView.GONE);
+                imageAdapter.clearSelectedItems();
+            }
         });
     }
 
@@ -94,8 +106,6 @@ public class HomeScreen extends AppCompatActivity implements BackgroundProcessin
     private void updateUI() {
         imageURIs.clear();
         imageURIs.addAll(mainController.getImageController().getAllImageURLs());
-        Log.v("ImageURIs", mainController.getImageController().getAllImageURLs().toString());
-
         imageAdapter = new ImageAdapter(this, imageURIs);
         recyclerMediaView.setLayoutManager(new GridLayoutManager(this, 3));
         recyclerMediaView.setAdapter(imageAdapter);
@@ -104,9 +114,16 @@ public class HomeScreen extends AppCompatActivity implements BackgroundProcessin
 
     @Override
     public void onBackgroundTaskCompleted() {
-        Log.v("HomeScreen", "onBackgroundTaskCompleted");
         isBackgroundTaskCompleted = true;
         updateUI();
+        isBackgroundTaskCompleted = false;
+    }
+
+    @SuppressLint("SetTextI18n")
+    @Override
+    public void getSelectedItemsCount(int count) {
+        Log.v("SelectedItems", count + " items selected");
+        numberOfImagesSelected.setText(count + " images selected");
     }
 }
 

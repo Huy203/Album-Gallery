@@ -8,7 +8,8 @@ import android.widget.Button;
 import androidx.activity.ComponentActivity;
 import androidx.annotation.Nullable;
 
-import com.example.albumgallery.view.HomeScreen;
+import com.example.albumgallery.view.activity.HomeScreen;
+import com.example.albumgallery.view.activity.LoginScreen;
 
 public class MainActivity extends ComponentActivity {
 
@@ -25,7 +26,7 @@ public class MainActivity extends ComponentActivity {
             startActivity(intent);
         });
         editButton.setOnClickListener(v -> {
-            Intent intent = new Intent(this, com.example.albumgallery.view.LoginScreen.class);
+            Intent intent = new Intent(this, LoginScreen.class);
             startActivity(intent);
         });
 

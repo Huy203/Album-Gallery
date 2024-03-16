@@ -1,4 +1,4 @@
-package com.example.albumgallery.view;
+package com.example.albumgallery.view.activity;
 import com.bumptech.glide.Glide;
 import com.example.albumgallery.R;
 

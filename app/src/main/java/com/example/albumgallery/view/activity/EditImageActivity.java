@@ -1,33 +1,25 @@
-package com.example.albumgallery.view;
 
-import com.bumptech.glide.Glide;
-import com.example.albumgallery.R;
+package com.example.albumgallery.view.activity;
 
+import android.annotation.SuppressLint;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
-import android.widget.ImageView;
-import android.widget.TextView;
-
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
-
+import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
-import android.widget.Toast;
+import android.widget.ImageView;
 
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.view.GestureDetectorCompat;
 import androidx.core.widget.NestedScrollView;
 
-import android.view.GestureDetector;
-
-import android.content.DialogInterface;
-
-import androidx.appcompat.app.AlertDialog;
-
-import android.graphics.Matrix;
+import com.bumptech.glide.Glide;
+import com.example.albumgallery.R;
+import com.example.albumgallery.view.CropImageActivity;
 
 
 public class EditImageActivity extends AppCompatActivity {
@@ -37,6 +29,7 @@ public class EditImageActivity extends AppCompatActivity {
     private float startX, startY, imageX, imageY;
     private static final int REQUEST_IMAGE_CROP = 101;
 
+    @SuppressLint("ClickableViewAccessibility")
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -55,25 +48,22 @@ public class EditImageActivity extends AppCompatActivity {
         ImageView rotateButton = findViewById(R.id.rotateButton);
         ImageView cutButton = findViewById(R.id.cutButton);
 
-        memeImageView.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                switch (event.getActionMasked()) {
-                    case MotionEvent.ACTION_DOWN:
-                        startX = event.getX();
-                        startY = event.getY();
-                        imageX = memeImageView.getX();
-                        imageY = memeImageView.getY();
-                        break;
-                    case MotionEvent.ACTION_MOVE:
-                        float dx = event.getX() - startX;
-                        float dy = event.getY() - startY;
-                        memeImageView.setX(imageX + dx);
-                        memeImageView.setY(imageY + dy);
-                        break;
-                }
-                return true;
+        memeImageView.setOnTouchListener((v, event) -> {
+            switch (event.getActionMasked()) {
+                case MotionEvent.ACTION_DOWN:
+                    startX = event.getX();
+                    startY = event.getY();
+                    imageX = memeImageView.getX();
+                    imageY = memeImageView.getY();
+                    break;
+                case MotionEvent.ACTION_MOVE:
+                    float dx = event.getX() - startX;
+                    float dy = event.getY() - startY;
+                    memeImageView.setX(imageX + dx);
+                    memeImageView.setY(imageY + dy);
+                    break;
             }
+            return true;
         });
 
         gestureDetector = new GestureDetectorCompat(this, new GestureDetector.SimpleOnGestureListener() {
@@ -136,7 +126,6 @@ public class EditImageActivity extends AppCompatActivity {
                 startImageCropActivity();
             }
         });
-
         // lấy ảnh từ detail image activity sang edit image activity
         String imagePath = getIntent().getStringExtra("imagePath");
         ImageView memeImageView = findViewById(R.id.memeImageView);
