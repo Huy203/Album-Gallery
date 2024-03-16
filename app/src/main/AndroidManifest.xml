@@ -35,6 +35,7 @@
         <activity android:name=".view.AlbumActivity" />
         <activity android:name=".view.LoginScreen" />
         <activity android:name=".view.RegisterScreen" />
+        <activity android:name=".view.CropImageActivity" />
 
     </application>
 </manifest>
