@@ -1,4 +1,4 @@
-package com.example.albumgallery.view;
+package com.example.albumgallery.view.activity;
 import com.example.albumgallery.R;
 
 import android.content.Intent;
