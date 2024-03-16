@@ -15,6 +15,7 @@ import com.example.albumgallery.R;
 import com.example.albumgallery.view.DetailPicture;
 import com.example.albumgallery.view.EditImageActivity;
 
+import java.util.Collections;
 import java.util.List;
 
 public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> {
@@ -68,4 +69,8 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> 
             imageView = itemView.findViewById(R.id.imageView);
         }
     }
+    // Xử lý sắp xếp hình ảnh theo ngày
+    public void sortImageByDate() {
+    }
+
 }
