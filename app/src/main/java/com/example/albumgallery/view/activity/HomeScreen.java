@@ -68,7 +68,7 @@ public class HomeScreen extends AppCompatActivity implements BackgroundProcessin
         });
 
         btnPickMultipleImages.setOnClickListener(view -> {
-            if (imageAdapter.toggleMultipleChooseImagesEnabled()) {
+            if (imageAdapter.toggleMultipleChoiceImagesEnabled()) {
                 btnPickMultipleImages.setText("Cancel");
                 numberOfImagesSelected.setVisibility(TextView.VISIBLE);
                 numberOfImagesSelected.setText("0 images selected");

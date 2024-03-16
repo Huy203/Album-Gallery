@@ -25,7 +25,7 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> 
     private final Context context;
     private final List<String> imagePaths;
     private final SparseBooleanArray selectedItems;
-    private boolean isMultipleChoose = false;
+    private boolean isMultipleChoice = false;
     private final ImageAdapterListener listener;
 
     public ImageAdapter(Activity activity, List<String> imagePaths) {
@@ -53,7 +53,7 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> 
         Glide.with(context).load(Uri.parse(imagePath)).into(holder.imageView);
 
         holder.itemView.setOnClickListener(view -> {
-            if (!isMultipleChoose) {
+            if (!isMultipleChoice) {
                 Intent intent = new Intent(view.getContext(), DetailPicture.class);
                 intent.putExtra("imagePath", imagePath);
                 view.getContext().startActivity(intent);
@@ -73,12 +73,12 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> 
         });
     }
 
-    public void setMultipleChooseEnabled(boolean isMultipleChoose) {
-        this.isMultipleChoose = isMultipleChoose;
+    public void setMultipleChoiceEnabled(boolean isMultipleChoice) {
+        this.isMultipleChoice = isMultipleChoice;
     }
 
-    public boolean getMultipleChooseImagesEnabled() {
-        return isMultipleChoose;
+    public boolean getMultipleChoiceImagesEnabled() {
+        return isMultipleChoice;
     }
 
     public int getItemCount() {
@@ -86,17 +86,17 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> 
         else return 0;
     }
 
-    public boolean toggleMultipleChooseImagesEnabled() {
-        Log.v("ImageAdapter", "toggleMultipleChooseImagesEnabled: " + listener);
+    public boolean toggleMultipleChoiceImagesEnabled() {
+        Log.v("ImageAdapter", "toggleMultipleChoiceImagesEnabled: " + listener);
         if (listener != null) {
-            setMultipleChooseEnabled(!isMultipleChoose);
+            setMultipleChoiceEnabled(!isMultipleChoice);
         }
-        if (getMultipleChooseImagesEnabled()) {
+        if (getMultipleChoiceImagesEnabled()) {
             View view = LayoutInflater.from(context).inflate(R.layout.item_image, null);
             CheckBox checkBox = view.findViewById(R.id.checkbox);
             checkBox.setVisibility(View.INVISIBLE);
         }
-        return isMultipleChoose;
+        return isMultipleChoice;
     }
 
     public void clearSelectedItems() {
