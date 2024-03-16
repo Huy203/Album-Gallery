@@ -1,4 +1,4 @@
-package com.example.albumgallery.view;
+package com.example.albumgallery.view.activity;
 
 import android.annotation.SuppressLint;
 import android.content.ClipData;

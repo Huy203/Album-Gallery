@@ -15,12 +15,12 @@ import android.util.Log;
 
 import androidx.annotation.NonNull;
 
-import com.example.albumgallery.BackgroundProcessingCallback;
+import com.example.albumgallery.view.activity.BackgroundProcessingCallback;
 import com.example.albumgallery.DatabaseHelper;
 import com.example.albumgallery.FirebaseManager;
 import com.example.albumgallery.model.ImageModel;
 import com.example.albumgallery.model.Model;
-import com.example.albumgallery.view.HomeScreen;
+import com.example.albumgallery.view.activity.HomeScreen;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;

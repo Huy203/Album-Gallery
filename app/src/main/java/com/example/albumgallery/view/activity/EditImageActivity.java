@@ -1,4 +1,4 @@
-package com.example.albumgallery.view;
+package com.example.albumgallery.view.activity;
 import com.bumptech.glide.Glide;
 import com.example.albumgallery.R;
 
@@ -6,12 +6,12 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.widget.ImageView;
-import android.widget.TextView;
+
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import android.view.MotionEvent;
 import android.view.View;
-import android.widget.Toast;
+
 import androidx.core.view.GestureDetectorCompat;
 import androidx.core.widget.NestedScrollView;
 import android.view.GestureDetector;
