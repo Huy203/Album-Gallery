@@ -4,6 +4,9 @@ import com.example.albumgallery.R;
 
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.widget.ImageView;
@@ -24,6 +27,9 @@ public class DetailPicture extends AppCompatActivity {
 
         pencilButton.setOnClickListener(v -> {
             Intent intent = new Intent(DetailPicture.this, EditImageActivity.class);
+            // truyền ảnh sang edit image activity
+            String imagePath = getIntent().getStringExtra("imagePath");
+            intent.putExtra("imagePath", imagePath);
             startActivity(intent);
             finish();
         });

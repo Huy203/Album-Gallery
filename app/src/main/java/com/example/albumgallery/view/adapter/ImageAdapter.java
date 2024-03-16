@@ -19,6 +19,7 @@ import com.bumptech.glide.Glide;
 import com.example.albumgallery.R;
 import com.example.albumgallery.view.activity.DetailPicture;
 
+import java.util.Collections;
 import java.util.List;
 
 public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> {
@@ -114,4 +115,8 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> 
             checkbox = itemView.findViewById(R.id.checkbox);
         }
     }
+    // Xử lý sắp xếp hình ảnh theo ngày
+    public void sortImageByDate() {
+    }
+
 }

@@ -1,7 +1,9 @@
 package com.example.albumgallery.view.activity;
+import com.bumptech.glide.Glide;
 import com.example.albumgallery.R;
 
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.widget.ImageView;
 
@@ -92,6 +94,12 @@ public class EditImageActivity extends AppCompatActivity {
                 memeImageView.setRotation(memeImageView.getRotation() + 90);
             }
         });
+        // lấy ảnh từ detail image activity sang edit image activity
+        String imagePath = getIntent().getStringExtra("imagePath");
+        ImageView memeImageView = findViewById(R.id.memeImageView);
+        Glide.with(this).load(imagePath).into(memeImageView);
+
+
     }
     private boolean isMotionEventInsideView(float x, float y, View view) {
         int[] location = new int[2];
