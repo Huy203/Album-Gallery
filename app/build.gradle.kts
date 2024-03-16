@@ -75,7 +75,7 @@ dependencies {
 //    Google Play services Places SDK
     implementation("com.google.android.gms:play-services-places:17.0.0")
 //    Google Play services Auth SDK
-    implementation("com.google.android.gms:play-services-auth:20.7.0")
+    implementation("com.google.android.gms:play-services-auth:21.0.0")
     androidTestImplementation(platform("androidx.compose:compose-bom:2023.08.00"))
     androidTestImplementation("androidx.compose.ui:ui-test-junit4")
     androidTestImplementation(platform("androidx.compose:compose-bom:2023.08.00"))
