@@ -15,7 +15,9 @@ import com.example.albumgallery.R;
 import com.example.albumgallery.view.DetailPicture;
 import com.example.albumgallery.view.EditImageActivity;
 
+import java.io.File;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> {
@@ -69,8 +71,25 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> 
             imageView = itemView.findViewById(R.id.imageView);
         }
     }
-    // Xử lý sắp xếp hình ảnh theo ngày
+    // Xử lý sắp xếp hình ảnh theo date
     public void sortImageByDate() {
+        Collections.sort(imagePaths, new Comparator<String>() {
+            @Override
+            public int compare(String path_1, String path_2) {
+                long date_1 = getImageDate(path_1);
+                long date_2 = getImageDate(path_2);
+                return Long.compare(date_1, date_2);
+            }
+        });
+        notifyDataSetChanged();
     }
 
+    private long getImageDate(String imagePath) {
+        File imageFile = new File(imagePath);
+        if(imageFile.exists()) {
+            return imageFile.lastModified();
+        } else {
+            return 0;
+        }
+    }
 }

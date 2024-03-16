@@ -127,7 +127,6 @@ public class ImageController implements Controller {
             });
         }
     }
-
     @SuppressLint("Range")
     private void retrieveDataImageFromURL(Uri uri) {
         try (Cursor cursor = activity.getContentResolver().query(uri, PROJECTION, null, null, null)) {
