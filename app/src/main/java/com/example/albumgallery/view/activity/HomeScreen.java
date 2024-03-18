@@ -1,7 +1,10 @@
 package com.example.albumgallery.view.activity;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.util.Log;
@@ -10,6 +13,7 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -18,6 +22,8 @@ import com.example.albumgallery.R;
 import com.example.albumgallery.controller.MainController;
 import com.example.albumgallery.view.adapter.ImageAdapter;
 import com.example.albumgallery.view.adapter.ImageAdapterListener;
+import com.google.android.gms.tasks.Task;
+import com.google.android.gms.tasks.Tasks;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,6 +37,8 @@ public class HomeScreen extends AppCompatActivity implements BackgroundProcessin
     private ImageAdapter imageAdapter; //adapter for the recycler view
     private MainController mainController; //controller contains other controllers
     TextView numberOfImagesSelected;
+    List<String> selectedImageURLs;
+    List<Task> selectedImageURLsTask;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,6 +49,8 @@ public class HomeScreen extends AppCompatActivity implements BackgroundProcessin
         mainController = new MainController(this);
         // Fetch images from DB
         imageURIs = new ArrayList<>();
+        selectedImageURLs = new ArrayList<>();
+        selectedImageURLsTask = new ArrayList<>();
 
         imageAdapter = new ImageAdapter(this, imageURIs);
         recyclerMediaView = findViewById(R.id.recyclerMediaView);
@@ -50,6 +60,7 @@ public class HomeScreen extends AppCompatActivity implements BackgroundProcessin
 
         Button btnPickImageFromDevice = findViewById(R.id.btnPickImageFromDevice);
         Button btnPickMultipleImages = findViewById(R.id.btnPickMultipleImages);
+        Button btnDeleteMultipleImages = findViewById(R.id.btnDeleteMultipleImages);
 
         numberOfImagesSelected = findViewById(R.id.numberOfSelectedImages);
 
@@ -65,6 +76,11 @@ public class HomeScreen extends AppCompatActivity implements BackgroundProcessin
         btnPickImageFromDevice.setOnClickListener(view -> {
             isBackgroundTaskCompleted = false;
             mainController.getImageController().pickMultipleImages(this);
+        });
+
+        btnDeleteMultipleImages.setOnClickListener(view -> {
+            // mainController.getImageController().deleteSelectedImageAtHomeScreeen(selectedImageURLsTask, 1);
+            showDeleteConfirmationDialog();
         });
 
         btnPickMultipleImages.setOnClickListener(view -> {
@@ -124,9 +140,34 @@ public class HomeScreen extends AppCompatActivity implements BackgroundProcessin
     public void getSelectedItemsCount(int count) {
         Log.v("SelectedItems", count + " items selected");
         numberOfImagesSelected.setText(count + " images selected");
+
+//        List<Task<Uri>> task =  new ArrayList<>();
+//        for (String uri : imageURIs) {
+//            task.add(Tasks.forResult(Uri.parse(uri)));
+//        }
+
+        for(int i = 0; i < count; i++) {
+            selectedImageURLsTask.add(Tasks.forResult(Uri.parse(imageURIs.get(i))));
+            Log.d("Deleted images task", selectedImageURLsTask.get(i).getResult().toString());
+        }
+
+        for(int i = 0; i < count; i++) {
+            selectedImageURLs.add(imageURIs.get(i));
+            Log.d("Deleted images", selectedImageURLs.get(i));
+        }
+    }
+    private void showDeleteConfirmationDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Confirm Deletion");
+        builder.setMessage("Are you sure you want to delete this image?");
+        builder.setPositiveButton("Delete", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                // Call deleteSelectedImage() method from ImageController
+                mainController.getImageController().deleteSelectedImageAtHomeScreeen(selectedImageURLsTask);
+            }
+        });
+        builder.setNegativeButton("Cancel", null);
+        builder.show();
     }
 }
-
-
-
-
