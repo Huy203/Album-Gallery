@@ -105,7 +105,9 @@ public class HomeScreen extends AppCompatActivity implements BackgroundProcessin
 
     private void updateUI() {
         imageURIs.clear();
-        imageURIs.addAll(mainController.getImageController().getAllImageURLs());
+//        imageURIs.addAll(mainController.getImageController().getAllImageURLs());
+        // lấy ảnh sort theo date (mới nhất xếp trước).
+        imageURIs.addAll(mainController.getImageController().getAllImageURLsSortByDate());
         imageAdapter = new ImageAdapter(this, imageURIs);
         recyclerMediaView.setLayoutManager(new GridLayoutManager(this, 3));
         recyclerMediaView.setAdapter(imageAdapter);
