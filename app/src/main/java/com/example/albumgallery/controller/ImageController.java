@@ -128,6 +128,18 @@ public class ImageController implements Controller {
             });
         }
     }
+    public void handleImageFromCamera(Uri imageUri) {
+        retrieveDataImageFromURL(imageUri);
+        List<String> data;
+        try {
+            data = dbHelper.select("Image", "id", null);
+            String id = data.get(0);
+            update("ref", imageUri.toString(), "id = " + id);
+            Toast.makeText(activity, "Saved image successfully !", Toast.LENGTH_SHORT).show();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
     @SuppressLint("Range")
     private void retrieveDataImageFromURL(Uri uri) {
         try (Cursor cursor = activity.getContentResolver().query(uri, PROJECTION, null, null, null)) {

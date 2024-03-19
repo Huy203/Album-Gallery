@@ -2,7 +2,10 @@ package com.example.albumgallery.view.activity;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.widget.Button;
@@ -19,6 +22,9 @@ import com.example.albumgallery.controller.MainController;
 import com.example.albumgallery.view.adapter.ImageAdapter;
 import com.example.albumgallery.view.adapter.ImageAdapterListener;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -93,8 +99,14 @@ public class HomeScreen extends AppCompatActivity implements BackgroundProcessin
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         mainController.getImageController().onActivityResult(requestCode, resultCode, data);
-    }
+        if(requestCode == CAMERA_REQUEST_CODE && resultCode == RESULT_OK && data != null) {
+            if(data.getData() != null) {
+                Uri imageUri = data.getData();
+                mainController.getImageController().handleImageFromCamera(imageUri);
+            }
 
+        }
+    }
     // function to open camera on Emulator
     private void openCamera() {
         Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
