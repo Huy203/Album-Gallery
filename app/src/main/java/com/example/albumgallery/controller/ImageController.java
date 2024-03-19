@@ -25,10 +25,15 @@ import com.example.albumgallery.view.activity.HomeScreen;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.Firebase;
+import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageMetadata;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -47,6 +52,9 @@ public class ImageController implements Controller {
         this.dbHelper = new DatabaseHelper(activity);
         this.firebaseManager = FirebaseManager.getInstance(activity);
     }
+    private DatabaseHelper getDbHelper(){
+        return dbHelper;
+    }
 
     public void create(String name, int width, int height, long capacity, String dateAdded) {
         ImageModel imageModel = new ImageModel(name, width, height, capacity, dateAdded);
@@ -57,6 +65,8 @@ public class ImageController implements Controller {
     public void insert(Model model) {
         idSelectedImages.add(dbHelper.insert("Image", model));
         dbHelper.close();
+        firebaseManager.getStorage();
+        // FirebaseStorage storage = FirebaseStorage.getInstance();
     }
 
     @Override
@@ -69,7 +79,7 @@ public class ImageController implements Controller {
     @Override
     public void delete(String where) {
         // Delete an image
-//        dbHelper.delete("Image", where);
+        dbHelper.delete("Image", where);
         dbHelper.close();
     }
 
@@ -236,5 +246,71 @@ public class ImageController implements Controller {
         final String replace = idSelectedImages.toString().replace("[", "").replace("]", "");
         Log.v("Image", "Selected images: " + "ref" + "id IN (" + replace + ")");
         return dbHelper.select("Image", "ref", "id IN (" + replace + ")");
+    }
+    private String parseURL(String url){
+        String filename = null;
+        try {
+            // Parse the URL
+            URI uri = new URI(url);
+
+            // Extract filename
+            filename = Paths.get(uri.getPath()).getFileName().toString();
+        } catch (URISyntaxException e) {
+            e.printStackTrace();
+        }
+        filename = "images/" + filename;
+        return filename;
+    }
+
+    public void deleteSelectedImage(String imageURL){
+        String URL = parseURL(imageURL);
+        Log.d("URL", URL);
+
+        FirebaseStorage storage = FirebaseStorage.getInstance();
+        // Create a storage reference from our app
+        StorageReference storageRef = storage.getReference();
+
+        // Create a reference to the file to delete
+        StorageReference desertRef = storageRef.child(URL);
+
+        // Delete the file
+        desertRef.delete().addOnSuccessListener(new OnSuccessListener<Void>() {
+            @Override
+            public void onSuccess(Void aVoid) {
+                // File deleted successfully
+                delete("ref = '" + imageURL + "'");
+                Toast.makeText(activity, "Image deleted successfully", Toast.LENGTH_SHORT).show();
+                // You may want to update your local data or UI here if necessary.
+                Intent intent = new Intent(activity, HomeScreen.class);
+                activity.startActivity(intent);
+                activity.finish();
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception exception) {
+                // Uh-oh, an error occurred!
+                Toast.makeText(activity, "Image deleted failed", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+    public String checkExistURL(String longImageURL){
+        String[] parts = longImageURL.split("/");
+        String imageURL = parts[parts.length - 1];
+
+        getDbHelper().select("image", "ref", null);
+
+        // Get all image URLs
+        List<String> imageURLs = getAllImageURLs();
+        Log.d("size", String.valueOf(imageURLs.size()));
+        Log.d("ImageURLs", "Image URLs: " + imageURLs);
+        Log.d("ImagePath", "Image Path: " + imageURL);
+
+        // Check if the current imageURL exists in the list
+        for (String url : imageURLs) {
+            if (url.contains(imageURL)) {
+                return url;
+            }
+        }
+        return null;
     }
 }
