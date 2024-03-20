@@ -30,7 +30,7 @@ import java.util.List;
 import java.util.Objects;
 
 public class HomeScreen extends AppCompatActivity implements BackgroundProcessingCallback, ImageAdapterListener {
-    private static final int CAMERA_REQUEST_CODE = 100;
+    private static final int CAMERA_REQUEST_CODE = 1000;
     private boolean isBackgroundTaskCompleted = true;
     private RecyclerView recyclerMediaView;
     private List<String> imageURIs; //contains the list of image encoded.
@@ -98,14 +98,14 @@ public class HomeScreen extends AppCompatActivity implements BackgroundProcessin
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        mainController.getImageController().onActivityResult(requestCode, resultCode, data);
-        if(requestCode == CAMERA_REQUEST_CODE && resultCode == RESULT_OK && data != null) {
-            if(data.getData() != null) {
-                Uri imageUri = data.getData();
-                mainController.getImageController().handleImageFromCamera(imageUri);
+        if(data != null) {
+            if (data.getData() == null) {
+                Log.d("Check data", "is null");
+            } else {
+                Log.d("Check data", "is not null");
             }
-
         }
+        mainController.getImageController().onActivityResult(requestCode, resultCode, data);
     }
     // function to open camera on Emulator
     private void openCamera() {

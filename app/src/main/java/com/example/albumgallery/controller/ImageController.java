@@ -7,8 +7,10 @@ import static com.example.albumgallery.utils.Constant.imageExtensions;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.ClipData;
+import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.provider.MediaStore;
 import android.util.Log;
@@ -31,6 +33,7 @@ import com.google.firebase.storage.StorageMetadata;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 
+import java.io.ByteArrayOutputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.file.Paths;
@@ -46,6 +49,7 @@ public class ImageController implements Controller {
     private final DatabaseHelper dbHelper;
     private final FirebaseManager firebaseManager;
     private final List<Long> idSelectedImages = new ArrayList<>();
+    private static final int CAMERA_REQUEST_CODE = 1000;
 
     public ImageController(Activity activity) {
         this.activity = activity;
@@ -92,9 +96,28 @@ public class ImageController implements Controller {
     }
 
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        Log.d("request code", Integer.toString(requestCode));
         if (requestCode == REQUEST_CODE_PICK_MULTIPLE_IMAGES && resultCode == RESULT_OK && data != null) {
             handleImagePicked(data);
         }
+        // xử lý ảnh chụp từ camera trong app
+        if (requestCode == CAMERA_REQUEST_CODE && resultCode == RESULT_OK && data != null) {
+            Bitmap bitmap = (Bitmap) data.getExtras().get("data");
+            if(bitmap != null) {
+                Uri imageUri = convertFromBitmapToURI(activity, bitmap);
+                handleImageFromCamera(imageUri);
+
+            } else {
+                Log.d("Camera in app",  "Bitmap Image is null");
+            }
+        }
+    }
+    private Uri convertFromBitmapToURI(Context inContext, Bitmap inImage) {
+        String imageName = "IMG_" + System.currentTimeMillis() + ".jpg";
+        ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+        inImage.compress(Bitmap.CompressFormat.JPEG, 100, bytes);
+        String path = MediaStore.Images.Media.insertImage(inContext.getContentResolver(), inImage, imageName, null);
+        return Uri.parse(path);
     }
 
     private void handleImagePicked(Intent data) {
@@ -138,16 +161,26 @@ public class ImageController implements Controller {
             });
         }
     }
-    public void handleImageFromCamera(Uri imageUri) {
+    private void handleImageFromCamera(Uri imageUri) {
         retrieveDataImageFromURL(imageUri);
-        List<String> data;
+        Log.d("Camera in app", "here");
         try {
-            data = dbHelper.select("Image", "id", null);
-            String id = data.get(0);
-            update("ref", imageUri.toString(), "id = " + id);
-            Toast.makeText(activity, "Saved image successfully !", Toast.LENGTH_SHORT).show();
+            Long id = dbHelper.getLastId("Image");
+            String id_string = Long.toString(id);
+            Task<Uri> uploadTask = uploadImage(imageUri);
+            uploadTask.addOnCompleteListener(task -> {
+                if(task.isSuccessful()) {
+                    Uri firebaseURI = task.getResult();
+                    Log.d("test firebase uri", firebaseURI.toString());
+                    update("ref", firebaseURI.toString(), "id = " + id_string);
+                    activity.runOnUiThread(() -> {
+                        ((HomeScreen) activity).onBackgroundTaskCompleted();
+                    });
+                }
+            });
         } catch (Exception e) {
             e.printStackTrace();
+            Log.d("Camera in app", "add and update image fail");
         }
     }
     @SuppressLint("Range")
@@ -313,4 +346,5 @@ public class ImageController implements Controller {
         }
         return null;
     }
+
 }
