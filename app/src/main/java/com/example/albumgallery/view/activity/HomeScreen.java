@@ -60,13 +60,13 @@ public class HomeScreen extends AppCompatActivity implements BackgroundProcessin
         numberOfImagesSelected = findViewById(R.id.numberOfSelectedImages);
 
         // Trong phương thức onCreate của HomeScreen.java
-        TextView textAlbums = findViewById(R.id.textAlbums);
-        textAlbums.setOnClickListener(view -> {
-            // Chuyển sang màn hình mới
-            Intent intent = new Intent(HomeScreen.this, AlbumActivity.class);
-            startActivity(intent);
-            finish();
-        });
+//        TextView textAlbums = findViewById(R.id.textAlbums);
+//        textAlbums.setOnClickListener(view -> {
+//            // Chuyển sang màn hình mới
+//            Intent intent = new Intent(HomeScreen.this, AlbumActivity.class);
+//            startActivity(intent);
+//            finish();
+//        });
 
         btnPickImageFromDevice.setOnClickListener(view -> {
             isBackgroundTaskCompleted = false;
@@ -83,6 +83,13 @@ public class HomeScreen extends AppCompatActivity implements BackgroundProcessin
                 numberOfImagesSelected.setVisibility(TextView.GONE);
                 imageAdapter.clearSelectedItems();
             }
+        });
+
+        ImageButton btnAlbum = findViewById(R.id.btnAlbums);
+        btnAlbum.setOnClickListener(view -> {
+            Intent intent = new Intent(this, AlbumMain.class);
+            startActivity(intent);
+            finish();
         });
     }
 

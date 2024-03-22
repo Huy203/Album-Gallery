@@ -77,10 +77,12 @@
             android:gravity="center"
             android:orientation="vertical">
 
-            <ImageView
+            <ImageButton
                 android:layout_width="30dp"
                 android:layout_height="30dp"
-                android:src="@drawable/photo" />
+                android:src="@drawable/photo"
+                android:scaleType="fitCenter"
+                android:background="?attr/selectableItemBackgroundBorderless"/>
 
             <TextView
                 android:id="@+id/textPhotos"
@@ -97,10 +99,13 @@
             android:gravity="center"
             android:orientation="vertical">
 
-            <ImageView
+            <ImageButton
                 android:layout_width="30dp"
                 android:layout_height="30dp"
-                android:src="@drawable/album" />
+                android:id="@+id/btnAlbums"
+                android:src="@drawable/album"
+                android:scaleType="fitCenter"
+                android:background="?attr/selectableItemBackgroundBorderless"/>
 
             <TextView
                 android:id="@+id/textAlbums"
@@ -117,10 +122,12 @@
             android:gravity="center"
             android:orientation="vertical">
 
-            <ImageView
+            <ImageButton
                 android:layout_width="30dp"
                 android:layout_height="30dp"
-                android:src="@drawable/favourite" />
+                android:src="@drawable/favourite"
+                android:scaleType="fitCenter"
+                android:background="?attr/selectableItemBackgroundBorderless"/>
 
             <TextView
                 android:id="@+id/textFavorites"
