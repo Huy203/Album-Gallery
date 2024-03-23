@@ -4,8 +4,11 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Bitmap;
+
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.widget.Button;
@@ -25,12 +28,15 @@ import com.example.albumgallery.view.adapter.ImageAdapterListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.Tasks;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
 public class HomeScreen extends AppCompatActivity implements BackgroundProcessingCallback, ImageAdapterListener {
-    private static final int CAMERA_REQUEST_CODE = 100;
+    private static final int CAMERA_REQUEST_CODE = 1000;
     private boolean isBackgroundTaskCompleted = true;
     private RecyclerView recyclerMediaView;
     private List<String> imageURIs; //contains the list of image encoded.
@@ -108,9 +114,15 @@ public class HomeScreen extends AppCompatActivity implements BackgroundProcessin
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
+        if(data != null) {
+            if (data.getData() == null) {
+                Log.d("Check data", "is null");
+            } else {
+                Log.d("Check data", "is not null");
+            }
+        }
         mainController.getImageController().onActivityResult(requestCode, resultCode, data);
     }
-
     // function to open camera on Emulator
     private void openCamera() {
         Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
@@ -121,7 +133,9 @@ public class HomeScreen extends AppCompatActivity implements BackgroundProcessin
 
     private void updateUI() {
         imageURIs.clear();
-        imageURIs.addAll(mainController.getImageController().getAllImageURLs());
+//        imageURIs.addAll(mainController.getImageController().getAllImageURLs());
+        // lấy ảnh sort theo date (mới nhất xếp trước).
+        imageURIs.addAll(mainController.getImageController().getAllImageURLsSortByDate());
         imageAdapter = new ImageAdapter(this, imageURIs);
         recyclerMediaView.setLayoutManager(new GridLayoutManager(this, 3));
         recyclerMediaView.setAdapter(imageAdapter);

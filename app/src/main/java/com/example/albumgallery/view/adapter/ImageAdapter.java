@@ -11,6 +11,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -19,7 +20,9 @@ import com.bumptech.glide.Glide;
 import com.example.albumgallery.R;
 import com.example.albumgallery.view.activity.DetailPicture;
 
+import java.io.File;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> {
@@ -115,8 +118,24 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> 
             checkbox = itemView.findViewById(R.id.checkbox);
         }
     }
-    // Xử lý sắp xếp hình ảnh theo ngày
+    // Xử lý sắp xếp hình ảnh theo date
     public void sortImageByDate() {
+        Collections.sort(imagePaths, new Comparator<String>() {
+            @Override
+            public int compare(String path_1, String path_2) {
+                long date_1 = getImageDate(path_1);
+                long date_2 = getImageDate(path_2);
+                return Long.compare(date_1, date_2);
+            }
+        });
     }
 
+    private long getImageDate(String imagePath) {
+        File imageFile = new File(imagePath);
+        if(imageFile.exists()) {
+            return imageFile.lastModified();
+        } else {
+            return 0;
+        }
+    }
 }

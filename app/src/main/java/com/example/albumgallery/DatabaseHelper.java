@@ -11,6 +11,7 @@ import com.example.albumgallery.model.Model;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class DatabaseHelper extends SQLiteOpenHelper {
     //    public static final String DATABASE_NAME = "album_gallery.db";
@@ -177,6 +178,28 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             Log.v("DatabaseHelper", "No data found");
         }
         cursor.close();
+        return data;
+    }
+
+    public List<String> selectImagesSortByDate(String table, String column, String order) {
+        List<String> data = new ArrayList<>();
+        SQLiteDatabase db = getWritableDatabase();
+        String query = "SELECT " + column + " FROM " + table + " ORDER BY created_at";
+        if(Objects.equals(order, "ascending")) {
+            query += " ASC;";
+        } else if ( (Objects.equals(order,"descending"))) {
+            query += " DESC;";
+        }
+        Cursor cursor = db.rawQuery(query, null);
+        if(cursor.moveToFirst()) {
+            while(!cursor.isAfterLast()) {
+                data.add(cursor.getString(0));
+                cursor.moveToNext();
+            }
+            cursor.close();
+        } else {
+            Log.v("DatabaseHelper", "no data found");
+        }
         return data;
     }
 
