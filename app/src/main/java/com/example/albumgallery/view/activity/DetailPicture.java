@@ -57,7 +57,8 @@ public class DetailPicture extends AppCompatActivity {
 
             if (imageURL != null) {
                 // Call deleteSelectedImage() method from ImageController
-                mainController.getImageController().deleteSelectedImage(imageURL);
+                // mainController.getImageController().deleteSelectedImage(imageURL, 0);
+                showDeleteConfirmationDialog(imageURL);
             } else {
                 Toast.makeText(this, "No image to delete", Toast.LENGTH_SHORT).show();
             }
@@ -68,6 +69,21 @@ public class DetailPicture extends AppCompatActivity {
         ImageView imageView = findViewById(R.id.memeImageView);
         Glide.with(this).load(Uri.parse(imagePath)).into(imageView);
 
+    }
+
+    private void showDeleteConfirmationDialog(String imageURL) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Confirm Deletion");
+        builder.setMessage("Are you sure you want to delete this image?");
+        builder.setPositiveButton("Delete", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                // Call deleteSelectedImage() method from ImageController
+                mainController.getImageController().deleteSelectedImage(imageURL);
+            }
+        });
+        builder.setNegativeButton("Cancel", null);
+        builder.show();
     }
 
     private void showOptionsDialog() {
