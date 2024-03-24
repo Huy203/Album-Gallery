@@ -4,7 +4,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.view.LayoutInflater;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -12,14 +12,22 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.FragmentTransaction;
 
 import com.bumptech.glide.Glide;
 import com.example.albumgallery.R;
+import com.example.albumgallery.controller.Controller;
 import com.example.albumgallery.controller.MainController;
 import com.example.albumgallery.model.ImageModel;
+import com.example.albumgallery.view.fragment.ImageInfo;
+import com.example.albumgallery.view.adapter.ImageInfoListener;
 
-public class DetailPicture extends AppCompatActivity {
+import java.util.Objects;
+
+public class DetailPicture extends AppCompatActivity implements ImageInfoListener {
     private MainController mainController;
+    private View view ;
+    private boolean isImageInfoVisible = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -27,18 +35,19 @@ public class DetailPicture extends AppCompatActivity {
         setContentView(R.layout.activity_detail_image);
 
         mainController = new MainController(this);
+        ImageInfo imageInfoFragment = new ImageInfo();
 
         ImageView backButton = findViewById(R.id.backButton);
         ImageView pencilButton = findViewById(R.id.pencilButton);
         ImageView ellipsisButton = findViewById(R.id.ellipsisButton);
         ImageView trashButton = findViewById(R.id.trashButton);
         Button ImageInfo = findViewById(R.id.ImageInfo);
+        view = findViewById(R.id.imageInfo);
 
         pencilButton.setOnClickListener(v -> {
             Intent intent = new Intent(DetailPicture.this, EditImageActivity.class);
             // truyền ảnh sang edit image activity
-            String imageURL = getIntent().getStringExtra("imageURL");
-            long id = mainController.getImageController().getIdByRef(imageURL);
+            long id = intent.getLongExtra("id", 0);
             intent.putExtra("id", id);
             startActivity(intent);
             finish();
@@ -54,40 +63,35 @@ public class DetailPicture extends AppCompatActivity {
             showOptionsDialog();
         });
 
+        String uri = getImageModel().getRef();
         trashButton.setOnClickListener(v -> {
-            // Get the current image URL from the intent extras
-            String imageURL = getIntent().getStringExtra("imageURL");
-
-            if (imageURL != null) {
+            if (uri != null) {
                 // Call deleteSelectedImage() method from ImageController
-                // mainController.getImageController().deleteSelectedImage(imageURL, 0);
-                showDeleteConfirmationDialog(imageURL);
+                // mainController.getImageController().deleteSelectedImage(uri, 0);
+                showDeleteConfirmationDialog(uri);
             } else {
                 Toast.makeText(this, "No image to delete", Toast.LENGTH_SHORT).show();
             }
         });
 
         ImageInfo.setOnClickListener(v -> {
-            String imageURL = getIntent().getStringExtra("imageURL");
-            if (imageURL != null) {
-                long id = mainController.getImageController().getIdByRef(imageURL);
-                ImageModel imageModel = mainController.getImageController().getImageById(id);
-                View view = LayoutInflater.from(this).inflate(R.layout.image_info, null);
-                this.setContentView(view);
-
-
-
-            }
+            toggleImageInfo();
         });
 
-        // Lấy ảnh từ image adapter, hiển thị vào edit image screen.
-        String imageURL = getIntent().getStringExtra("imageURL");
-        ImageView imageView = findViewById(R.id.memeImageView);
-        Glide.with(this).load(Uri.parse(imageURL)).into(imageView);
+        imageInfoFragment.setImageInfo(getImageModel());
 
+        // Add ImageInfo fragment to activity
+        getSupportFragmentManager().beginTransaction()
+                .setCustomAnimations(R.anim.slide_up, R.anim.slide_down)
+                .add(R.id.imageInfo, imageInfoFragment)
+                .commit();
+
+        // Lấy ảnh từ image adapter, hiển thị vào edit image screen.
+        ImageView imageView = findViewById(R.id.memeImageView);
+        Glide.with(this).load(Uri.parse(uri)).into(imageView);
     }
 
-    private void showDeleteConfirmationDialog(String imageURL) {
+    private void showDeleteConfirmationDialog(String uri) {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Confirm Deletion");
         builder.setMessage("Are you sure you want to delete this image?");
@@ -95,7 +99,7 @@ public class DetailPicture extends AppCompatActivity {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 // Call deleteSelectedImage() method from ImageController
-                mainController.getImageController().deleteSelectedImage(imageURL);
+                mainController.getImageController().deleteSelectedImage(uri);
             }
         });
         builder.setNegativeButton("Cancel", null);
@@ -126,6 +130,35 @@ public class DetailPicture extends AppCompatActivity {
             }
         });
         builder.show();
+    }
+
+    private void toggleImageInfo() {
+        isImageInfoVisible = !isImageInfoVisible;
+        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+        Log.v("DetailPicture", "toggleImageInfo: " + getSupportFragmentManager().findFragmentById(R.id.imageInfo).getView().getVisibility());
+        if (isImageInfoVisible) {
+            view.setVisibility(View.VISIBLE);
+            transaction.setCustomAnimations(R.anim.slide_up, R.anim.slide_down);
+        } else {
+            view.setVisibility(View.GONE);
+            transaction.setCustomAnimations(R.anim.slide_down, R.anim.slide_up);
+        }
+        transaction.commit();
+    }
+
+    public ImageModel getImageModel() {
+        long id = getIntent().getLongExtra("id", 0);
+        return mainController.getImageController().getImageById(id);
+    }
+
+    @Override
+    public void onNoticePassed(String data) {
+        String where = "id = " + getIntent().getLongExtra("id", 0);
+        mainController.getImageController().update("notice", data, where);
+    }
+
+    public MainController getMainController() {
+        return mainController;
     }
 
 }

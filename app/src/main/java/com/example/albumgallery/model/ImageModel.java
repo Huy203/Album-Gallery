@@ -65,6 +65,14 @@ public class ImageModel implements Model {
         this.width = width;
     }
 
+    public int getHeight() {
+        return height;
+    }
+
+    public void setHeight(int height) {
+        this.height = height;
+    }
+
     public long getCapacity() {
         return capacity;
     }
@@ -123,7 +131,16 @@ public class ImageModel implements Model {
 
     @Override
     public String toString() {
-        return "ImageModel{" + ", name='" + name + '\'' + ", id_size=" + width + ", capacity=" + capacity + ", created_at='" + created_at + '\'' + ", notice='" + notice + '\'' + ", remain_time='" + remain_time + '\'' + ", is_deleted=" + is_deleted + ", is_favourited=" + is_favourited + '}';
+        return "name='" + name + '\'' +
+                ", width=" + width +
+                ", height=" + height +
+                ", capacity=" + capacity +
+                ", ref='" + ref + '\'' +
+                ", created_at='" + created_at + '\'' +
+                ", notice='" + notice + '\'' +
+                ", remain_time='" + remain_time + '\'' +
+                ", is_deleted=" + is_deleted +
+                ", is_favourited=" + is_favourited;
     }
 
     @Override

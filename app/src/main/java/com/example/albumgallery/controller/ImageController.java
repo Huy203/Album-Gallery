@@ -56,6 +56,7 @@ public class ImageController implements Controller {
         this.dbHelper = new DatabaseHelper(activity);
         this.firebaseManager = FirebaseManager.getInstance(activity);
     }
+
     private DatabaseHelper getDbHelper(){
         return dbHelper;
     }

@@ -7,6 +7,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.util.Log;
+import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.TextView;
@@ -14,12 +15,12 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityOptionsCompat;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.albumgallery.R;
 import com.example.albumgallery.controller.MainController;
-import com.example.albumgallery.model.ImageModel;
 import com.example.albumgallery.view.adapter.ImageAdapter;
 import com.example.albumgallery.view.adapter.ImageAdapterListener;
 import com.google.android.gms.tasks.Task;
@@ -32,7 +33,6 @@ import java.util.Objects;
 public class HomeScreen extends AppCompatActivity implements BackgroundProcessingCallback, ImageAdapterListener {
     private static final int CAMERA_REQUEST_CODE = 1000;
     private boolean isBackgroundTaskCompleted = true;
-    private int haveTask = 0;
     private RecyclerView recyclerMediaView;
     private List<String> imageURIs; //contains the list of image encoded.
     private ImageAdapter imageAdapter; //adapter for the recycler view
@@ -179,5 +179,15 @@ public class HomeScreen extends AppCompatActivity implements BackgroundProcessin
         });
         builder.setNegativeButton("Cancel", null);
         builder.show();
+    }
+
+    @Override
+    public void handleImagePick(View itemView, String uri) {
+        Intent intent = new Intent(this, DetailPicture.class);
+        ActivityOptionsCompat options = ActivityOptionsCompat.makeSceneTransitionAnimation(this, itemView, "image");
+        long id = mainController.getImageController().getIdByRef(uri);
+        intent.putExtra("id", id);
+        Log.v("ImageAdapter", "Image selected: " + itemView);
+        startActivity(intent, options.toBundle());
     }
 }
