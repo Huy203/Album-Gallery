@@ -1,14 +1,10 @@
 package com.example.albumgallery.view.activity;
 
 import android.annotation.SuppressLint;
-import android.app.Activity;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.graphics.Bitmap;
-
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Environment;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.widget.Button;
@@ -23,14 +19,12 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.albumgallery.R;
 import com.example.albumgallery.controller.MainController;
+import com.example.albumgallery.model.ImageModel;
 import com.example.albumgallery.view.adapter.ImageAdapter;
 import com.example.albumgallery.view.adapter.ImageAdapterListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.Tasks;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -38,6 +32,7 @@ import java.util.Objects;
 public class HomeScreen extends AppCompatActivity implements BackgroundProcessingCallback, ImageAdapterListener {
     private static final int CAMERA_REQUEST_CODE = 1000;
     private boolean isBackgroundTaskCompleted = true;
+    private int haveTask = 0;
     private RecyclerView recyclerMediaView;
     private List<String> imageURIs; //contains the list of image encoded.
     private ImageAdapter imageAdapter; //adapter for the recycler view
@@ -100,6 +95,7 @@ public class HomeScreen extends AppCompatActivity implements BackgroundProcessin
                 imageAdapter.clearSelectedItems();
             }
         });
+        updateUI();
     }
 
     @SuppressLint("NotifyDataSetChanged")
@@ -107,14 +103,12 @@ public class HomeScreen extends AppCompatActivity implements BackgroundProcessin
     protected void onResume() {
         Toast.makeText(this, "onResume", Toast.LENGTH_SHORT).show();
         super.onResume();
-        if (isBackgroundTaskCompleted)
-            updateUI();
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if(data != null) {
+        if (data != null) {
             if (data.getData() == null) {
                 Log.d("Check data", "is null");
             } else {
@@ -123,6 +117,7 @@ public class HomeScreen extends AppCompatActivity implements BackgroundProcessin
         }
         mainController.getImageController().onActivityResult(requestCode, resultCode, data);
     }
+
     // function to open camera on Emulator
     private void openCamera() {
         Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
@@ -160,16 +155,17 @@ public class HomeScreen extends AppCompatActivity implements BackgroundProcessin
 //            task.add(Tasks.forResult(Uri.parse(uri)));
 //        }
 
-        for(int i = 0; i < count; i++) {
+        for (int i = 0; i < count; i++) {
             selectedImageURLsTask.add(Tasks.forResult(Uri.parse(imageURIs.get(i))));
             Log.d("Deleted images task", selectedImageURLsTask.get(i).getResult().toString());
         }
 
-        for(int i = 0; i < count; i++) {
+        for (int i = 0; i < count; i++) {
             selectedImageURLs.add(imageURIs.get(i));
             Log.d("Deleted images", selectedImageURLs.get(i));
         }
     }
+
     private void showDeleteConfirmationDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Confirm Deletion");

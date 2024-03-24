@@ -14,11 +14,13 @@ import android.widget.ImageView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.core.app.ActivityOptionsCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.example.albumgallery.R;
 import com.example.albumgallery.view.activity.DetailPicture;
+import com.example.albumgallery.view.activity.HomeScreen;
 
 import java.io.File;
 import java.util.Collections;
@@ -27,14 +29,14 @@ import java.util.List;
 
 public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> {
     private final Context context;
-    private final List<String> imagePaths;
+    private final List<String> imageURLs;
     private final SparseBooleanArray selectedItems;
     private boolean isMultipleChoice = false;
     private final ImageAdapterListener listener;
 
-    public ImageAdapter(Activity activity, List<String> imagePaths) {
+    public ImageAdapter(Activity activity, List<String> imageURLs) {
         this.context = (Context)activity;
-        this.imagePaths = imagePaths;
+        this.imageURLs = imageURLs;
         this.selectedItems = new SparseBooleanArray();
         this.listener = (ImageAdapterListener)activity;
     }
@@ -48,19 +50,20 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> 
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        String imagePath = imagePaths.get(position);
+        String imageURL = imageURLs.get(position);
         holder.checkbox.setChecked(selectedItems.get(position, false));
-        if (imagePath == null) {
+        if (imageURL == null) {
             return;
         }
-//        Glide.with(context).load(imagePath).into(holder.imageView);
-        Glide.with(context).load(Uri.parse(imagePath)).into(holder.imageView);
+//        Glide.with(context).load(imageURL).into(holder.imageView);
+        Glide.with(context).load(Uri.parse(imageURL)).into(holder.imageView);
 
         holder.itemView.setOnClickListener(view -> {
             if (!isMultipleChoice) {
                 Intent intent = new Intent(view.getContext(), DetailPicture.class);
-                intent.putExtra("imagePath", imagePath);
-                view.getContext().startActivity(intent);
+                ActivityOptionsCompat options = ActivityOptionsCompat.makeSceneTransitionAnimation((Activity)context, holder.imageView, "image");
+                intent.putExtra("imageURL", imageURL);
+                view.getContext().startActivity(intent, options.toBundle());
             } else {
                 if (selectedItems.get(position, false)) {
                     selectedItems.delete(position);
@@ -86,7 +89,7 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> 
     }
 
     public int getItemCount() {
-        if (imagePaths != null) return imagePaths.size();
+        if (imageURLs != null) return imageURLs.size();
         else return 0;
     }
 
@@ -120,7 +123,7 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> 
     }
     // Xử lý sắp xếp hình ảnh theo date
     public void sortImageByDate() {
-        Collections.sort(imagePaths, new Comparator<String>() {
+        Collections.sort(imageURLs, new Comparator<String>() {
             @Override
             public int compare(String path_1, String path_2) {
                 long date_1 = getImageDate(path_1);
@@ -130,8 +133,8 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> 
         });
     }
 
-    private long getImageDate(String imagePath) {
-        File imageFile = new File(imagePath);
+    private long getImageDate(String imageURL) {
+        File imageFile = new File(imageURL);
         if(imageFile.exists()) {
             return imageFile.lastModified();
         } else {

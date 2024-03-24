@@ -69,7 +69,6 @@ public class ImageController implements Controller {
     public void insert(Model model) {
         idSelectedImages.add(dbHelper.insert("Image", model));
         dbHelper.close();
-        firebaseManager.getStorage();
         // FirebaseStorage storage = FirebaseStorage.getInstance();
     }
 
@@ -270,14 +269,23 @@ public class ImageController implements Controller {
         List<ImageModel> imageModels = new ArrayList<>();
         for (String s : data) {
             String[] temp = s.split(",");
-            imageModels.add(new ImageModel(temp[1], Integer.parseInt(temp[2]), Integer.parseInt(temp[3]), Long.parseLong(temp[4]), temp[5], temp[6], temp[7], Boolean.parseBoolean(temp[8]), Boolean.parseBoolean(temp[9])));
+            imageModels.add(new ImageModel(Integer.parseInt(temp[0]), temp[1], Integer.parseInt(temp[2]), Integer.parseInt(temp[3]), Long.parseLong(temp[4]), temp[5], temp[6], temp[7], temp[8], Boolean.parseBoolean(temp[9]), Boolean.parseBoolean(temp[10])));
         }
         return imageModels;
     }
 
     public List<String> getAllImageURLs() {
         return dbHelper.select("Image", "ref", null);
+    }
 
+    public ImageModel getImageById(long id) {
+        String data = dbHelper.getById("Image", id);
+        String[] temp = data.split(",");
+        return new ImageModel(Integer.parseInt(temp[0]),temp[1], Integer.parseInt(temp[2]), Integer.parseInt(temp[3]), Long.parseLong(temp[4]), temp[5], temp[6], temp[7], temp[8], Boolean.parseBoolean(temp[9]), Boolean.parseBoolean(temp[10]));
+    }
+
+    public long getIdByRef(String ref) {
+        return dbHelper.getId("Image", "ref = '" + ref + "'");
     }
 
     public List<String> getAllImageURLsSortByDate() {
@@ -286,7 +294,6 @@ public class ImageController implements Controller {
 
     public List<String> getSelectedImageURLs() {
         final String replace = idSelectedImages.toString().replace("[", "").replace("]", "");
-        Log.v("Image", "Selected images: " + "ref" + "id IN (" + replace + ")");
         return dbHelper.select("Image", "ref", "id IN (" + replace + ")");
     }
     private String parseURL(String url){
