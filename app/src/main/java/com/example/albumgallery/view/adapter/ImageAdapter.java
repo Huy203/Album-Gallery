@@ -38,12 +38,12 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> 
         this.context = (Context)activity;
         this.imagePaths = imagePaths;
         this.selectedItems = new SparseBooleanArray();
-//        this.listener = (ImageAdapterListener)activity;
+        this.listener = (ImageAdapterListener)activity;
     }
 
-    public void setImageAdapterListener(ImageAdapterListener listener) {
-        this.listener = listener;
-    }
+//    public void setImageAdapterListener(ImageAdapterListener listener) {
+//        this.listener = listener;
+//    }
 
     @NonNull
     @Override
@@ -100,6 +100,9 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> 
         Log.v("ImageAdapter", "toggleMultipleChoiceImagesEnabled: " + listener);
         if (listener != null) {
             setMultipleChoiceEnabled(!isMultipleChoice);
+        }
+        else{
+            Log.v("ImageAdapter", "toggleMultipleChoiceImagesEnabled: listener is null");
         }
         if (getMultipleChoiceImagesEnabled()) {
             View view = LayoutInflater.from(context).inflate(R.layout.item_image, null);

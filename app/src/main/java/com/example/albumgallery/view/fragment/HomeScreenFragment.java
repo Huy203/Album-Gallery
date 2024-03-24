@@ -1,6 +1,7 @@
 package com.example.albumgallery.view.fragment;
 
 import android.annotation.SuppressLint;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 
@@ -30,17 +31,31 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-public class HomeScreenFragment extends Fragment implements BackgroundProcessingCallback, ImageAdapterListener {
+public class HomeScreenFragment extends Fragment {
     private static final int CAMERA_REQUEST_CODE = 1000;
     private boolean isBackgroundTaskCompleted = true;
     private RecyclerView recyclerMediaView;
     private List<String> imageURIs; //contains the list of image encoded.
     private ImageAdapter imageAdapter; //adapter for the recycler view
     private MainController mainController; //controller contains other controllers
-    TextView numberOfImagesSelected;
+    private TextView numberOfImagesSelected;
+    private ImageAdapterListener iListener;
+    private BackgroundProcessingCallback bgListener;
 
     public HomeScreenFragment() {
         // Required empty public constructor
+    }
+
+    @Override
+    public void onAttach(@NonNull Context context) {
+        super.onAttach(context);
+        if (context instanceof ImageAdapterListener && context instanceof BackgroundProcessingCallback) {
+            iListener = (ImageAdapterListener) context;
+            bgListener = (BackgroundProcessingCallback) context;
+        } else {
+            throw new RuntimeException(context.toString()
+                    + " must implement Interface");
+        }
     }
 
     @Override
@@ -59,7 +74,7 @@ public class HomeScreenFragment extends Fragment implements BackgroundProcessing
         // imageURIs
         imageURIs = new ArrayList<>();
         imageAdapter = new ImageAdapter(getActivity(), imageURIs);
-        imageAdapter.setImageAdapterListener(this);
+//      imageAdapter.setImageAdapterListener(this);
         recyclerMediaView = view.findViewById(R.id.recyclerMediaView);
 
         ImageButton btnCamera = view.findViewById(R.id.btnCamera);
@@ -72,7 +87,7 @@ public class HomeScreenFragment extends Fragment implements BackgroundProcessing
 
         btnPickImageFromDevice.setOnClickListener(v -> {
             isBackgroundTaskCompleted = false;
-            mainController.getImageController().pickMultipleImages(this);
+            mainController.getImageController().pickMultipleImages(bgListener);
         });
 
         btnPickMultipleImages.setOnClickListener(v -> {
@@ -94,8 +109,6 @@ public class HomeScreenFragment extends Fragment implements BackgroundProcessing
     public void onResume() {
         Toast.makeText(requireContext(), "onResume", Toast.LENGTH_SHORT).show();
         super.onResume();
-        if (isBackgroundTaskCompleted)
-            updateUI();
     }
 
     @Override
@@ -111,9 +124,7 @@ public class HomeScreenFragment extends Fragment implements BackgroundProcessing
         mainController.getImageController().onActivityResult(requestCode, resultCode, data);
     }
 
-
-
-    private void updateUI() {
+    public void updateUI() {
         imageURIs.clear();
 //        imageURIs.addAll(mainController.getImageController().getAllImageURLs());
         // lấy ảnh sort theo date (mới nhất xếp trước).
@@ -124,17 +135,7 @@ public class HomeScreenFragment extends Fragment implements BackgroundProcessing
         imageAdapter.notifyDataSetChanged();
     }
 
-    @Override
-    public void onBackgroundTaskCompleted() {
-        isBackgroundTaskCompleted = true;
-        updateUI();
-        isBackgroundTaskCompleted = false;
-    }
-
-    @SuppressLint("SetTextI18n")
-    @Override
     public void getSelectedItemsCount(int count) {
-        Log.v("SelectedItems", count + " items selected");
         numberOfImagesSelected.setText(count + " images selected");
     }
 
@@ -143,5 +144,18 @@ public class HomeScreenFragment extends Fragment implements BackgroundProcessing
         if (intent.resolveActivity(getActivity().getPackageManager()) != null) {
             startActivityForResult(intent, CAMERA_REQUEST_CODE);
         }
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        iListener = null;
+        bgListener = null;
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        mainController = null;
     }
 }
