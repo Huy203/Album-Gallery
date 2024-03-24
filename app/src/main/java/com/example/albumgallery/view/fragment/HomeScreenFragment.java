@@ -1,35 +1,36 @@
-package com.example.albumgallery.view.activity;
+package com.example.albumgallery.view.fragment;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.net.Uri;
 import android.os.Bundle;
-import android.os.Environment;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
 import android.provider.MediaStore;
 import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.recyclerview.widget.GridLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-
 import com.example.albumgallery.R;
 import com.example.albumgallery.controller.MainController;
+import com.example.albumgallery.view.activity.BackgroundProcessingCallback;
 import com.example.albumgallery.view.adapter.ImageAdapter;
 import com.example.albumgallery.view.adapter.ImageAdapterListener;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-public class HomeScreen extends AppCompatActivity implements BackgroundProcessingCallback, ImageAdapterListener {
+public class HomeScreenFragment extends Fragment implements BackgroundProcessingCallback, ImageAdapterListener {
     private static final int CAMERA_REQUEST_CODE = 1000;
     private boolean isBackgroundTaskCompleted = true;
     private RecyclerView recyclerMediaView;
@@ -38,42 +39,43 @@ public class HomeScreen extends AppCompatActivity implements BackgroundProcessin
     private MainController mainController; //controller contains other controllers
     TextView numberOfImagesSelected;
 
+    public HomeScreenFragment() {
+        // Required empty public constructor
+    }
+
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        Objects.requireNonNull(getSupportActionBar()).hide();
-        setContentView(R.layout.activity_home_screen);
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        // Inflate the layout for this fragment
+        return inflater.inflate(R.layout.fragment_home_screen, container, false);
+    }
 
-        mainController = new MainController(this);
-        // Fetch images from DB
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        // bổ sung
+        // mainController
+        mainController = new MainController(getActivity());
+        // imageURIs
         imageURIs = new ArrayList<>();
+        imageAdapter = new ImageAdapter(getActivity(), imageURIs);
+        imageAdapter.setImageAdapterListener(this);
+        recyclerMediaView = view.findViewById(R.id.recyclerMediaView);
 
-        imageAdapter = new ImageAdapter(this, imageURIs);
-        recyclerMediaView = findViewById(R.id.recyclerMediaView);
+        ImageButton btnCamera = view.findViewById(R.id.btnCamera);
+        btnCamera.setOnClickListener(v -> openCamera());
 
-        ImageButton btnCamera = findViewById(R.id.btnCamera);
-        btnCamera.setOnClickListener(view -> openCamera());
+        Button btnPickImageFromDevice = view.findViewById(R.id.btnPickImageFromDevice);
+        Button btnPickMultipleImages = view.findViewById(R.id.btnPickMultipleImages);
 
-        Button btnPickImageFromDevice = findViewById(R.id.btnPickImageFromDevice);
-        Button btnPickMultipleImages = findViewById(R.id.btnPickMultipleImages);
+        numberOfImagesSelected = view.findViewById(R.id.numberOfSelectedImages);
 
-        numberOfImagesSelected = findViewById(R.id.numberOfSelectedImages);
-
-        // Trong phương thức onCreate của HomeScreen.java
-//        TextView textAlbums = findViewById(R.id.textAlbums);
-//        textAlbums.setOnClickListener(view -> {
-//            // Chuyển sang màn hình mới
-//            Intent intent = new Intent(HomeScreen.this, AlbumActivity.class);
-//            startActivity(intent);
-//            finish();
-//        });
-
-        btnPickImageFromDevice.setOnClickListener(view -> {
+        btnPickImageFromDevice.setOnClickListener(v -> {
             isBackgroundTaskCompleted = false;
             mainController.getImageController().pickMultipleImages(this);
         });
 
-        btnPickMultipleImages.setOnClickListener(view -> {
+        btnPickMultipleImages.setOnClickListener(v -> {
             if (imageAdapter.toggleMultipleChoiceImagesEnabled()) {
                 btnPickMultipleImages.setText("Cancel");
                 numberOfImagesSelected.setVisibility(TextView.VISIBLE);
@@ -85,25 +87,19 @@ public class HomeScreen extends AppCompatActivity implements BackgroundProcessin
             }
         });
 
-//        ImageButton btnAlbum = findViewById(R.id.btnAlbums);
-//        btnAlbum.setOnClickListener(view -> {
-//            Intent intent = new Intent(this, AlbumMain.class);
-//            startActivity(intent);
-//            finish();
-//        });
     }
 
     @SuppressLint("NotifyDataSetChanged")
     @Override
-    protected void onResume() {
-        Toast.makeText(this, "onResume", Toast.LENGTH_SHORT).show();
+    public void onResume() {
+        Toast.makeText(requireContext(), "onResume", Toast.LENGTH_SHORT).show();
         super.onResume();
         if (isBackgroundTaskCompleted)
             updateUI();
     }
 
     @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if(data != null) {
             if (data.getData() == null) {
@@ -114,21 +110,16 @@ public class HomeScreen extends AppCompatActivity implements BackgroundProcessin
         }
         mainController.getImageController().onActivityResult(requestCode, resultCode, data);
     }
-    // function to open camera on Emulator
-    private void openCamera() {
-        Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-        if (intent.resolveActivity(getPackageManager()) != null) {
-            startActivityForResult(intent, CAMERA_REQUEST_CODE);
-        }
-    }
+
+
 
     private void updateUI() {
         imageURIs.clear();
 //        imageURIs.addAll(mainController.getImageController().getAllImageURLs());
         // lấy ảnh sort theo date (mới nhất xếp trước).
         imageURIs.addAll(mainController.getImageController().getAllImageURLsSortByDate());
-        imageAdapter = new ImageAdapter(this, imageURIs);
-        recyclerMediaView.setLayoutManager(new GridLayoutManager(this, 3));
+        imageAdapter = new ImageAdapter(getActivity(), imageURIs);
+        recyclerMediaView.setLayoutManager(new GridLayoutManager(getContext(), 3));
         recyclerMediaView.setAdapter(imageAdapter);
         imageAdapter.notifyDataSetChanged();
     }
@@ -146,8 +137,11 @@ public class HomeScreen extends AppCompatActivity implements BackgroundProcessin
         Log.v("SelectedItems", count + " items selected");
         numberOfImagesSelected.setText(count + " images selected");
     }
+
+    private void openCamera() {
+        Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        if (intent.resolveActivity(getActivity().getPackageManager()) != null) {
+            startActivityForResult(intent, CAMERA_REQUEST_CODE);
+        }
+    }
 }
-
-
-
-

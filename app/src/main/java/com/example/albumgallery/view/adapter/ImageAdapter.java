@@ -3,9 +3,11 @@ package com.example.albumgallery.view.adapter;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.media.Image;
 import android.net.Uri;
 import android.util.Log;
 import android.util.SparseBooleanArray;
+import android.view.ContentInfo;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -30,13 +32,17 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> 
     private final List<String> imagePaths;
     private final SparseBooleanArray selectedItems;
     private boolean isMultipleChoice = false;
-    private final ImageAdapterListener listener;
+    private ImageAdapterListener listener;
 
     public ImageAdapter(Activity activity, List<String> imagePaths) {
         this.context = (Context)activity;
         this.imagePaths = imagePaths;
         this.selectedItems = new SparseBooleanArray();
-        this.listener = (ImageAdapterListener)activity;
+//        this.listener = (ImageAdapterListener)activity;
+    }
+
+    public void setImageAdapterListener(ImageAdapterListener listener) {
+        this.listener = listener;
     }
 
     @NonNull

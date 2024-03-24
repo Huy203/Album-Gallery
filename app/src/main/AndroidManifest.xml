@@ -38,6 +38,7 @@
         <activity android:name=".view.activity.LoginScreen" />
         <activity android:name=".view.activity.RegisterScreen" />
         <activity android:name=".view.activity.CreateAlbumActivity" />
+        <activity android:name=".view.activity.MainFragmentController" />
 
     </application>
 </manifest>
