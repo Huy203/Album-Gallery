@@ -206,6 +206,14 @@ public class ImageController implements Controller {
         }
         return true;
     }
+    private boolean allTasksCompletedGeneric(List<Task> tasks) {
+        for (Task<Uri> task : tasks) {
+            if (!task.isSuccessful()) {
+                return false;
+            }
+        }
+        return true;
+    }
 
     public String getExtensionName(Uri uri) {
         String fileName = uri.getPathSegments().get(uri.getPathSegments().size() - 1);
@@ -217,13 +225,26 @@ public class ImageController implements Controller {
         List<ImageModel> imageModels = new ArrayList<>();
         for (String s : data) {
             String[] temp = s.split(",");
-            imageModels.add(new ImageModel(temp[1], Integer.parseInt(temp[2]), Integer.parseInt(temp[3]), Long.parseLong(temp[4]), temp[5], temp[6], temp[7], Boolean.parseBoolean(temp[8]), Boolean.parseBoolean(temp[9])));
+            imageModels.add(new ImageModel(Integer.parseInt(temp[0]), temp[1], Integer.parseInt(temp[2]), Integer.parseInt(temp[3]), Long.parseLong(temp[4]), temp[5], temp[6], temp[7], temp[8], Boolean.parseBoolean(temp[9]), Boolean.parseBoolean(temp[10])));
         }
         return imageModels;
     }
 
     public List<String> getAllImageURLs() {
-        return dbHelper.select("Image", "ref", null);
+        return dbHelper.getAllRef("Image");
+    }
+    public ImageModel getImageById(long id) {
+        String data = dbHelper.getById("Image", id);
+        String[] temp = data.split(",");
+        return new ImageModel(Integer.parseInt(temp[0]),temp[1], Integer.parseInt(temp[2]), Integer.parseInt(temp[3]), Long.parseLong(temp[4]), temp[5], temp[6], temp[7], temp[8], Boolean.parseBoolean(temp[9]), Boolean.parseBoolean(temp[10]));
+    }
+
+    public long getIdByRef(String ref) {
+        return dbHelper.getId("Image", "ref = '" + ref + "'");
+    }
+
+    public List<String> getAllImageURLsSortByDate() {
+        return dbHelper.selectImagesSortByDate("Image", "ref", "descending");
     }
 
     public List<String> getSelectedImageURLs() {
@@ -296,5 +317,44 @@ public class ImageController implements Controller {
             }
         }
         return null;
+    }
+    public List<String> getImagePaths() {
+        return getAllImageURLs();
+    }
+    public void deleteSelectedImageAtHomeScreeen(List<Task> imageURLs){
+        FirebaseStorage storage = FirebaseStorage.getInstance();
+        // Create a storage reference from our app
+        StorageReference storageRef = storage.getReference();
+
+        for(Task taskImageURL : imageURLs){
+            if(taskImageURL.isSuccessful()){
+                String imageURL = taskImageURL.getResult().toString();
+                Log.d("Image task", imageURL);
+                String URL = parseURL(imageURL);
+
+                // Create a reference to the file to delete
+                StorageReference desertRef = storageRef.child(URL);
+
+                // Delete the file
+                desertRef.delete().addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+                        // File deleted successfully
+                        delete("ref = '" + imageURL + "'");
+                        if(allTasksCompletedGeneric(imageURLs)){
+                            activity.runOnUiThread(() -> {
+                                ((HomeScreen) activity).onBackgroundTaskCompleted();
+                            });
+                        }
+                    }
+                }).addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception exception) {
+                        // Uh-oh, an error occurred!
+                        Toast.makeText(activity, "Image deleted failed", Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }
+        }
     }
 }

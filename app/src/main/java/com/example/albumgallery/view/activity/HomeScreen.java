@@ -182,11 +182,12 @@ public class HomeScreen extends AppCompatActivity implements BackgroundProcessin
     }
 
     @Override
-    public void handleImagePick(View itemView, String uri) {
+    public void handleImagePick(View itemView, String uri, int position) {
         Intent intent = new Intent(this, DetailPicture.class);
         ActivityOptionsCompat options = ActivityOptionsCompat.makeSceneTransitionAnimation(this, itemView, "image");
         long id = mainController.getImageController().getIdByRef(uri);
         intent.putExtra("id", id);
+        intent.putExtra("position", position);
         Log.v("ImageAdapter", "Image selected: " + itemView);
         startActivity(intent, options.toBundle());
     }
