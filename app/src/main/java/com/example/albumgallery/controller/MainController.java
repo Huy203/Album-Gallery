@@ -5,6 +5,8 @@ import android.app.Activity;
 import com.example.albumgallery.DatabaseHelper;
 import com.example.albumgallery.model.Model;
 
+import java.util.List;
+
 public class MainController {
     private final DatabaseHelper dbHelper;
     private final AlbumController albumController;
@@ -23,4 +25,8 @@ public class MainController {
     public ImageController getImageController() {
         return imageController;
     }
+    public List<String> getImagePaths() {
+        return imageController.getImagePaths();
+    }
+
 }

@@ -15,15 +15,47 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import com.example.albumgallery.controller.OnSwipeTouchListener;
+
+import java.util.List;
 
 public class DetailPicture extends AppCompatActivity {
     private MainController mainController;
+    private ImageView imageView;
+    private List<String> imagePaths;
+    private int currentPosition;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_detail_image);
 
         mainController = new MainController(this);
+        imagePaths = mainController.getImagePaths();
+        currentPosition = getIntent().getIntExtra("position", 0);
+
+        imageView = findViewById(R.id.memeImageView);
+        loadImage(currentPosition);
+
+        // Detect swipe gestures
+        imageView.setOnTouchListener(new OnSwipeTouchListener(this) {
+            @Override
+            public void onSwipeLeft() {
+                // Swipe left, show next image
+                if (currentPosition < imagePaths.size() - 1) {
+                    currentPosition++;
+                    loadImage(currentPosition);
+                }
+            }
+
+            @Override
+            public void onSwipeRight() {
+                // Swipe right, show previous image
+                if (currentPosition > 0) {
+                    currentPosition--;
+                    loadImage(currentPosition);
+                }
+            }
+        });
 
         ImageView backButton = findViewById(R.id.backButton);
         ImageView pencilButton = findViewById(R.id.pencilButton);
@@ -33,7 +65,7 @@ public class DetailPicture extends AppCompatActivity {
         pencilButton.setOnClickListener(v -> {
             Intent intent = new Intent(DetailPicture.this, EditImageActivity.class);
             // truyền ảnh sang edit image activity
-            String imagePath = getIntent().getStringExtra("imagePath");
+            String imagePath = imagePaths.get(currentPosition);
             intent.putExtra("imagePath", imagePath);
             startActivity(intent);
             finish();
@@ -63,13 +95,16 @@ public class DetailPicture extends AppCompatActivity {
             }
         });
 
-        // Lấy ảnh từ image adapter, hiển thị vào edit image screen.
-        String imagePath = getIntent().getStringExtra("imagePath");
-        ImageView imageView = findViewById(R.id.memeImageView);
-        Glide.with(this).load(Uri.parse(imagePath)).into(imageView);
+//        // Lấy ảnh từ image adapter, hiển thị vào edit image screen.
+//        String imagePath = getIntent().getStringExtra("imagePath");
+//        ImageView imageView = findViewById(R.id.memeImageView);
+//        Glide.with(this).load(Uri.parse(imagePath)).into(imageView);
 
     }
 
+    private void loadImage(int position) {
+        Glide.with(this).load(Uri.parse(imagePaths.get(position))).into(imageView);
+    }
     private void showOptionsDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Options");
