@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
-import android.util.Log;
 import android.util.SparseBooleanArray;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -13,27 +12,30 @@ import android.widget.CheckBox;
 import android.widget.ImageView;
 
 import androidx.annotation.NonNull;
+import androidx.core.app.ActivityOptionsCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.example.albumgallery.R;
 import com.example.albumgallery.view.activity.DetailPicture;
 
+import java.io.File;
 import java.util.Collections;
 import java.util.List;
 
 public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> {
+
     private final Context context;
-    private final List<String> imagePaths;
+    private final List<String> imageURLs;
     private final SparseBooleanArray selectedItems;
     private boolean isMultipleChoice = false;
     private final ImageAdapterListener listener;
 
-    public ImageAdapter(Activity activity, List<String> imagePaths) {
-        this.context = (Context)activity;
-        this.imagePaths = imagePaths;
+    public ImageAdapter(Activity activity, List<String> imageURLs) {
+        this.context = activity;
+        this.imageURLs = imageURLs;
         this.selectedItems = new SparseBooleanArray();
-        this.listener = (ImageAdapterListener)activity;
+        this.listener = (ImageAdapterListener) activity;
     }
 
     @NonNull
@@ -45,33 +47,8 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> 
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        String imagePath = imagePaths.get(position);
-        holder.checkbox.setChecked(selectedItems.get(position, false));
-        if (imagePath == null) {
-            return;
-        }
-//        Glide.with(context).load(imagePath).into(holder.imageView);
-        Glide.with(context).load(Uri.parse(imagePath)).into(holder.imageView);
-
-        holder.itemView.setOnClickListener(view -> {
-            if (!isMultipleChoice) {
-                Intent intent = new Intent(view.getContext(), DetailPicture.class);
-                intent.putExtra("imagePath", imagePath);
-                view.getContext().startActivity(intent);
-            } else {
-                if (selectedItems.get(position, false)) {
-                    selectedItems.delete(position);
-                    holder.checkbox.setChecked(false);
-                    holder.checkbox.setVisibility(View.INVISIBLE);
-                } else {
-                    selectedItems.put(position, true);
-                    holder.checkbox.setChecked(true);
-                    holder.checkbox.setVisibility(View.VISIBLE);
-                }
-                System.out.println("Selected items: " + selectedItems);
-                listener.getSelectedItemsCount(selectedItems.size());
-            }
-        });
+        String imageURL = imageURLs.get(position);
+        holder.bind(imageURL, position);
     }
 
     public void setMultipleChoiceEnabled(boolean isMultipleChoice) {
@@ -83,19 +60,12 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> 
     }
 
     public int getItemCount() {
-        if (imagePaths != null) return imagePaths.size();
-        else return 0;
+        return imageURLs.size();
     }
 
     public boolean toggleMultipleChoiceImagesEnabled() {
-        Log.v("ImageAdapter", "toggleMultipleChoiceImagesEnabled: " + listener);
         if (listener != null) {
             setMultipleChoiceEnabled(!isMultipleChoice);
-        }
-        if (getMultipleChoiceImagesEnabled()) {
-            View view = LayoutInflater.from(context).inflate(R.layout.item_image, null);
-            CheckBox checkBox = view.findViewById(R.id.checkbox);
-            checkBox.setVisibility(View.INVISIBLE);
         }
         return isMultipleChoice;
     }
@@ -105,18 +75,51 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> 
         notifyDataSetChanged();
     }
 
-    public static class ViewHolder extends RecyclerView.ViewHolder {
-        public ImageView imageView;
-        public CheckBox checkbox;
+    public class ViewHolder extends RecyclerView.ViewHolder {
+
+        private final ImageView imageView;
+        private final CheckBox checkbox;
 
         public ViewHolder(View itemView) {
             super(itemView);
             imageView = itemView.findViewById(R.id.imageView);
             checkbox = itemView.findViewById(R.id.checkbox);
         }
-    }
-    // Xử lý sắp xếp hình ảnh theo ngày
-    public void sortImageByDate() {
+
+        public void bind(String imageURL, int position) {
+            checkbox.setChecked(selectedItems.get(position, false));
+            Glide.with(context).load(Uri.parse(imageURL)).into(imageView);
+
+            itemView.setOnClickListener(view -> {
+                if (!isMultipleChoice) {
+                    listener.handleImagePick(imageView, imageURL);
+                } else {
+                    toggleSelection(position);
+                    listener.getSelectedItemsCount(selectedItems.size());
+                }
+            });
+
+            checkbox.setVisibility(isMultipleChoice ? View.VISIBLE : View.INVISIBLE);
+        }
     }
 
+    private void toggleSelection(int position) {
+        if (selectedItems.get(position, false)) {
+            selectedItems.delete(position);
+        } else {
+            selectedItems.put(position, true);
+        }
+        notifyItemChanged(position);
+    }
+
+    // Xử lý sắp xếp hình ảnh theo date
+    public void sortImageByDate() {
+        Collections.sort(imageURLs, (path_1, path_2) -> Long.compare(getImageDate(path_1), getImageDate(path_2)));
+        notifyDataSetChanged();
+    }
+
+    private long getImageDate(String imageURL) {
+        File imageFile = new File(imageURL);
+        return imageFile.exists() ? imageFile.lastModified() : 0;
+    }
 }

@@ -19,10 +19,12 @@ import androidx.core.widget.NestedScrollView;
 
 import com.bumptech.glide.Glide;
 import com.example.albumgallery.R;
+import com.example.albumgallery.controller.MainController;
 import com.example.albumgallery.view.CropImageActivity;
 
 
 public class EditImageActivity extends AppCompatActivity {
+    private MainController mainController;
     private ImageView memeImageView;
     private float scaleFactor = 1.0f;
     private GestureDetectorCompat gestureDetector;
@@ -34,6 +36,7 @@ public class EditImageActivity extends AppCompatActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_edit_image);
+        mainController = new MainController(this);
 
         ImageView backButton = findViewById(R.id.backButton);
         memeImageView = findViewById(R.id.memeImageView);
@@ -127,11 +130,12 @@ public class EditImageActivity extends AppCompatActivity {
             }
         });
         // lấy ảnh từ detail image activity sang edit image activity
-        String imagePath = getIntent().getStringExtra("imagePath");
-        ImageView memeImageView = findViewById(R.id.memeImageView);
-        Glide.with(this).load(imagePath).into(memeImageView);
+        long id = getIntent().getLongExtra("id", 0);
+        String imageURL = mainController.getImageController().getImageById(id).getRef();
+        Glide.with(this).load(Uri.parse(imageURL)).into(memeImageView);
 
-
+//        ImageView memeImageView = findViewById(R.id.memeImageView);
+//        Glide.with(this).load(Uri.parse(imageURL)).into(memeImageView);
     }
 
     private boolean isMotionEventInsideView(float x, float y, View view) {
@@ -177,16 +181,18 @@ public class EditImageActivity extends AppCompatActivity {
     }
 
     private void goBackToDetailScreen() {
-        Intent intent = new Intent(EditImageActivity.this, DetailPicture.class);
-        intent.putExtra("imagePath", getIntent().getStringExtra("imagePath"));
-        startActivity(intent);
+//        Intent intent = new Intent(EditImageActivity.this, DetailPicture.class);
+//        intent.putExtra("id", getIntent().getLongExtra("id", 0));
+//        startActivity(intent);
         finish();
     }
 
     private void startImageCropActivity() {
         // Khởi tạo một intent để mở hoạt động cắt ảnh
         Intent intent = new Intent(EditImageActivity.this, CropImageActivity.class);
-        intent.setData(Uri.parse(getIntent().getStringExtra("imagePath"))); // Chuyển đổi đường dẫn sang Uri
+        long id = getIntent().getLongExtra("id", 0);
+        String imageURL = mainController.getImageController().getImageById(id).getRef();
+        intent.putExtra("imageURL", imageURL);
         startActivityForResult(intent, REQUEST_IMAGE_CROP);
     }
 

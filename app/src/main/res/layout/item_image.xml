@@ -16,7 +16,9 @@
             android:layout_height="100dp"
             android:outlineSpotShadowColor="@color/black"
             android:scaleType="centerCrop"
-            android:src="@drawable/ic_launcher_foreground" />
+            android:src="@drawable/ic_launcher_foreground"
+            android:transitionName="image"
+            />
 
         <CheckBox
             android:id="@+id/checkbox"

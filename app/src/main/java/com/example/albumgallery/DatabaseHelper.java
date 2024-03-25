@@ -11,6 +11,7 @@ import com.example.albumgallery.model.Model;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class DatabaseHelper extends SQLiteOpenHelper {
     //    public static final String DATABASE_NAME = "album_gallery.db";
@@ -170,13 +171,36 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 : db.rawQuery("SELECT " + column + " FROM " + table + " WHERE " + where, null);
         if (cursor.moveToFirst()) {
             while (!cursor.isAfterLast()) {
-                data.add(cursor.getString(0));
+                String temp = cursor.getString(0) + "," + cursor.getString(1) + "," + cursor.getString(2)+ "," + cursor.getString(3)+ "," + cursor.getString(4)+ "," + cursor.getString(5)+ "," + cursor.getString(6)+ "," + cursor.getString(7)+ "," + cursor.getString(8)+ "," + cursor.getString(9)+ "," + cursor.getString(10);
+                data.add(temp);
                 cursor.moveToNext();
             }
         } else {
             Log.v("DatabaseHelper", "No data found");
         }
         cursor.close();
+        return data;
+    }
+
+    public List<String> selectImagesSortByDate(String table, String column, String order) {
+        List<String> data = new ArrayList<>();
+        SQLiteDatabase db = getWritableDatabase();
+        String query = "SELECT " + column + " FROM " + table + " ORDER BY created_at";
+        if(Objects.equals(order, "ascending")) {
+            query += " ASC;";
+        } else if ( (Objects.equals(order,"descending"))) {
+            query += " DESC;";
+        }
+        Cursor cursor = db.rawQuery(query, null);
+        if(cursor.moveToFirst()) {
+            while(!cursor.isAfterLast()) {
+                data.add(cursor.getString(0));
+                cursor.moveToNext();
+            }
+            cursor.close();
+        } else {
+            Log.v("DatabaseHelper", "no data found");
+        }
         return data;
     }
 
@@ -199,13 +223,22 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         cursor.close();
     }
 
-    public long getId(String table, String column, String where) {
+    public long getId(String table,  String where) {
         SQLiteDatabase db = getWritableDatabase();
-        Cursor cursor = db.rawQuery("SELECT id FROM " + table + " WHERE " + column + " = " + where, null);
+        Cursor cursor = db.rawQuery("SELECT id FROM " + table + " WHERE " + where, null);
         if (cursor.moveToFirst()) {
             return cursor.getLong(0);
         }
         return -1;
+    }
+
+    public String getById(String table, long id) {
+        SQLiteDatabase db = getWritableDatabase();
+        Cursor cursor = db.rawQuery("SELECT * FROM " + table + " WHERE id = " + id, null);
+        if (cursor.moveToFirst()) {
+            return cursor.getString(0) + "," + cursor.getString(1) + "," + cursor.getString(2)+ "," + cursor.getString(3)+ "," + cursor.getString(4)+ "," + cursor.getString(5)+ "," + cursor.getString(6)+ "," + cursor.getString(7)+ "," + cursor.getString(8)+ "," + cursor.getString(9)+ "," + cursor.getString(10);
+        }
+        return null;
     }
 
     public long getLastId(String table) {
@@ -223,7 +256,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         Cursor cursor = db.rawQuery("SELECT * FROM " + table, null);
         if (cursor.moveToFirst()) {
             while (!cursor.isAfterLast()) {
-                data.add(cursor.getString(0));
+                String temp = cursor.getString(0) + "," + cursor.getString(1) + "," + cursor.getString(2)+ "," + cursor.getString(3)+ "," + cursor.getString(4)+ "," + cursor.getString(5)+ "," + cursor.getString(6)+ "," + cursor.getString(7)+ "," + cursor.getString(8)+ "," + cursor.getString(9)+ "," + cursor.getString(10);
+                data.add(temp);
                 cursor.moveToNext();
             }
         }

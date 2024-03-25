@@ -297,11 +297,4 @@ public class ImageController implements Controller {
         }
         return null;
     }
-
-    public List<String> getImagePaths() {
-        return getAllImageURLs();
-    }
-
-
-
 }
