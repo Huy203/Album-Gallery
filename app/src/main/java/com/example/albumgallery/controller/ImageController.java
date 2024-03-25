@@ -18,15 +18,16 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 
+import com.example.albumgallery.view.activity.BackgroundProcessingCallback;
 import com.example.albumgallery.DatabaseHelper;
 import com.example.albumgallery.FirebaseManager;
 import com.example.albumgallery.model.ImageModel;
 import com.example.albumgallery.model.Model;
-import com.example.albumgallery.view.activity.BackgroundProcessingCallback;
-import com.example.albumgallery.view.activity.MainFragmentController;
+import com.example.albumgallery.view.activity.HomeScreen;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.Firebase;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageMetadata;
 import com.google.firebase.storage.StorageReference;
@@ -56,7 +57,7 @@ public class ImageController implements Controller {
         this.firebaseManager = FirebaseManager.getInstance(activity);
     }
 
-    private DatabaseHelper getDbHelper() {
+    private DatabaseHelper getDbHelper(){
         return dbHelper;
     }
 
@@ -69,7 +70,6 @@ public class ImageController implements Controller {
     public void insert(Model model) {
         idSelectedImages.add(dbHelper.insert("Image", model));
         dbHelper.close();
-        firebaseManager.getStorage();
         // FirebaseStorage storage = FirebaseStorage.getInstance();
     }
 
@@ -271,14 +271,23 @@ public class ImageController implements Controller {
         List<ImageModel> imageModels = new ArrayList<>();
         for (String s : data) {
             String[] temp = s.split(",");
-            imageModels.add(new ImageModel(temp[1], Integer.parseInt(temp[2]), Integer.parseInt(temp[3]), Long.parseLong(temp[4]), temp[5], temp[6], temp[7], Boolean.parseBoolean(temp[8]), Boolean.parseBoolean(temp[9])));
+            imageModels.add(new ImageModel(Integer.parseInt(temp[0]), temp[1], Integer.parseInt(temp[2]), Integer.parseInt(temp[3]), Long.parseLong(temp[4]), temp[5], temp[6], temp[7], temp[8], Boolean.parseBoolean(temp[9]), Boolean.parseBoolean(temp[10])));
         }
         return imageModels;
     }
 
     public List<String> getAllImageURLs() {
         return dbHelper.select("Image", "ref", null);
+    }
 
+    public ImageModel getImageById(long id) {
+        String data = dbHelper.getById("Image", id);
+        String[] temp = data.split(",");
+        return new ImageModel(Integer.parseInt(temp[0]),temp[1], Integer.parseInt(temp[2]), Integer.parseInt(temp[3]), Long.parseLong(temp[4]), temp[5], temp[6], temp[7], temp[8], Boolean.parseBoolean(temp[9]), Boolean.parseBoolean(temp[10]));
+    }
+
+    public long getIdByRef(String ref) {
+        return dbHelper.getId("Image", "ref = '" + ref + "'");
     }
 
     public List<String> getAllImageURLsSortByDate() {
@@ -306,7 +315,7 @@ public class ImageController implements Controller {
         return filename;
     }
 
-    public void deleteSelectedImage(String imageURL) {
+    public void deleteSelectedImage(String imageURL){
         String URL = parseURL(imageURL);
         Log.d("URL", URL);
 

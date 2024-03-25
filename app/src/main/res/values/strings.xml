@@ -5,7 +5,13 @@
     <string name="title_activity_album_activity.java">AlbumActivity.java</string>
 
     <string name="log_in">Log In</string>
-    <!-- TODO: Remove or change this placeholder text -->
+    <string name="sign_up">Sign Up</string>
+    <string name="forgot_password">Forgot Password?</string>
+    <string name="email">Email</string>
+    <string name="password">Password</string>
+    <string name="confirm_password">Confirm Password</string>
+    <string name="select">Select</string>
+    <string name="cancel">Cancel</string>
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="create_album">Create Album</string>
 </resources>
