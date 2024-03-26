@@ -4,13 +4,23 @@ import android.content.Context;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
+
+import com.example.albumgallery.R;
 
 public class OnSwipeTouchListener implements View.OnTouchListener {
 
     private final GestureDetector gestureDetector;
+    private final View view;
+    private final Animation slideInLeft;
+    private final Animation slideInRight;
 
-    public OnSwipeTouchListener(Context context) {
+    public OnSwipeTouchListener(Context context, View view) {
+        this.view = view;
         gestureDetector = new GestureDetector(context, new GestureListener());
+        slideInLeft = AnimationUtils.loadAnimation(context, R.anim.slide_in_left);
+        slideInRight = AnimationUtils.loadAnimation(context, R.anim.slide_in_right);
     }
 
     public void onSwipeLeft() {
@@ -41,8 +51,10 @@ public class OnSwipeTouchListener implements View.OnTouchListener {
                 if (Math.abs(diffX) > SWIPE_THRESHOLD && Math.abs(velocityX) > SWIPE_VELOCITY_THRESHOLD) {
                     if (diffX > 0) {
                         onSwipeRight();
+                        view.startAnimation(slideInLeft);
                     } else {
                         onSwipeLeft();
+                        view.startAnimation(slideInRight);
                     }
                     return true;
                 }
