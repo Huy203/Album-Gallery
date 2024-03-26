@@ -16,16 +16,15 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 
-import com.example.albumgallery.view.activity.BackgroundProcessingCallback;
 import com.example.albumgallery.DatabaseHelper;
 import com.example.albumgallery.FirebaseManager;
 import com.example.albumgallery.model.ImageModel;
 import com.example.albumgallery.model.Model;
-import com.example.albumgallery.view.activity.HomeScreen;
+import com.example.albumgallery.view.activity.BackgroundProcessingCallback;
+import com.example.albumgallery.view.activity.MainFragmentController;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
-import com.google.firebase.Firebase;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageMetadata;
 import com.google.firebase.storage.StorageReference;
@@ -41,6 +40,7 @@ import java.util.List;
 import java.util.Objects;
 
 public class ImageController implements Controller {
+    private static final int CAMERA_REQUEST_CODE = 1000;
     final String[] PROJECTION = {MediaStore.Images.Media._ID, MediaStore.Images.Media.DISPLAY_NAME, MediaStore.Images.Media.WIDTH, MediaStore.Images.Media.HEIGHT, MediaStore.Images.Media.SIZE, MediaStore.Images.Media.DATE_ADDED,};
     private final Activity activity;
     private final DatabaseHelper dbHelper;
@@ -52,6 +52,7 @@ public class ImageController implements Controller {
         this.dbHelper = new DatabaseHelper(activity);
         this.firebaseManager = FirebaseManager.getInstance(activity);
     }
+
     private DatabaseHelper getDbHelper(){
         return dbHelper;
     }
@@ -95,6 +96,25 @@ public class ImageController implements Controller {
         if (requestCode == REQUEST_CODE_PICK_MULTIPLE_IMAGES && resultCode == RESULT_OK && data != null) {
             handleImagePicked(data);
         }
+        // xử lý ảnh chụp từ camera trong app
+        if (requestCode == CAMERA_REQUEST_CODE && resultCode == RESULT_OK && data != null) {
+            Bitmap bitmap = (Bitmap) data.getExtras().get("data");
+            if (bitmap != null) {
+                Uri imageUri = convertFromBitmapToURI(activity, bitmap);
+                handleImageFromCamera(imageUri);
+
+            } else {
+                Log.d("Camera in app", "Bitmap Image is null");
+            }
+        }
+    }
+
+    private Uri convertFromBitmapToURI(Context inContext, Bitmap inImage) {
+        String imageName = "IMG_" + System.currentTimeMillis() + ".jpg";
+        ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+        inImage.compress(Bitmap.CompressFormat.JPEG, 100, bytes);
+        String path = MediaStore.Images.Media.insertImage(inContext.getContentResolver(), inImage, imageName, null);
+        return Uri.parse(path);
     }
 
     private void handleImagePicked(Intent data) {
@@ -117,16 +137,15 @@ public class ImageController implements Controller {
         }
 
         for (Task<Uri> task : uploadTasks) {
-
             task.addOnCompleteListener(task1 -> {
                 if (task1.isSuccessful()) {
                     try {
                         Uri uriImage = task1.getResult(); // The uri with the location of the file in firebase
                         update("ref", uriImage.toString(), "id = " + idSelectedImages.get(uploadTasks.indexOf(task1))); // Update the reference of the image
                         Log.v("Image", "Image uploaded" + " at " + idSelectedImages.get(uploadTasks.indexOf(task1)));
-                        if(allTasksCompleted(uploadTasks)){
+                        if (allTasksCompleted(uploadTasks)) {
                             activity.runOnUiThread(() -> {
-                                ((HomeScreen) activity).onBackgroundTaskCompleted();
+                                ((MainFragmentController) activity).onBackgroundTaskCompleted();
                             });
                         }
                     } catch (Exception e) {
@@ -136,6 +155,29 @@ public class ImageController implements Controller {
 
                 }
             });
+        }
+    }
+
+    private void handleImageFromCamera(Uri imageUri) {
+        retrieveDataImageFromURL(imageUri);
+        Log.d("Camera in app", "here");
+        try {
+            Long id = dbHelper.getLastId("Image");
+            String id_string = Long.toString(id);
+            Task<Uri> uploadTask = uploadImage(imageUri);
+            uploadTask.addOnCompleteListener(task -> {
+                if (task.isSuccessful()) {
+                    Uri firebaseURI = task.getResult();
+                    Log.d("test firebase uri", firebaseURI.toString());
+                    update("ref", firebaseURI.toString(), "id = " + id_string);
+                    activity.runOnUiThread(() -> {
+                        ((MainFragmentController) activity).onBackgroundTaskCompleted();
+                    });
+                }
+            });
+        } catch (Exception e) {
+            e.printStackTrace();
+            Log.d("Camera in app", "add and update image fail");
         }
     }
 
@@ -252,7 +294,8 @@ public class ImageController implements Controller {
         Log.v("Image", "Selected images: " + "ref" + "id IN (" + replace + ")");
         return dbHelper.select("Image", "ref", "id IN (" + replace + ")");
     }
-    private String parseURL(String url){
+
+    private String parseURL(String url) {
         String filename = null;
         try {
             // Parse the URL
@@ -267,7 +310,7 @@ public class ImageController implements Controller {
         return filename;
     }
 
-    public void deleteSelectedImage(String imageURL){
+    public void deleteSelectedImage(String imageURL) {
         String URL = parseURL(imageURL);
         Log.d("URL", URL);
 
@@ -286,7 +329,8 @@ public class ImageController implements Controller {
                 delete("ref = '" + imageURL + "'");
                 Toast.makeText(activity, "Image deleted successfully", Toast.LENGTH_SHORT).show();
                 // You may want to update your local data or UI here if necessary.
-                Intent intent = new Intent(activity, HomeScreen.class);
+
+                Intent intent = new Intent(activity, MainFragmentController.class);
                 activity.startActivity(intent);
                 activity.finish();
             }
@@ -298,7 +342,8 @@ public class ImageController implements Controller {
             }
         });
     }
-    public String checkExistURL(String longImageURL){
+
+    public String checkExistURL(String longImageURL) {
         String[] parts = longImageURL.split("/");
         String imageURL = parts[parts.length - 1];
 
@@ -326,8 +371,8 @@ public class ImageController implements Controller {
         // Create a storage reference from our app
         StorageReference storageRef = storage.getReference();
 
-        for(Task taskImageURL : imageURLs){
-            if(taskImageURL.isSuccessful()){
+        for (Task taskImageURL : imageURLs) {
+            if (taskImageURL.isSuccessful()) {
                 String imageURL = taskImageURL.getResult().toString();
                 Log.d("Image task", imageURL);
                 String URL = parseURL(imageURL);
@@ -341,9 +386,9 @@ public class ImageController implements Controller {
                     public void onSuccess(Void aVoid) {
                         // File deleted successfully
                         delete("ref = '" + imageURL + "'");
-                        if(allTasksCompletedGeneric(imageURLs)){
+                        if (allTasksCompletedGeneric(imageURLs)) {
                             activity.runOnUiThread(() -> {
-                                ((HomeScreen) activity).onBackgroundTaskCompleted();
+                                ((MainFragmentController) activity).onBackgroundTaskCompleted();
                             });
                         }
                     }
