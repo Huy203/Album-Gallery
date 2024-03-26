@@ -7,6 +7,8 @@ import androidx.fragment.app.Fragment;
 import com.example.albumgallery.DatabaseHelper;
 import com.example.albumgallery.model.Model;
 
+import java.util.List;
+
 public class MainController {
     private final AlbumController albumController;
     private final ImageController imageController;
@@ -24,4 +26,8 @@ public class MainController {
     public ImageController getImageController() {
         return imageController;
     }
+    public List<String> getImagePaths() {
+        return imageController.getImagePaths();
+    }
+
 }

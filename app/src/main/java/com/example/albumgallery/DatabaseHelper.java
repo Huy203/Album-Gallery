@@ -169,6 +169,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 : (where == null)
                 ? db.rawQuery("SELECT " + column + " FROM " + table, null)
                 : db.rawQuery("SELECT " + column + " FROM " + table + " WHERE " + where, null);
+        Log.d("hello",cursor.toString());
         if (cursor.moveToFirst()) {
             while (!cursor.isAfterLast()) {
                 String temp = cursor.getString(0) + "," + cursor.getString(1) + "," + cursor.getString(2)+ "," + cursor.getString(3)+ "," + cursor.getString(4)+ "," + cursor.getString(5)+ "," + cursor.getString(6)+ "," + cursor.getString(7)+ "," + cursor.getString(8)+ "," + cursor.getString(9)+ "," + cursor.getString(10);
@@ -258,6 +259,18 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             while (!cursor.isAfterLast()) {
                 String temp = cursor.getString(0) + "," + cursor.getString(1) + "," + cursor.getString(2)+ "," + cursor.getString(3)+ "," + cursor.getString(4)+ "," + cursor.getString(5)+ "," + cursor.getString(6)+ "," + cursor.getString(7)+ "," + cursor.getString(8)+ "," + cursor.getString(9)+ "," + cursor.getString(10);
                 data.add(temp);
+                cursor.moveToNext();
+            }
+        }
+        return data;
+    }
+    public List<String> getAllRef(String table){
+        List<String> data = new ArrayList<>();
+        SQLiteDatabase db = getWritableDatabase();
+        Cursor cursor = db.rawQuery("SELECT ref FROM " + table, null);
+        if(cursor.moveToFirst()){
+            while(!cursor.isAfterLast()){
+                data.add(cursor.getString(0));
                 cursor.moveToNext();
             }
         }
