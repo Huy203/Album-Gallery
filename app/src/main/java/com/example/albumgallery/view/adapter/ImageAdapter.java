@@ -3,8 +3,10 @@ package com.example.albumgallery.view.adapter;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.media.Image;
 import android.net.Uri;
 import android.util.SparseBooleanArray;
+import android.view.ContentInfo;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -29,7 +31,7 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> 
     private final List<String> imageURLs;
     private final SparseBooleanArray selectedItems;
     private boolean isMultipleChoice = false;
-    private final ImageAdapterListener listener;
+    private ImageAdapterListener listener;
 
     public ImageAdapter(Activity activity, List<String> imageURLs) {
         this.context = activity;
@@ -37,6 +39,10 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> 
         this.selectedItems = new SparseBooleanArray();
         this.listener = (ImageAdapterListener) activity;
     }
+
+//    public void setImageAdapterListener(ImageAdapterListener listener) {
+//        this.listener = listener;
+//    }
 
     @NonNull
     @Override
@@ -66,6 +72,14 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> 
     public boolean toggleMultipleChoiceImagesEnabled() {
         if (listener != null) {
             setMultipleChoiceEnabled(!isMultipleChoice);
+        }
+        else{
+            Log.v("ImageAdapter", "toggleMultipleChoiceImagesEnabled: listener is null");
+        }
+        if (getMultipleChoiceImagesEnabled()) {
+            View view = LayoutInflater.from(context).inflate(R.layout.item_image, null);
+            CheckBox checkBox = view.findViewById(R.id.checkbox);
+            checkBox.setVisibility(View.INVISIBLE);
         }
         return isMultipleChoice;
     }
