@@ -4,15 +4,18 @@ import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityOptionsCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
 import com.example.albumgallery.R;
+import com.example.albumgallery.controller.MainController;
 import com.example.albumgallery.databinding.ActivityFragmentControllerBinding;
 import com.example.albumgallery.view.adapter.ImageAdapterListener;
 import com.example.albumgallery.view.fragment.AlbumsMainFragment;
@@ -22,6 +25,7 @@ import com.example.albumgallery.view.fragment.HomeScreenFragment;
 public class MainFragmentController extends AppCompatActivity implements BackgroundProcessingCallback, ImageAdapterListener {
     ActivityFragmentControllerBinding binding;
     private boolean isBackgroundTaskCompleted = true;
+    private MainController mainController; //controller contains other controllers
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -30,6 +34,8 @@ public class MainFragmentController extends AppCompatActivity implements Backgro
         getSupportFragmentManager().beginTransaction()
                 .add(R.id.fragment_container, fragment)
                 .commit();
+
+        mainController = new MainController(this);
 
         binding = ActivityFragmentControllerBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
@@ -103,5 +109,16 @@ public class MainFragmentController extends AppCompatActivity implements Backgro
         if (fragment != null) {
             fragment.getSelectedItemsCount(count);
         }
+    }
+
+    @Override
+    public void handleImagePick(View itemView, String uri, int position) {
+        Intent intent = new Intent(this, DetailPicture.class);
+        ActivityOptionsCompat options = ActivityOptionsCompat.makeSceneTransitionAnimation(this, itemView, "image");
+        long id = mainController.getImageController().getIdByRef(uri);
+        intent.putExtra("id", id);
+        intent.putExtra("position", position);
+        Log.v("ImageAdapter", "Image selected: " + itemView);
+        startActivity(intent, options.toBundle());
     }
 }
