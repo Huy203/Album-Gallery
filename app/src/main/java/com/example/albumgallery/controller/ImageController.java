@@ -7,10 +7,8 @@ import static com.example.albumgallery.utils.Constant.imageExtensions;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.ClipData;
-import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
-import android.graphics.Bitmap;
 import android.net.Uri;
 import android.provider.MediaStore;
 import android.util.Log;
@@ -32,7 +30,6 @@ import com.google.firebase.storage.StorageMetadata;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 
-import java.io.ByteArrayOutputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.file.Paths;
@@ -56,7 +53,6 @@ public class ImageController implements Controller {
         this.firebaseManager = FirebaseManager.getInstance(activity);
     }
 
-
     private DatabaseHelper getDbHelper(){
         return dbHelper;
     }
@@ -70,6 +66,7 @@ public class ImageController implements Controller {
     public void insert(Model model) {
         idSelectedImages.add(dbHelper.insert("Image", model));
         dbHelper.close();
+        firebaseManager.getStorage();
         // FirebaseStorage storage = FirebaseStorage.getInstance();
     }
 
@@ -251,7 +248,6 @@ public class ImageController implements Controller {
         }
         return true;
     }
-
     private boolean allTasksCompletedGeneric(List<Task> tasks) {
         for (Task<Uri> task : tasks) {
             if (!task.isSuccessful()) {
@@ -277,9 +273,8 @@ public class ImageController implements Controller {
     }
 
     public List<String> getAllImageURLs() {
-        return dbHelper.select("Image", "ref", null);
+        return dbHelper.getAllRef("Image");
     }
-
     public ImageModel getImageById(long id) {
         String data = dbHelper.getById("Image", id);
         String[] temp = data.split(",");
@@ -296,6 +291,7 @@ public class ImageController implements Controller {
 
     public List<String> getSelectedImageURLs() {
         final String replace = idSelectedImages.toString().replace("[", "").replace("]", "");
+        Log.v("Image", "Selected images: " + "ref" + "id IN (" + replace + ")");
         return dbHelper.select("Image", "ref", "id IN (" + replace + ")");
     }
 
@@ -331,6 +327,7 @@ public class ImageController implements Controller {
             public void onSuccess(Void aVoid) {
                 // File deleted successfully
                 delete("ref = '" + imageURL + "'");
+                Toast.makeText(activity, "Image deleted successfully", Toast.LENGTH_SHORT).show();
                 // You may want to update your local data or UI here if necessary.
 
                 Intent intent = new Intent(activity, MainFragmentController.class);
@@ -366,8 +363,10 @@ public class ImageController implements Controller {
         }
         return null;
     }
-
-    public void deleteSelectedImageAtHomeScreeen(List<Task> imageURLs) {
+    public List<String> getImagePaths() {
+        return getAllImageURLs();
+    }
+    public void deleteSelectedImageAtHomeScreeen(List<Task> imageURLs){
         FirebaseStorage storage = FirebaseStorage.getInstance();
         // Create a storage reference from our app
         StorageReference storageRef = storage.getReference();
@@ -403,5 +402,4 @@ public class ImageController implements Controller {
             }
         }
     }
-
 }

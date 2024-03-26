@@ -1,7 +1,17 @@
 package com.example.albumgallery.view.activity;
+import com.bumptech.glide.Glide;
+import com.example.albumgallery.R;
+import com.example.albumgallery.controller.MainController;
+import com.example.albumgallery.controller.OnSwipeTouchListener;
+import com.example.albumgallery.model.ImageModel;
+import com.example.albumgallery.view.adapter.ImageInfoListener;
+import com.example.albumgallery.view.fragment.ImageInfo;
 
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
@@ -14,27 +24,47 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.FragmentTransaction;
 
-import com.bumptech.glide.Glide;
-import com.example.albumgallery.R;
-import com.example.albumgallery.controller.Controller;
-import com.example.albumgallery.controller.MainController;
-import com.example.albumgallery.model.ImageModel;
-import com.example.albumgallery.view.fragment.ImageInfo;
-import com.example.albumgallery.view.adapter.ImageInfoListener;
-
-import java.util.Objects;
+import java.util.List;
 
 public class DetailPicture extends AppCompatActivity implements ImageInfoListener {
     private MainController mainController;
+    private ImageView imageView;
+    private List<String> imagePaths;
+    private int currentPosition;
     private View view ;
     private boolean isImageInfoVisible = false;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_detail_image);
 
         mainController = new MainController(this);
+        imagePaths = mainController.getImagePaths();
+        currentPosition = getIntent().getIntExtra("position", 0);
+
+        imageView = findViewById(R.id.memeImageView);
+        loadImage(currentPosition);
+
+        // Detect swipe gestures
+        imageView.setOnTouchListener(new OnSwipeTouchListener(this) {
+            @Override
+            public void onSwipeLeft() {
+                // Swipe left, show next image
+                if (currentPosition < imagePaths.size() - 1) {
+                    currentPosition++;
+                    loadImage(currentPosition);
+                }
+            }
+
+            @Override
+            public void onSwipeRight() {
+                // Swipe right, show previous image
+                if (currentPosition > 0) {
+                    currentPosition--;
+                    loadImage(currentPosition);
+                }
+            }
+        });
         ImageInfo imageInfoFragment = new ImageInfo();
 
         ImageView backButton = findViewById(R.id.backButton);
@@ -46,14 +76,14 @@ public class DetailPicture extends AppCompatActivity implements ImageInfoListene
 
         pencilButton.setOnClickListener(v -> {
             Intent intent = new Intent(DetailPicture.this, EditImageActivity.class);
-            // truyền ảnh sang edit image activity
-            long id = intent.getLongExtra("id", 0);
+
+            long id = mainController.getImageController().getIdByRef(imagePaths.get(currentPosition));
             intent.putExtra("id", id);
             startActivity(intent);
             finish();
         });
         backButton.setOnClickListener(v -> {
-//            Intent intent = new Intent(DetailPicture.this, HomeScreen.class);
+            //Intent intent = new Intent(DetailPicture.this, HomeScreen.class);
 //            startActivity(intent);
             supportFinishAfterTransition();
         });
@@ -62,7 +92,6 @@ public class DetailPicture extends AppCompatActivity implements ImageInfoListene
             // Hiển thị menu hoặc dialog chọn tùy chọn
             showOptionsDialog();
         });
-
         String uri = getImageModel().getRef();
         trashButton.setOnClickListener(v -> {
             if (uri != null) {
@@ -74,6 +103,10 @@ public class DetailPicture extends AppCompatActivity implements ImageInfoListene
             }
         });
 
+        //        // Lấy ảnh từ image adapter, hiển thị vào edit image screen.
+//        String imagePath = getIntent().getStringExtra("imagePath");
+//        ImageView imageView = findViewById(R.id.memeImageView);
+//        Glide.with(this).load(Uri.parse(imagePath)).into(imageView);
         ImageInfo.setOnClickListener(v -> {
             toggleImageInfo();
         });
@@ -86,7 +119,7 @@ public class DetailPicture extends AppCompatActivity implements ImageInfoListene
                 .add(R.id.imageInfo, imageInfoFragment)
                 .commit();
 
-        // Lấy ảnh từ image adapter, hiển thị vào edit image screen.
+
         ImageView imageView = findViewById(R.id.memeImageView);
         Glide.with(this).load(Uri.parse(uri)).into(imageView);
     }
@@ -104,6 +137,10 @@ public class DetailPicture extends AppCompatActivity implements ImageInfoListene
         });
         builder.setNegativeButton("Cancel", null);
         builder.show();
+    }
+
+    private void loadImage(int position) {
+        Glide.with(this).load(Uri.parse(imagePaths.get(position))).into(imageView);
     }
 
     private void showOptionsDialog() {
@@ -131,7 +168,6 @@ public class DetailPicture extends AppCompatActivity implements ImageInfoListene
         });
         builder.show();
     }
-
     private void toggleImageInfo() {
         isImageInfoVisible = !isImageInfoVisible;
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();

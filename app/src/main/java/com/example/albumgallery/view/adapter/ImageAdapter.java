@@ -106,7 +106,7 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> 
 
             itemView.setOnClickListener(view -> {
                 if (!isMultipleChoice) {
-                    listener.handleImagePick(imageView, imageURL);
+                    listener.handleImagePick(imageView, imageURL, position);
                 } else {
                     toggleSelection(position);
                     listener.getSelectedItemsCount(selectedItems.size());
