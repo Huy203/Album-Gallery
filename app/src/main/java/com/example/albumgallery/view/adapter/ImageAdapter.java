@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.media.Image;
 import android.net.Uri;
+import android.util.Log;
 import android.util.SparseBooleanArray;
 import android.view.ContentInfo;
 import android.view.LayoutInflater;

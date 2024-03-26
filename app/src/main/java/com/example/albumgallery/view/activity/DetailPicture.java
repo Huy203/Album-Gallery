@@ -1,4 +1,5 @@
 package com.example.albumgallery.view.activity;
+
 import com.bumptech.glide.Glide;
 import com.example.albumgallery.R;
 import com.example.albumgallery.controller.MainController;
@@ -31,8 +32,9 @@ public class DetailPicture extends AppCompatActivity implements ImageInfoListene
     private ImageView imageView;
     private List<String> imagePaths;
     private int currentPosition;
-    private View view ;
+    private View view;
     private boolean isImageInfoVisible = false;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -168,6 +170,7 @@ public class DetailPicture extends AppCompatActivity implements ImageInfoListene
         });
         builder.show();
     }
+
     private void toggleImageInfo() {
         isImageInfoVisible = !isImageInfoVisible;
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
