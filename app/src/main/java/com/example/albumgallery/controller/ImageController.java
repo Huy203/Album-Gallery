@@ -123,6 +123,7 @@ public class ImageController implements Controller {
     }
 
     private void handleImagePicked(Intent data) {
+        Log.v("Image", "Image picked" + " " + data.getData());
         List<Uri> imageUris = new ArrayList<>();
         if (data.getData() != null) {
             // Single image selected
@@ -138,6 +139,7 @@ public class ImageController implements Controller {
         List<Task<Uri>> uploadTasks = new ArrayList<>();
         for (Uri uri : imageUris) {
             retrieveDataImageFromURL(uri);
+            Log.v("Image", "Image selected" + " " + uri);
             uploadTasks.add(uploadImage(uri));
         }
 
@@ -213,6 +215,7 @@ public class ImageController implements Controller {
     }
 
     private Task<Uri> uploadImage(Uri uri) {
+        Log.v("Image", "Uploading image" + " " + uri);
         String extensionName = getExtensionName(uri);
 
         // Create file metadata including the content type
@@ -240,6 +243,7 @@ public class ImageController implements Controller {
             }
 
             // Continue with the task to get the download URL
+            Log.v("Image", "Image uploaded" + " " + imageRef.getDownloadUrl());
             return imageRef.getDownloadUrl();
 
         });

@@ -25,7 +25,6 @@ import com.example.albumgallery.view.fragment.HomeScreenFragment;
 public class MainFragmentController extends AppCompatActivity implements BackgroundProcessingCallback, ImageAdapterListener {
     ActivityFragmentControllerBinding binding;
     private boolean isBackgroundTaskCompleted = true;
-    private MainController mainController; //controller contains other controllers
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -34,8 +33,6 @@ public class MainFragmentController extends AppCompatActivity implements Backgro
         getSupportFragmentManager().beginTransaction()
                 .add(R.id.fragment_container, fragment)
                 .commit();
-
-        mainController = new MainController(this);
 
         binding = ActivityFragmentControllerBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
@@ -113,12 +110,9 @@ public class MainFragmentController extends AppCompatActivity implements Backgro
 
     @Override
     public void handleImagePick(View itemView, String uri, int position) {
-        Intent intent = new Intent(this, DetailPicture.class);
-        ActivityOptionsCompat options = ActivityOptionsCompat.makeSceneTransitionAnimation(this, itemView, "image");
-        long id = mainController.getImageController().getIdByRef(uri);
-        intent.putExtra("id", id);
-        intent.putExtra("position", position);
-        Log.v("ImageAdapter", "Image selected: " + itemView);
-        startActivity(intent, options.toBundle());
+        HomeScreenFragment fragment = (HomeScreenFragment) getSupportFragmentManager().findFragmentById(R.id.fragment_container);
+        if (fragment != null) {
+            fragment.handleImagePick(itemView, uri, position);
+        }
     }
 }

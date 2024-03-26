@@ -145,7 +145,7 @@ public class ImageModel implements Model {
 
     @Override
     public String insert() {
-        return "INSERT INTO Image (name, width, height, capacity, ref, created_at, notice, remain_time, is_deleted, is_favourited) VALUES ('" + name + "', " + width + ", " + height + ", " + capacity + ", '" + ref + "', '" + created_at + "', '" + notice + "', '" + remain_time + "', " + is_deleted + ", " + is_favourited + ")";
+        return "INSERT INTO Image (name, width, height, capacity, ref, created_at, notice, remain_time, is_deleted, is_favourited) VALUES ('" + name + "', " + width + ", " + height + ", " + capacity + ", '" + ref + "', '" + created_at + "', '" + notice + "', '" + remain_time + "', " + (is_deleted ? 1 : 0) + ", " + (is_favourited ? 1 : 0) + ")";
     }
 
     @Override
