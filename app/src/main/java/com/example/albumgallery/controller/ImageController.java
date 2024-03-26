@@ -7,8 +7,10 @@ import static com.example.albumgallery.utils.Constant.imageExtensions;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.ClipData;
+import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.provider.MediaStore;
 import android.util.Log;
@@ -30,6 +32,7 @@ import com.google.firebase.storage.StorageMetadata;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 
+import java.io.ByteArrayOutputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.file.Paths;
