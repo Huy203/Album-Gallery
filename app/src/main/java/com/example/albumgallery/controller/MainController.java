@@ -2,6 +2,8 @@ package com.example.albumgallery.controller;
 
 import android.app.Activity;
 
+import androidx.fragment.app.Fragment;
+
 import com.example.albumgallery.DatabaseHelper;
 import com.example.albumgallery.model.Model;
 
@@ -15,6 +17,7 @@ public class MainController {
         albumController = new AlbumController(activity);
         imageController = new ImageController(activity);
     }
+
 
     public AlbumController getAlbumController() {
         return albumController;
