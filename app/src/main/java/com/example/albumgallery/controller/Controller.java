@@ -1,5 +1,8 @@
 package com.example.albumgallery.controller;
 
+import android.app.Activity;
+
+import com.example.albumgallery.FirebaseManager;
 import com.example.albumgallery.model.Model;
 
 public interface Controller {
@@ -8,4 +11,5 @@ public interface Controller {
     void update(String column, String value, String where); // Update a model
 
     void delete(String where); // Delete a model
+
 }
