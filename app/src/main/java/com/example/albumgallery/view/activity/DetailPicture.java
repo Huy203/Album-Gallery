@@ -1,5 +1,9 @@
 package com.example.albumgallery.view.activity;
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.DataSource;
+import com.bumptech.glide.load.engine.GlideException;
+import com.bumptech.glide.request.RequestListener;
+import com.bumptech.glide.request.target.Target;
 import com.example.albumgallery.R;
 import com.example.albumgallery.controller.MainController;
 import com.example.albumgallery.controller.OnSwipeTouchListener;
@@ -7,6 +11,7 @@ import com.example.albumgallery.model.ImageModel;
 import com.example.albumgallery.view.adapter.ImageInfoListener;
 import com.example.albumgallery.view.fragment.ImageInfo;
 
+import android.app.WallpaperManager;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -16,14 +21,19 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import androidx.annotation.AnimRes;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.FragmentTransaction;
 
+import java.io.IOException;
 import java.util.List;
 
 public class DetailPicture extends AppCompatActivity implements ImageInfoListener {
@@ -46,10 +56,9 @@ public class DetailPicture extends AppCompatActivity implements ImageInfoListene
         loadImage(currentPosition);
 
         // Detect swipe gestures
-        imageView.setOnTouchListener(new OnSwipeTouchListener(this) {
+        imageView.setOnTouchListener(new OnSwipeTouchListener(this, imageView) {
             @Override
             public void onSwipeLeft() {
-                // Swipe left, show next image
                 if (currentPosition < imagePaths.size() - 1) {
                     currentPosition++;
                     loadImage(currentPosition);
@@ -58,7 +67,6 @@ public class DetailPicture extends AppCompatActivity implements ImageInfoListene
 
             @Override
             public void onSwipeRight() {
-                // Swipe right, show previous image
                 if (currentPosition > 0) {
                     currentPosition--;
                     loadImage(currentPosition);
@@ -143,10 +151,11 @@ public class DetailPicture extends AppCompatActivity implements ImageInfoListene
         Glide.with(this).load(Uri.parse(imagePaths.get(position))).into(imageView);
     }
 
+
     private void showOptionsDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Options");
-        builder.setItems(new CharSequence[]{"Add to album", "Mat", "Start referencing", "Detail"}, new DialogInterface.OnClickListener() {
+        builder.setItems(new CharSequence[]{"Add to album", "Set as Wallpaper", "Start referencing", "Detail"}, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 // Xử lý khi người dùng chọn một tùy chọn
@@ -155,7 +164,8 @@ public class DetailPicture extends AppCompatActivity implements ImageInfoListene
                         // Xử lý khi người dùng chọn "Add to album"
                         break;
                     case 1:
-                        // Xử lý khi người dùng chọn "Mat"
+                        // Xử lý khi người dùng chọn "Set as Wallpaper"
+                        setAsWallpaper(imagePaths.get(currentPosition));
                         break;
                     case 2:
                         // Xử lý khi người dùng chọn "Start referencing"
@@ -195,6 +205,37 @@ public class DetailPicture extends AppCompatActivity implements ImageInfoListene
 
     public MainController getMainController() {
         return mainController;
+    }
+
+    private void setAsWallpaper(String imagePath) {
+        Glide.with(this)
+                .asBitmap()
+                .load(Uri.parse(imagePath))
+                .addListener(new RequestListener<Bitmap>() {
+                    @Override
+                    public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Bitmap> target, boolean isFirstResource) {
+                        Log.e("DetailPicture", "Failed to load image: " + e.getMessage());
+                        Toast.makeText(DetailPicture.this, "Failed to set wallpaper", Toast.LENGTH_SHORT).show();
+                        return false;
+                    }
+
+                    @Override
+                    public boolean onResourceReady(Bitmap resource, Object model, Target<Bitmap> target, DataSource dataSource, boolean isFirstResource) {
+                        WallpaperManager wallpaperManager = WallpaperManager.getInstance(getApplicationContext());
+                        try {
+                            wallpaperManager.setBitmap(resource);
+                            //Toast.makeText(DetailPicture.this, "Wallpaper set successfully", Toast.LENGTH_SHORT).show();
+                        } catch (IOException e) {
+                            Log.e("DetailPicture", "Failed to set wallpaper: " + e.getMessage());
+                            Toast.makeText(DetailPicture.this, "Failed to set wallpaper", Toast.LENGTH_SHORT).show();
+                        }
+                        return false;
+                    }
+
+
+                })
+                .submit();
+        Toast.makeText(DetailPicture.this, "Wallpaper set successfully", Toast.LENGTH_SHORT).show();
     }
 
 }
