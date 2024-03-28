@@ -41,6 +41,7 @@
         <activity android:name=".view.activity.RegisterScreen" />
         <activity android:name=".view.activity.CreateAlbumActivity" />
         <activity android:name=".view.activity.HomeScreen" />
+        <activity android:name=".view.activity.SelectImageActivity" />
 
     </application>
 </manifest>

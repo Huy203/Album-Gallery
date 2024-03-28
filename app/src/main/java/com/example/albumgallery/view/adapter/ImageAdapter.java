@@ -26,7 +26,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> {
+public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> implements View.OnClickListener {
     private final Context context;
     private final List<String> imageURLs;
     private final SparseBooleanArray selectedItems;
@@ -85,6 +85,11 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> 
         notifyDataSetChanged();
     }
 
+    @Override
+    public void onClick(View view) {
+
+    }
+
     public class ViewHolder extends RecyclerView.ViewHolder {
 
         private final ImageView imageView;
@@ -132,4 +137,5 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> 
         File imageFile = new File(imageURL);
         return imageFile.exists() ? imageFile.lastModified() : 0;
     }
+
 }

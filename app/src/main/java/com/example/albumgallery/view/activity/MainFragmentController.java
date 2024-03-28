@@ -39,6 +39,12 @@ public class MainFragmentController extends AppCompatActivity implements Backgro
         // fragment đầu tiên khi vừa vào app
 //        replaceFragment(new HomeScreenFragment());
 
+        String fragmentToLoad = getIntent().getStringExtra("fragmentToLoad");
+        if(fragmentToLoad != null && fragmentToLoad.equals("AlbumMain")) {
+            replaceFragment(new AlbumsMainFragment());
+        }
+
+
         binding.bottomNavigationView.setOnItemSelectedListener(item -> {
             int itemId = item.getItemId();
             if (itemId == R.id.photos) {
@@ -57,7 +63,11 @@ public class MainFragmentController extends AppCompatActivity implements Backgro
     public void onResume() {
         Toast.makeText(this, "onResume", Toast.LENGTH_SHORT).show();
         super.onResume();
-        HomeScreenFragment fragment = (HomeScreenFragment) getSupportFragmentManager().findFragmentById(R.id.fragment_container);
+        Fragment currentFragment = getSupportFragmentManager().findFragmentById(R.id.fragment_container);
+        HomeScreenFragment fragment = null;
+        if(currentFragment instanceof HomeScreenFragment) {
+            fragment = (HomeScreenFragment) getSupportFragmentManager().findFragmentById(R.id.fragment_container);
+        }
         if (fragment != null) {
             if (isBackgroundTaskCompleted)
                 fragment.updateUI();
