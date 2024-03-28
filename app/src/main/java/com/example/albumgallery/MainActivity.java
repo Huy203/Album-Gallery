@@ -10,6 +10,7 @@ import androidx.annotation.Nullable;
 
 import com.example.albumgallery.view.activity.MainFragmentController;
 import com.example.albumgallery.view.activity.LoginScreen;
+import com.example.albumgallery.view.activity.CropImageActivity;
 
 public class MainActivity extends ComponentActivity {
 
@@ -27,7 +28,7 @@ public class MainActivity extends ComponentActivity {
             startActivity(intent);
         });
         editButton.setOnClickListener(v -> {
-            Intent intent = new Intent(this, LoginScreen.class);
+            Intent intent = new Intent(this, CropImageActivity.class);
             startActivity(intent);
         });
 
