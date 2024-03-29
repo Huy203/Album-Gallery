@@ -35,7 +35,7 @@ public class AlbumModel implements Model{
 
     @Override
     public String insert() {
-        return null;
+        return "INSERT INTO Album (name, capacity, created_at, notice, remain_time, is_deleted, is_favourited) VALUES ('" + name + ", " + capacity + ", '" + created_at + "', '" + notice + "', '" + remain_time + "', " + (is_deleted ? 1 : 0) + ", " + (is_favourited ? 1 : 0) + ")";
     }
 
     @Override

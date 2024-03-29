@@ -2,7 +2,9 @@ package com.example.albumgallery.view.fragment;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.util.Log;
@@ -16,6 +18,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.core.app.ActivityOptionsCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
@@ -28,6 +31,8 @@ import com.example.albumgallery.view.activity.BackgroundProcessingCallback;
 import com.example.albumgallery.view.activity.DetailPicture;
 import com.example.albumgallery.view.adapter.ImageAdapter;
 import com.example.albumgallery.view.adapter.ImageAdapterListener;
+import com.google.android.gms.tasks.Task;
+import com.google.android.gms.tasks.Tasks;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -42,6 +47,8 @@ public class HomeScreenFragment extends Fragment {
     private TextView numberOfImagesSelected;
     private ImageAdapterListener iListener;
     private BackgroundProcessingCallback bgListener;
+    List<String> selectedImageURLs;
+    List<Task> selectedImageURLsTask;
 
     public HomeScreenFragment() {
         // Required empty public constructor
@@ -74,6 +81,8 @@ public class HomeScreenFragment extends Fragment {
         mainController = new MainController(getActivity());
         // imageURIs
         imageURIs = new ArrayList<>();
+        selectedImageURLs = new ArrayList<>();
+        selectedImageURLsTask = new ArrayList<>();
         imageAdapter = new ImageAdapter(getActivity(), imageURIs);
 //      imageAdapter.setImageAdapterListener(this);
         recyclerMediaView = view.findViewById(R.id.recyclerMediaView);
@@ -83,12 +92,18 @@ public class HomeScreenFragment extends Fragment {
 
         Button btnPickImageFromDevice = view.findViewById(R.id.btnPickImageFromDevice);
         Button btnPickMultipleImages = view.findViewById(R.id.btnPickMultipleImages);
+        Button btnDeleteMultipleImages = view.findViewById(R.id.btnDeleteMultipleImages);
 
         numberOfImagesSelected = view.findViewById(R.id.numberOfSelectedImages);
 
         btnPickImageFromDevice.setOnClickListener(v -> {
             isBackgroundTaskCompleted = false;
             mainController.getImageController().pickMultipleImages(bgListener);
+        });
+
+        btnDeleteMultipleImages.setOnClickListener(v -> {
+            // mainController.getImageController().deleteSelectedImageAtHomeScreeen(selectedImageURLsTask, 1);
+            showDeleteConfirmationDialog();
         });
 
         btnPickMultipleImages.setOnClickListener(v -> {
@@ -136,9 +151,42 @@ public class HomeScreenFragment extends Fragment {
         imageAdapter.notifyDataSetChanged();
     }
 
+    @SuppressLint("SetTextI18n")
     public void getSelectedItemsCount(int count) {
+        Log.v("SelectedItems", count + " items selected");
         numberOfImagesSelected.setText(count + " images selected");
+
+//        List<Task<Uri>> task =  new ArrayList<>();
+//        for (String uri : imageURIs) {
+//            task.add(Tasks.forResult(Uri.parse(uri)));
+//        }
+
+        for (int i = 0; i < count; i++) {
+            selectedImageURLsTask.add(Tasks.forResult(Uri.parse(imageURIs.get(i))));
+            Log.d("Deleted images task", selectedImageURLsTask.get(i).getResult().toString());
+        }
+
+        for (int i = 0; i < count; i++) {
+            selectedImageURLs.add(imageURIs.get(i));
+            Log.d("Deleted images", selectedImageURLs.get(i));
+        }
     }
+
+    private void showDeleteConfirmationDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        builder.setTitle("Confirm Deletion");
+        builder.setMessage("Are you sure you want to delete this image?");
+        builder.setPositiveButton("Delete", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                // Call deleteSelectedImage() method from ImageController
+                mainController.getImageController().deleteSelectedImageAtHomeScreeen(selectedImageURLsTask);
+            }
+        });
+        builder.setNegativeButton("Cancel", null);
+        builder.show();
+    }
+
 
     public void handleImagePick(View view, String uri, int position) {
         FragmentActivity activity = getActivity();
