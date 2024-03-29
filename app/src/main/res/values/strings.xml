@@ -18,4 +18,5 @@
     <string name="fab_content_desc">create album</string>
     <string name="select_image">Select Image</string>
     <string name="confirm_create_album">Create Album</string>
+    <string name="private_album">Private Album</string>
 </resources>

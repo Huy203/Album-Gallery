@@ -6,6 +6,8 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.TextView;
 
 import androidx.annotation.Nullable;
@@ -58,6 +60,37 @@ public class SelectImageActivity extends AppCompatActivity implements ImageAdapt
 
         imageAdapter.notifyDataSetChanged();
         imageAdapter.toggleMultipleChoiceImagesEnabled();
+
+        handleInteractions();
+    }
+
+    private void handleInteractions() {
+        Button btnCreateAlbum = (Button) findViewById(R.id.btnCreateAlbum);
+        btnCreateAlbum.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(SelectImageActivity.this, CreateAlbumActivity.class);
+                // pass the number of images to CreateAlbumActivity
+                intent.putExtra("numOfImages", numberOfImagesSelected.getText().toString());
+                // pass the list of URLS to CreateAlbumActivity
+                intent.putStringArrayListExtra("selectedImageURLs", (ArrayList<String>) selectedImageURLs);
+                // set the afterSelectImage
+                intent.putExtra("isSelected", true);
+
+                startActivity(intent);
+                finish();
+            }
+        });
+
+        ImageButton btnBack = (ImageButton) findViewById(R.id.backButtonSelectImageActivity);
+        btnBack.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(SelectImageActivity.this, CreateAlbumActivity.class);
+                startActivity(intent);
+                finish();
+            }
+        });
     }
 
     @Override
