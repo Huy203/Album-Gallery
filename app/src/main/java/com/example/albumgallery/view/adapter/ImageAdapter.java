@@ -15,7 +15,6 @@ import android.widget.CheckBox;
 import android.widget.ImageView;
 
 import androidx.annotation.NonNull;
-import androidx.core.app.ActivityOptionsCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
@@ -24,10 +23,10 @@ import com.example.albumgallery.view.activity.DetailPicture;
 
 import java.io.File;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
-public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> {
-
+public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> implements View.OnClickListener {
     private final Context context;
     private final List<String> imageURLs;
     private final SparseBooleanArray selectedItems;
@@ -40,10 +39,6 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> 
         this.selectedItems = new SparseBooleanArray();
         this.listener = (ImageAdapterListener) activity;
     }
-
-//    public void setImageAdapterListener(ImageAdapterListener listener) {
-//        this.listener = listener;
-//    }
 
     @NonNull
     @Override
@@ -88,6 +83,11 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> 
     public void clearSelectedItems() {
         selectedItems.clear();
         notifyDataSetChanged();
+    }
+
+    @Override
+    public void onClick(View view) {
+
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {
@@ -137,4 +137,5 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> 
         File imageFile = new File(imageURL);
         return imageFile.exists() ? imageFile.lastModified() : 0;
     }
+
 }

@@ -88,7 +88,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                     "    PRIMARY KEY (image_id, album_id)\n" +
                     ");");
             db.execSQL("CREATE TABLE " + IMAGE_TAG_TABLE + "(\n" +
-                    "    image_id INTEGER REFERENCES " + IMAGE_TABLE + "(id),\n" +
+                    "    image_id INTEGER REFERENCES "   + IMAGE_TABLE + "(id),\n" +
                     "    tag_id INTEGER REFERENCES " + TAG_TABLE + "(id),\n" +
                     "    PRIMARY KEY (image_id, tag_id)\n" +
                     ");");

@@ -14,4 +14,6 @@
     <color name="textColor">#ECE5EC</color>
     <color name="pinkColor">#FF003B</color>
     <color name="tansparentColor">#00FFFFFF</color>
+    <color name="textInButtonColor">#8F43EE</color>
+    <color name="hintTextColor">#7C7C7C</color>
 </resources>
