@@ -54,6 +54,7 @@ android {
     kotlinOptions {
         jvmTarget = "19"
     }
+
 }
 
 dependencies {
@@ -93,4 +94,8 @@ dependencies {
     implementation("com.github.bumptech.glide:glide:4.16.0")
 
     implementation("com.google.android.gms:play-services-vision:20.1.3")
+
+    implementation("com.theartofdev.edmodo:android-image-cropper:2.8.0")
 }
+
+
