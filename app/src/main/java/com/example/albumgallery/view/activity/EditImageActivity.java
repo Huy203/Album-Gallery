@@ -1,11 +1,14 @@
-
 package com.example.albumgallery.view.activity;
 
 import android.annotation.SuppressLint;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
@@ -20,7 +23,10 @@ import androidx.core.widget.NestedScrollView;
 import com.bumptech.glide.Glide;
 import com.example.albumgallery.R;
 import com.example.albumgallery.controller.MainController;
-import com.example.albumgallery.view.CropImageActivity;
+
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 
 
 public class EditImageActivity extends AppCompatActivity {
@@ -29,7 +35,8 @@ public class EditImageActivity extends AppCompatActivity {
     private float scaleFactor = 1.0f;
     private GestureDetectorCompat gestureDetector;
     private float startX, startY, imageX, imageY;
-    private static final int REQUEST_IMAGE_CROP = 101;
+
+    private static final int CROP_IMAGE_REQUEST_CODE = 100;
 
     @SuppressLint("ClickableViewAccessibility")
     @Override
@@ -40,7 +47,6 @@ public class EditImageActivity extends AppCompatActivity {
 
         ImageView backButton = findViewById(R.id.backButton);
         memeImageView = findViewById(R.id.memeImageView);
-        NestedScrollView memeScrollView = findViewById(R.id.memeScrollView);
 
         backButton.setOnClickListener(v -> {
             showSaveChangesDialog();
@@ -76,7 +82,7 @@ public class EditImageActivity extends AppCompatActivity {
                 if (isMotionEventInsideView(e2.getRawX(), e2.getRawY(), memeImageView)) {
                     // Thực hiện zoom
                     scaleFactor -= distanceY / 1000;
-                    scaleFactor = Math.max(0.1f, Math.min(scaleFactor, 3.0f)); // Giới hạn scaleFactor
+                    scaleFactor = Math.max(0.1f, Math.min(scaleFactor, 3.0f));
                     memeImageView.setScaleX(scaleFactor);
                     memeImageView.setScaleY(scaleFactor);
                     return true;
@@ -85,20 +91,13 @@ public class EditImageActivity extends AppCompatActivity {
             }
         });
 
-//        memeScrollView.setOnTouchListener(new View.OnTouchListener() {
-//            @Override
-//            public boolean onTouch(View v, MotionEvent event) {
-//                gestureDetector.onTouchEvent(event);
-//                return true;
-//            }
-//        });
 
         zoomInButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 // Khi nút zoom in được bấm, tăng scaleFactor và cập nhật ảnh
                 scaleFactor += 0.1f;
-                scaleFactor = Math.min(scaleFactor, 3.0f); // Giới hạn scaleFactor
+                scaleFactor = Math.min(scaleFactor, 3.0f);
                 memeImageView.setScaleX(scaleFactor);
                 memeImageView.setScaleY(scaleFactor);
             }
@@ -109,7 +108,7 @@ public class EditImageActivity extends AppCompatActivity {
             public void onClick(View v) {
                 // Khi nút zoom out được bấm, giảm scaleFactor và cập nhật ảnh
                 scaleFactor -= 0.1f;
-                scaleFactor = Math.max(0.1f, scaleFactor); // Giới hạn scaleFactor
+                scaleFactor = Math.max(0.1f, scaleFactor);
                 memeImageView.setScaleX(scaleFactor);
                 memeImageView.setScaleY(scaleFactor);
             }
@@ -129,13 +128,24 @@ public class EditImageActivity extends AppCompatActivity {
                 startImageCropActivity();
             }
         });
-        // lấy ảnh từ detail image activity sang edit image activity
-        long id = getIntent().getLongExtra("id", 0);
-        String imageURL = mainController.getImageController().getImageById(id).getRef();
-        Glide.with(this).load(Uri.parse(imageURL)).into(memeImageView);
+        Bitmap croppedImage = getIntent().getParcelableExtra("croppedImage");
 
-//        ImageView memeImageView = findViewById(R.id.memeImageView);
-//        Glide.with(this).load(Uri.parse(imageURL)).into(memeImageView);
+        // Kiểm tra xem hình ảnh đã cắt có tồn tại hay không
+        if (croppedImage != null) {
+
+            ImageView imageView = findViewById(R.id.memeImageView);
+            imageView.setImageBitmap(croppedImage);
+        } else {
+
+            long id = getIntent().getLongExtra("id", 0);
+            String imageURL = mainController.getImageController().getImageById(id).getRef();
+            Glide.with(this).load(Uri.parse(imageURL)).into(memeImageView);
+        }
+    }
+
+    @Override
+    public void onBackPressed() {
+        showSaveChangesDialog();
     }
 
     private boolean isMotionEventInsideView(float x, float y, View view) {
@@ -176,36 +186,46 @@ public class EditImageActivity extends AppCompatActivity {
     }
 
     private void saveChangesAndGoBack() {
-        // save picture
         goBackToDetailScreen();
     }
 
     private void goBackToDetailScreen() {
-//        Intent intent = new Intent(EditImageActivity.this, DetailPicture.class);
-//        intent.putExtra("id", getIntent().getLongExtra("id", 0));
-//        startActivity(intent);
         finish();
     }
 
     private void startImageCropActivity() {
-        // Khởi tạo một intent để mở hoạt động cắt ảnh
         Intent intent = new Intent(EditImageActivity.this, CropImageActivity.class);
-        long id = getIntent().getLongExtra("id", 0);
-        String imageURL = mainController.getImageController().getImageById(id).getRef();
-        intent.putExtra("imageURL", imageURL);
-        startActivityForResult(intent, REQUEST_IMAGE_CROP);
+        intent.putExtra("imageUri", getImageUri());
+        startActivityForResult(intent, CROP_IMAGE_REQUEST_CODE);
     }
 
+    private Uri getImageUri() {
+        // Lấy Bitmap từ ImageView
+        Bitmap bitmap = ((BitmapDrawable) memeImageView.getDrawable()).getBitmap();
+
+        // Tạo một file tạm thời để lưu ảnh
+        File tempFile = null;
+        try {
+            tempFile = File.createTempFile("temp_image", ".jpg", getCacheDir());
+            FileOutputStream out = new FileOutputStream(tempFile);
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, out);
+            out.flush();
+            out.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        // Trả về Uri của file tạm thời
+        return tempFile != null ? Uri.fromFile(tempFile) : null;
+    }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == REQUEST_IMAGE_CROP && resultCode == RESULT_OK) {
-            // Xử lý ảnh đã cắt được ở đây
-            if (data != null) {
-                String croppedImagePath = data.getStringExtra("croppedImagePath");
-                // Load ảnh cắt được vào ImageView
-                Glide.with(this).load(croppedImagePath).into(memeImageView);
+        if (requestCode == CROP_IMAGE_REQUEST_CODE && resultCode == RESULT_OK && data != null) {
+            Bitmap croppedImage = data.getParcelableExtra("croppedImage");
+            if (croppedImage != null) {
+                memeImageView.setImageBitmap(croppedImage);
             }
         }
     }
