@@ -14,6 +14,7 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.albumgallery.R;
+import com.example.albumgallery.controller.MainController;
 import com.google.android.material.materialswitch.MaterialSwitch;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.switchmaterial.SwitchMaterial;
@@ -21,6 +22,7 @@ import com.google.android.material.textfield.TextInputLayout;
 
 public class CreateAlbumActivity extends AppCompatActivity {
 
+    private MainController mainController;
     private TextView numOfImagesTextView;
     private ImageButton backButton;
     private Button btnSelectImage;
@@ -37,6 +39,8 @@ public class CreateAlbumActivity extends AppCompatActivity {
 
         // handle all the interactions
         handleInteractions();
+
+        mainController = new MainController(this);
 
         // display number of images selected
         String numOfImages = getIntent().getStringExtra("numOfImages");
@@ -97,9 +101,12 @@ public class CreateAlbumActivity extends AppCompatActivity {
                     String password = passwordInputText.getEditText().getText().toString();
                     if(albumName.isEmpty()) {
                         makeNotification(findViewById(R.id.relativeLayoutCreateAlbum),"Album's name is empty");
+                        return;
                     } else if (isPrivate && password.isEmpty()) {
                         makeNotification(findViewById(R.id.relativeLayoutCreateAlbum), "Album's password is empty");
+                        return;
                     }
+                    mainController.getAlbumController().addAlbum(albumName, password);
                 }
             });
     }
