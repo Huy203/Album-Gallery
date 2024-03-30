@@ -66,6 +66,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                     "    created_at TIMESTAMP,\n" +
                     "    notice TEXT,\n" +
                     "    ref TEXT,\n" +
+                    "    is_deleted INTEGER,\n" +
                     "    num_of_images INTEGER,\n" +
                     "    password TEXT\n" +
                     ");");

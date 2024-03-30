@@ -17,6 +17,7 @@ public class AlbumModel implements Model{
     private String ref;
     private String password;
     private int num_of_images;   // number of images
+    private boolean is_deleted; // is album deleted
 
     public DatabaseHelper getDbHelper() {
         return dbHelper;
@@ -89,13 +90,6 @@ public class AlbumModel implements Model{
     public void setNum_of_images(int num_of_images) {
         this.num_of_images = num_of_images;
     }
-    public String getRemain_time() {
-        return remain_time;
-    }
-
-    public void setRemain_time(String remain_time) {
-        this.remain_time = remain_time;
-    }
 
     public boolean isIs_deleted() {
         return is_deleted;
@@ -104,9 +98,6 @@ public class AlbumModel implements Model{
     public void setIs_deleted(boolean is_deleted) {
         this.is_deleted = is_deleted;
     }
-
-    private String remain_time; // remaining time of the album
-    private boolean is_deleted; // is album deleted
 
     public AlbumModel(Context context) {
         dbHelper = new DatabaseHelper(context);
@@ -118,7 +109,6 @@ public class AlbumModel implements Model{
         this.capacity = capacity;
         this.created_at = (Calendar.getInstance().getTime()).toString();
         this.notice = "";
-        this.remain_time = "";
         this.is_deleted = false;
     }
 
@@ -134,11 +124,16 @@ public class AlbumModel implements Model{
         this.notice = "";
         this.num_of_images = num_of_images;
     }
+    public AlbumModel(String name, String password){
+        this.name = name;
+        this.password = password;
+    }
 
     @Override
     public String insert() {
-        return "INSERT INTO Album (name, capacity, created_at, notice, remain_time, is_deleted, password) VALUES ('" + name + ", " + capacity + ", '" + created_at + "', '" + notice + "', '" + remain_time + "', " + (is_deleted ? 1 : 0) + ", " + password + "', " + ")";
+        return "INSERT INTO Album (name, capacity, created_at, notice, is_deleted, password, num_of_images) VALUES ('" + name + "', " + capacity + ", '" + created_at + "', '" + notice + "', " + is_deleted + ", '" + password + "', " + num_of_images + ")";
     }
+
 
     @Override
     public void delete() {

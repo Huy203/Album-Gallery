@@ -53,9 +53,10 @@ public class AlbumController implements Controller {
         dbHelper.close();
     }
 
-    public void addAlbum() {
+    public void addAlbum(String name, String password) {
         // Add an album
-
+        AlbumModel albumModel = new AlbumModel(name, password);
+        this.insert((albumModel));
     }
 
     public void deleteAlbum() {
