@@ -62,13 +62,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             db.execSQL("CREATE TABLE " + ALBUM_TABLE + " (\n" +
                     "    id INTEGER PRIMARY KEY AUTOINCREMENT,\n" +
                     "    name TEXT,\n" +
-                    "    width REAL,\n" +
-                    "    height REAL,\n" +
                     "    capacity INTEGER,\n" +
                     "    created_at TIMESTAMP,\n" +
                     "    notice TEXT,\n" +
                     "    ref TEXT,\n" +
-                    "    user_id INTEGER,\n" +
+                    "    num_of_images INTEGER,\n" +
                     "    password TEXT\n" +
                     ");");
             db.execSQL("CREATE TABLE " + IMAGE_TABLE + " (\n" +
