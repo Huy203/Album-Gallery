@@ -25,6 +25,7 @@ import java.util.List;
 
 public class CreateAlbumActivity extends AppCompatActivity {
 
+    private MainController mainController;
     private TextView numOfImagesTextView;
     private ImageButton backButton;
     private Button btnSelectImage;
@@ -35,7 +36,6 @@ public class CreateAlbumActivity extends AppCompatActivity {
     private boolean isPrivate = false;
     private boolean isSelected = false;
     private List<String> selectedImageURLs;
-    private MainController mainController;
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -43,7 +43,7 @@ public class CreateAlbumActivity extends AppCompatActivity {
 
         // handle all the interactions
         handleInteractions();
-
+        mainController = new MainController(this);
         // display number of images selected
         String numOfImages = getIntent().getStringExtra("numOfImages");
         numOfImagesTextView = (TextView) findViewById(R.id.numberOfSelectedImagesCreateAlbumActivity);
@@ -55,7 +55,6 @@ public class CreateAlbumActivity extends AppCompatActivity {
         selectedImageURLs = new ArrayList<>();
         selectedImageURLs = getIntent().getStringArrayListExtra("selectedImageURLs");
 
-        mainController = new MainController(this);
 
     }
 
@@ -107,11 +106,13 @@ public class CreateAlbumActivity extends AppCompatActivity {
                     String password = passwordInputText.getEditText().getText().toString();
                     if(albumName.isEmpty()) {
                         makeNotification(findViewById(R.id.relativeLayoutCreateAlbum),"Album's name is empty");
+                        return;
                     } else if (isPrivate && password.isEmpty()) {
                         makeNotification(findViewById(R.id.relativeLayoutCreateAlbum), "Album's password is empty");
+                        return;
                     }
                     // add album
-
+                    mainController.getAlbumController().addAlbum(albumName, password);
                 }
             });
     }

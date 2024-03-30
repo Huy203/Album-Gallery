@@ -1,24 +1,62 @@
 package com.example.albumgallery.controller;
 
+import com.example.albumgallery.DatabaseHelper;
+import com.example.albumgallery.FirebaseManager;
 import com.example.albumgallery.model.AlbumModel;
+import com.example.albumgallery.model.ImageModel;
+import com.example.albumgallery.model.Model;
 
+import android.app.Activity;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
-public class AlbumController {
+import java.util.ArrayList;
+import java.util.List;
+
+public class AlbumController implements Controller {
     private AlbumModel album;
+    private final DatabaseHelper dbHelper;
 
     public AlbumController(Context context) {
         album = new AlbumModel(context);
+        this.dbHelper = new DatabaseHelper(context);
     }
-    public void getAllAlbums() {
+    private DatabaseHelper getDbHelper(){
+        return dbHelper;
+    }
+    public List<AlbumModel> getAllAlbums() {
         // Get all albums
-
+        List<String> data = dbHelper.getAll("Album");
+        List<AlbumModel> albumModels = new ArrayList<>();
+        for (String s : data) {
+            String[] temp = s.split(",");
+            albumModels.add(new AlbumModel(Integer.parseInt(temp[0]), temp[1], Integer.parseInt(temp[2]), temp[3], temp[4], Integer.parseInt(temp[5])));
+        }
+        return albumModels;
     }
-    public void addAlbum() {
-        // Add an album
+    @Override
+    public void insert(Model model) {
+        dbHelper.insert("Album", model);
+        dbHelper.close();
+    }
 
+    @Override
+    public void update(String column, String value, String where) {
+        dbHelper.update("Album", column, value, where);
+        dbHelper.close();
+    }
+
+    @Override
+    public void delete(String where) {
+        dbHelper.delete("Album", where);
+        dbHelper.close();
+    }
+
+    public void addAlbum(String name, String password) {
+        // Add an album
+        AlbumModel albumModel = new AlbumModel(name, password);
+        this.insert((albumModel));
     }
 
     public void deleteAlbum() {
