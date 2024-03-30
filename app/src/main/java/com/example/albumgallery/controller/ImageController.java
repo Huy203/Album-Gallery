@@ -18,15 +18,17 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 
+import com.example.albumgallery.view.activity.BackgroundProcessingCallback;
 import com.example.albumgallery.DatabaseHelper;
 import com.example.albumgallery.FirebaseManager;
 import com.example.albumgallery.model.ImageModel;
 import com.example.albumgallery.model.Model;
-import com.example.albumgallery.view.activity.BackgroundProcessingCallback;
+import com.example.albumgallery.view.activity.HomeScreen;
 import com.example.albumgallery.view.activity.MainFragmentController;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.Firebase;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageMetadata;
 import com.google.firebase.storage.StorageReference;
@@ -317,7 +319,7 @@ public class ImageController implements Controller {
         return filename;
     }
 
-    public void deleteSelectedImage(String imageURL) {
+    public void deleteSelectedImage(String imageURL){
         String URL = parseURL(imageURL);
         Log.d("URL", URL);
 

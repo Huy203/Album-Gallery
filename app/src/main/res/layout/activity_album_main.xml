@@ -23,12 +23,13 @@
 
         <ImageButton
             android:id="@+id/btnCreateAlbum"
-            android:layout_width="30dp"
-            android:layout_height="30dp"
-            android:layout_marginRight="20dp"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_marginEnd="20dp"
             android:src="@drawable/ic_plus"
             android:scaleType="fitCenter"
-            android:background="?attr/selectableItemBackgroundBorderless"/>
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="@string/create_album"/>
     </LinearLayout>
 
     <View

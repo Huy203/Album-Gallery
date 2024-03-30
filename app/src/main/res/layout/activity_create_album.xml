@@ -1,20 +1,34 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:layout_marginLeft="20dp"
+    android:layout_marginRight="20dp">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:gravity="center_vertical">
+        android:gravity="center_vertical" >
+
+        <ImageButton
+            android:id="@+id/backButton"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:src="@drawable/previous_button"
+            android:scaleType="fitCenter"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="@string/create_album" />
+
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Create Album"
             android:layout_weight="1"
             android:textStyle="bold"
-            android:textSize="40sp"
+            android:textSize="40dp"
             android:layout_marginLeft="16dp"
             android:layout_marginTop="8dp"
             android:layout_marginBottom="8dp"/>
@@ -24,26 +38,57 @@
         android:layout_width="match_parent"
         android:layout_height="3dp"
         android:background="#61677A"
-        android:layout_marginLeft="20dp"
-        android:layout_marginRight="20dp"
         android:layout_marginBottom="30dp"/>
 
-    <EditText
-        android:id="@+id/editTextAlbumName"
-        android:layout_width="300dp"
+
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/albumName"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Enter album name..."
-        android:textColorHint="#81689D"
-        android:textStyle="bold"
-        android:textSize="20dp"
-        android:layout_margin="16dp"
-        android:padding="10dp"
-        android:background="@drawable/border_edit_text"/>
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+        app:endIconMode="clear_text"
+        tools:ignore="ExtraText"
+        android:layout_marginTop="20dp">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Album Name" />
+
+    </com.google.android.material.textfield.TextInputLayout>
+
+
+
+    <com.google.android.material.materialswitch.MaterialSwitch
+        android:id="@+id/passwordSwitch"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:checked="false"
+        android:layout_marginTop="10dp"
+        android:textSize="17dp"
+        android:text="@string/private_album" />
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/passwordInputText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Enter password..."
+        app:endIconMode="password_toggle"
+        android:visibility="gone">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="textPassword" />
+
+    </com.google.android.material.textfield.TextInputLayout>
 
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="16dp">
+        android:layout_marginTop="80dp"
+        android:id="@+id/relativeLayoutCreateAlbum">
 
         <TextView
             android:id="@+id/textViewChooseImage"
@@ -53,22 +98,46 @@
             android:textSize="18sp"
             android:layout_alignParentStart="true"
             android:layout_alignParentTop="true"
-            android:layout_marginTop="8dp"
+            android:layout_marginTop="10dp"
             android:layout_marginEnd="8dp"
             android:layout_marginBottom="5dp"
-            android:textColor="#7C7C7C"/>
+            android:textColor="@color/hintTextColor"/>
+
+        <TextView
+            android:id="@+id/numberOfSelectedImagesCreateAlbumActivity"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/textViewChooseImage"
+            android:text="0 image selected"
+            android:textSize="18sp"
+            android:layout_marginTop="10dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginBottom="5dp"
+            android:textColor="@color/hintTextColor"
+            android:visibility="gone"/>
 
         <Button
             android:id="@+id/buttonChooseImage"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/textViewChooseImage"
+            android:layout_height="80dp"
+            android:layout_below="@id/numberOfSelectedImagesCreateAlbumActivity"
             android:text="Select Image"
-            android:layout_marginTop="8dp"
+            android:layout_marginTop="10dp"
             android:textStyle="bold"
-            android:textSize="17dp"
-            android:background="@drawable/button_background"/>
+            android:textSize="25dp"
+            style="@style/Widget.Material3.Button.TonalButton"
+            android:textColor="@color/textInButtonColor"/>
 
+        <Button
+            style="@style/Widget.Material3.Button.TonalButton"
+            android:id="@+id/btnCreateAlbumActivity"
+            android:layout_width="match_parent"
+            android:layout_height="80dp"
+            android:layout_below="@+id/buttonChooseImage"
+            android:textSize="25dp"
+            android:textStyle="bold"
+            android:text="Create Album"
+            android:layout_marginTop="10dp"
+            android:textColor="@color/textInButtonColor"/>
     </RelativeLayout>
-
 </LinearLayout>

@@ -14,9 +14,10 @@ public class AlbumModel implements Model{
     private int capacity; // capacity of the album
     private String created_at; // created date of the album
     private String notice; // notice of the album
+    private String ref;
+    private String password;
     private String remain_time; // remaining time of the album
     private boolean is_deleted; // is album deleted
-    private boolean is_favourited; // is album favourited
 
     public AlbumModel(Context context) {
         dbHelper = new DatabaseHelper(context);
@@ -30,7 +31,18 @@ public class AlbumModel implements Model{
         this.notice = "";
         this.remain_time = "";
         this.is_deleted = false;
-        this.is_favourited = false;
+    }
+
+    public AlbumModel(int id, String name, int capacity, String ref, String password) {
+        this.id = id;
+        this.name = name;
+        this.capacity = capacity;
+        this.ref = ref;
+        this.password = password;
+        this.created_at = (Calendar.getInstance().getTime()).toString();
+        this.is_deleted = false;
+        this.password = "";
+        this.notice = "";
     }
 
     @Override
