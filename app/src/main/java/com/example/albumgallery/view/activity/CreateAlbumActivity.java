@@ -14,10 +14,14 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.albumgallery.R;
+import com.example.albumgallery.controller.MainController;
 import com.google.android.material.materialswitch.MaterialSwitch;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.switchmaterial.SwitchMaterial;
 import com.google.android.material.textfield.TextInputLayout;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class CreateAlbumActivity extends AppCompatActivity {
 
@@ -30,6 +34,8 @@ public class CreateAlbumActivity extends AppCompatActivity {
     private Button btnCreateAlbum;
     private boolean isPrivate = false;
     private boolean isSelected = false;
+    private List<String> selectedImageURLs;
+    private MainController mainController;
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -46,6 +52,10 @@ public class CreateAlbumActivity extends AppCompatActivity {
         if(isSelected) {
             numOfImagesTextView.setVisibility(View.VISIBLE);
         }
+        selectedImageURLs = new ArrayList<>();
+        selectedImageURLs = getIntent().getStringArrayListExtra("selectedImageURLs");
+
+        mainController = new MainController(this);
 
     }
 
@@ -100,6 +110,8 @@ public class CreateAlbumActivity extends AppCompatActivity {
                     } else if (isPrivate && password.isEmpty()) {
                         makeNotification(findViewById(R.id.relativeLayoutCreateAlbum), "Album's password is empty");
                     }
+                    // add album
+
                 }
             });
     }
