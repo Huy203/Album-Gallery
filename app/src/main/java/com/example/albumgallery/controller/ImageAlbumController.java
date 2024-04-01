@@ -54,9 +54,10 @@ public class ImageAlbumController implements Controller {
         dbHelper.close();
     }
 
-    public void addImageAlbum() {
+    public void addImageAlbum(int id_image, int id_album) {
         // Add an ImageAlbum
-
+        ImageAlbumModel imageAlbumModel = new ImageAlbumModel(id_image, id_album);
+        this.insert((imageAlbumModel));
     }
 
     public void deleteImageAlbum() {

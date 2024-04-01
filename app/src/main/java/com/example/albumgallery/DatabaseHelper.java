@@ -27,6 +27,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public static final String VIDEO_TABLE = "Video";
     public static final String VIDEO_ALBUM_TABLE = "Video_Album";
     public static final String VIDEO_TAG_TABLE = "Video_Tag";
+    public static final String TRASH_TABLE = "Trash";
+    public static final String IMAGE_TRASH_TABLE = "Image_Trash";
+    public static final String VIDEO_TRASH_TABLE = "Video_Trash";
 
     public DatabaseHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -114,6 +117,18 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                     "    video_id INTEGER REFERENCES " + VIDEO_TABLE + "(id),\n" +
                     "    tag_id INTEGER REFERENCES " + TAG_TABLE + "(id)\n" +
                     ");");
+            db.execSQL("CREATE TABLE " + TRASH_TABLE + "(\n" +
+                    "    id INTEGER PRIMARY KEY AUTOINCREMENT,\n" +
+                    "    capacity INTEGER\n" +
+                    ");");
+            db.execSQL("CREATE TABLE " + IMAGE_TRASH_TABLE + "(\n" +
+                    "    image_id INTEGER REFERENCES " + IMAGE_TABLE + "(id),\n" +
+                    "    trash_id INTEGER REFERENCES " + TRASH_TABLE + "(id)\n" +
+                    ");");
+            db.execSQL("CREATE TABLE " + VIDEO_TRASH_TABLE + "(\n" +
+                    "    video_id INTEGER REFERENCES " + VIDEO_TABLE + "(id),\n" +
+                    "    trash_id INTEGER REFERENCES " + TRASH_TABLE + "(id)\n" +
+                    ");");
         } catch (SQLiteException e) {
             e.printStackTrace();
         }
@@ -132,6 +147,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             db.execSQL("DROP TABLE IF EXISTS " + VIDEO_TABLE);
             db.execSQL("DROP TABLE IF EXISTS " + VIDEO_ALBUM_TABLE);
             db.execSQL("DROP TABLE IF EXISTS " + VIDEO_TAG_TABLE);
+            db.execSQL("DROP TABLE IF EXISTS " + TRASH_TABLE);
+            db.execSQL("DROP TABLE IF EXISTS " + IMAGE_TRASH_TABLE);
+            db.execSQL("DROP TABLE IF EXISTS " + VIDEO_TRASH_TABLE);
         } catch (SQLiteException e) {
             e.printStackTrace();
         }
