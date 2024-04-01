@@ -6,7 +6,6 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CompoundButton;
-import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
@@ -15,9 +14,9 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.albumgallery.R;
 import com.example.albumgallery.controller.MainController;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.materialswitch.MaterialSwitch;
 import com.google.android.material.snackbar.Snackbar;
-import com.google.android.material.switchmaterial.SwitchMaterial;
 import com.google.android.material.textfield.TextInputLayout;
 
 import java.util.ArrayList;
@@ -36,6 +35,7 @@ public class CreateAlbumActivity extends AppCompatActivity {
     private boolean isPrivate = false;
     private boolean isSelected = false;
     private List<String> selectedImageURLs;
+    private List<Task> selectedImageURLsTask;
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -44,6 +44,8 @@ public class CreateAlbumActivity extends AppCompatActivity {
         // handle all the interactions
         handleInteractions();
         mainController = new MainController(this);
+        selectedImageURLs = new ArrayList<>();
+
         // display number of images selected
         String numOfImages = getIntent().getStringExtra("numOfImages");
         numOfImagesTextView = (TextView) findViewById(R.id.numberOfSelectedImagesCreateAlbumActivity);
@@ -51,11 +53,10 @@ public class CreateAlbumActivity extends AppCompatActivity {
         isSelected = getIntent().getBooleanExtra("isSelected", false);
         if(isSelected) {
             numOfImagesTextView.setVisibility(View.VISIBLE);
+            for(String url: selectedImageURLs) {
+                Log.d("create album activity", url);
+            }
         }
-        selectedImageURLs = new ArrayList<>();
-        selectedImageURLs = getIntent().getStringArrayListExtra("selectedImageURLs");
-
-
     }
 
     private void handleInteractions() {
@@ -104,15 +105,36 @@ public class CreateAlbumActivity extends AppCompatActivity {
                 public void onClick(View view) {
                     String albumName = albumNameInputTxt.getEditText().getText().toString();
                     String password = passwordInputText.getEditText().getText().toString();
+                    String numOfImagesString = getIntent().getStringExtra("numOfImages");
+                    int numOfImages = Integer.parseInt(String.valueOf(numOfImagesString.charAt(0)));
                     if(albumName.isEmpty()) {
                         makeNotification(findViewById(R.id.relativeLayoutCreateAlbum),"Album's name is empty");
                         return;
                     } else if (isPrivate && password.isEmpty()) {
                         makeNotification(findViewById(R.id.relativeLayoutCreateAlbum), "Album's password is empty");
                         return;
+                    } else if (numOfImages == 0) {
+                        makeNotification(findViewById(R.id.relativeLayoutCreateAlbum), "Please choose at least 1 image");
+                        return;
                     }
                     // add album
-                    mainController.getAlbumController().addAlbum(albumName, password);
+                    mainController.getAlbumController().addAlbum(albumName, password, numOfImages);
+                    // get the album's id just added and add to album_image table
+                    int id_album = (int) mainController.getAlbumController().getLastAlbumId();
+                    selectedImageURLs = getIntent().getStringArrayListExtra("selectedImageURLs");
+                    List<String> ids = new ArrayList<>();
+                    ids = getIntent().getStringArrayListExtra("selectedIds");
+                    for(String id: ids) {
+                        int id_image = Integer.parseInt(id);
+//                        Log.d("test image album", Integer.toString(id_image));
+//                        Log.d("test image album", Integer.toString(id_album));
+                        mainController.getImageAlbumController().addImageAlbum(id_image, id_album);
+                    }
+                    // navigate to album main after adding album
+                    Intent albumFrag = new Intent(CreateAlbumActivity.this, MainFragmentController.class);
+                    albumFrag.putExtra("fragmentToLoad", "AlbumMain");
+                    startActivity(albumFrag);
+                    finish();
                 }
             });
     }

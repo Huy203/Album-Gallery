@@ -1,5 +1,6 @@
 package com.example.albumgallery;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -146,6 +147,15 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return getLastId(table);
     }
 
+    public void insertByCustomId(String table, Model model) {
+        SQLiteDatabase db = getWritableDatabase();
+        try {
+            db.execSQL(model.insert());
+        } catch (SQLiteException e) {
+            Log.e("database error", e.getMessage());
+        }
+    }
+
     public void delete(String table, String where){
         SQLiteDatabase db = getWritableDatabase();
         db.execSQL("DELETE FROM " + table + " WHERE " + where);
@@ -274,5 +284,33 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             }
         }
         return data;
+    }
+    public List<String> getFromAlbum(String column) {
+        List<String> res = new ArrayList<>();
+        SQLiteDatabase db = getReadableDatabase();
+        String query = "SELECT " + column + " FROM " + ALBUM_TABLE;
+        Cursor cursor = db.rawQuery(query, null);
+        if(cursor.moveToFirst()) {
+            while (!cursor.isAfterLast()) {
+                String name = cursor.getString(0);
+                res.add(name);
+                cursor.moveToNext();
+            }
+        }
+        return res;
+    }
+    public List<String> getFromImage(String column) {
+        List<String> res = new ArrayList<>();
+        SQLiteDatabase db = getReadableDatabase();
+        String query = "SELECT " + column + " FROM " + IMAGE_TABLE;
+        Cursor cursor = db.rawQuery(query, null);
+        if(cursor.moveToFirst()) {
+            while (!cursor.isAfterLast()) {
+                String name = cursor.getString(0);
+                res.add(name);
+                cursor.moveToNext();
+            }
+        }
+        return res;
     }
 }

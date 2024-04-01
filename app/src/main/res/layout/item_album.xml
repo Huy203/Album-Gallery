@@ -15,7 +15,7 @@
         <!-- Media -->
         <ImageView
             android:layout_width="match_parent"
-            android:layout_height="130dp"
+            android:layout_height="150dp"
             app:srcCompat="@drawable/baseline_add_24"
             android:scaleType="centerCrop"
             android:contentDescription="thumbnail"
@@ -33,29 +33,31 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="album name"
+                android:textSize="20dp"
+
                 android:textAppearance="?attr/textAppearanceTitleMedium"
                 />
         </LinearLayout>
 
         <!-- Buttons -->
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal">
-            <com.google.android.material.button.MaterialButton
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginEnd="8dp"
-                android:text="action 1"
-                style="?attr/borderlessButtonStyle"
-                />
-            <com.google.android.material.button.MaterialButton
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="action 2"
-                style="?attr/borderlessButtonStyle"
-                />
-        </LinearLayout>
+<!--        <LinearLayout-->
+<!--            android:layout_width="wrap_content"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:orientation="horizontal">-->
+<!--            <com.google.android.material.button.MaterialButton-->
+<!--                android:layout_width="wrap_content"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:layout_marginEnd="8dp"-->
+<!--                android:text="action 1"-->
+<!--                style="?attr/borderlessButtonStyle"-->
+<!--                />-->
+<!--            <com.google.android.material.button.MaterialButton-->
+<!--                android:layout_width="wrap_content"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:text="action 2"-->
+<!--                style="?attr/borderlessButtonStyle"-->
+<!--                />-->
+<!--        </LinearLayout>-->
     </LinearLayout>
 
 </com.google.android.material.card.MaterialCardView>
