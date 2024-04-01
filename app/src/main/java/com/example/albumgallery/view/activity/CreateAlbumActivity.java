@@ -106,9 +106,13 @@ public class CreateAlbumActivity extends AppCompatActivity {
                     String albumName = albumNameInputTxt.getEditText().getText().toString();
                     String password = passwordInputText.getEditText().getText().toString();
                     String numOfImagesString = getIntent().getStringExtra("numOfImages");
+                    Boolean isAlbumNameExists = mainController.getAlbumController().isAlbumNameExists(albumName);
                     int numOfImages = Integer.parseInt(String.valueOf(numOfImagesString.charAt(0)));
                     if(albumName.isEmpty()) {
                         makeNotification(findViewById(R.id.relativeLayoutCreateAlbum),"Album's name is empty");
+                        return;
+                    } else if (isAlbumNameExists) {
+                        makeNotification(findViewById(R.id.relativeLayoutCreateAlbum), "Album's name already existed");
                         return;
                     } else if (isPrivate && password.isEmpty()) {
                         makeNotification(findViewById(R.id.relativeLayoutCreateAlbum), "Album's password is empty");
@@ -126,8 +130,6 @@ public class CreateAlbumActivity extends AppCompatActivity {
                     ids = getIntent().getStringArrayListExtra("selectedIds");
                     for(String id: ids) {
                         int id_image = Integer.parseInt(id);
-//                        Log.d("test image album", Integer.toString(id_image));
-//                        Log.d("test image album", Integer.toString(id_album));
                         mainController.getImageAlbumController().addImageAlbum(id_image, id_album);
                     }
                     // navigate to album main after adding album

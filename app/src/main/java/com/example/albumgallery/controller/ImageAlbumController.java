@@ -61,6 +61,10 @@ public class ImageAlbumController implements Controller {
         this.insert((imageAlbumModel));
     }
 
+    public List<Long> getImageIdsByAlbumId(long albumId) {
+        return dbHelper.getImageIdsByAlbumId(albumId);
+    }
+
     public void deleteImageAlbum() {
         // Delete an ImageAlbum
     }

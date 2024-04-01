@@ -9,6 +9,7 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,19 +17,20 @@ import android.widget.ImageButton;
 
 import com.example.albumgallery.R;
 import com.example.albumgallery.controller.MainController;
+import com.example.albumgallery.view.activity.AlbumContentActivity;
 import com.example.albumgallery.view.activity.CreateAlbumActivity;
 import com.example.albumgallery.view.adapter.AlbumAdapter;
+import com.example.albumgallery.view.adapter.AlbumAdapterListener;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class AlbumsMainFragment extends Fragment {
-    RecyclerView recyclerView;
-    AlbumAdapter albumAdapter;
-    Bundle bundle;
-    List<String> test;
-    List<String> albumNames;
-    MainController mainController;
+public class AlbumsMainFragment extends Fragment implements AlbumAdapterListener {
+    private RecyclerView recyclerView;
+    private AlbumAdapter albumAdapter;
+    private List<String> albumNames;
+    private MainController mainController;
+    private AlbumAdapterListener listener;
 
     public AlbumsMainFragment() {
         // Required empty public constructor
@@ -57,6 +59,7 @@ public class AlbumsMainFragment extends Fragment {
         recyclerView.setLayoutManager(new GridLayoutManager(view.getContext(), 2, GridLayoutManager.HORIZONTAL, false));
 
         albumAdapter = new AlbumAdapter(getActivity(), albumNames);
+        albumAdapter.setAlbumAdapterListener(this);
         recyclerView.setAdapter(albumAdapter);
     }
 
@@ -72,5 +75,12 @@ public class AlbumsMainFragment extends Fragment {
     private void initializeData() {
         this.albumNames = new ArrayList<>();
         albumNames = mainController.getAlbumController().getAlbumNames();
+    }
+
+    @Override
+    public void onAlbumClicked(String albumName) {
+        Intent intent = new Intent(getContext(), AlbumContentActivity.class);
+        intent.putExtra("albumName", albumName);
+        startActivity(intent);
     }
 }

@@ -54,6 +54,14 @@ public class AlbumController implements Controller {
         this.insert(albumModel);
     }
 
+    public boolean isAlbumNameExists(String albumName) {
+        return dbHelper.isAlbumNameExists(albumName);
+    }
+
+    public long getAlbumIdByName(String albumName) {
+        return dbHelper.getAlbumIdByName(albumName);
+    }
+
     public List<String> getAlbumNames() {
 //        List<String> albumNames = dbHelper.select("Album","name", null);
         List<String> albumNames = dbHelper.getFromAlbum("name");

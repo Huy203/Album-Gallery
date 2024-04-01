@@ -313,4 +313,59 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         }
         return res;
     }
+
+    public boolean isAlbumNameExists(String albumName) {
+        SQLiteDatabase db = getReadableDatabase();
+        Cursor cursor = db.rawQuery("SELECT COUNT(*) FROM " + ALBUM_TABLE + " WHERE name = ?", new String[]{albumName});
+        int count = 0;
+        if (cursor != null) {
+            cursor.moveToFirst();
+            count = cursor.getInt(0);
+            cursor.close();
+        }
+        return count > 0;
+    }
+
+    public long getAlbumIdByName(String albumName) {
+        SQLiteDatabase db = getReadableDatabase();
+        Cursor cursor = db.rawQuery("SELECT id FROM " + ALBUM_TABLE + " WHERE name = ?", new String[]{albumName});
+        long albumId = -1;
+        if (cursor != null) {
+            if (cursor.moveToFirst()) {
+                albumId = cursor.getLong(0);
+            }
+            cursor.close();
+        }
+        return albumId;
+    }
+
+    public List<Long> getImageIdsByAlbumId(long albumId) {
+        List<Long> imageIds = new ArrayList<>();
+        SQLiteDatabase db = getReadableDatabase();
+        Cursor cursor = db.rawQuery("SELECT image_id FROM " + IMAGE_ALBUM_TABLE + " WHERE album_id = ?", new String[]{String.valueOf(albumId)});
+        if (cursor != null) {
+            if (cursor.moveToFirst()) {
+                do {
+                    long imageId = cursor.getLong(0);
+                    imageIds.add(imageId);
+                } while (cursor.moveToNext());
+            }
+            cursor.close();
+        }
+        return imageIds;
+    }
+
+    public String getImageRefById(long imageId) {
+        SQLiteDatabase db = getReadableDatabase();
+        String ref = null;
+        Cursor cursor = db.rawQuery("SELECT ref FROM " + IMAGE_TABLE + " WHERE id = ?", new String[]{String.valueOf(imageId)});
+        if (cursor != null) {
+            if (cursor.moveToFirst()) {
+                ref = cursor.getString(0);
+            }
+            cursor.close();
+        }
+        return ref;
+    }
+
 }
