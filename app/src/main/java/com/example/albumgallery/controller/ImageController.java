@@ -297,7 +297,13 @@ public class ImageController implements Controller {
     public List<String> getAllImageURLsSortByDate() {
         return dbHelper.selectImagesSortByDate("Image", "ref", "descending");
     }
+    public List<String> getAllImageIds() {
+        return dbHelper.getFromImage("id");
+    }
 
+    public String getImageRefById(long imageId) {
+        return dbHelper.getImageRefById(imageId);
+    }
     public List<String> getSelectedImageURLs() {
         final String replace = idSelectedImages.toString().replace("[", "").replace("]", "");
         Log.v("Image", "Selected images: " + "ref" + "id IN (" + replace + ")");

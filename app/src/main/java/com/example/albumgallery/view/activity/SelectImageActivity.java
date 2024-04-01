@@ -25,6 +25,7 @@ import com.google.android.gms.tasks.Tasks;
 
 import org.w3c.dom.Text;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -36,9 +37,8 @@ public class SelectImageActivity extends AppCompatActivity implements ImageAdapt
     private TextView numberOfImagesSelected;
     List<String> selectedImageURLs;
     List<Task> selectedImageURLsTask;
-
-
-
+    List<String> ids;
+    List<String> selectedIds;
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -49,11 +49,13 @@ public class SelectImageActivity extends AppCompatActivity implements ImageAdapt
         imageURIs = new ArrayList<>();
         selectedImageURLs = new ArrayList<>();
         selectedImageURLsTask = new ArrayList<>();
+        ids = new ArrayList<>();
+        selectedIds = new ArrayList<>();
         numberOfImagesSelected = (TextView) findViewById(R.id.numberOfSelectedImagesInSelectActivity);
 
         imageURIs.addAll(mainController.getImageController().getAllImageURLsSortByDate());
-        imageAdapter = new ImageAdapter(this, imageURIs);
-
+        ids.addAll(mainController.getImageController().getAllImageIds());
+        imageAdapter = new ImageAdapter(this, imageURIs, ids);
         recyclerMediaView = this.findViewById(R.id.recyclerViewForSelectImageActivity);
         recyclerMediaView.setLayoutManager(new GridLayoutManager(this, 3));
         recyclerMediaView.setAdapter(imageAdapter);
@@ -72,8 +74,9 @@ public class SelectImageActivity extends AppCompatActivity implements ImageAdapt
                 Intent intent = new Intent(SelectImageActivity.this, CreateAlbumActivity.class);
                 // pass the number of images to CreateAlbumActivity
                 intent.putExtra("numOfImages", numberOfImagesSelected.getText().toString());
-                // pass the list of URLS to CreateAlbumActivity
+                // pass the list of URLS and image ids to CreateAlbumActivity
                 intent.putStringArrayListExtra("selectedImageURLs", (ArrayList<String>) selectedImageURLs);
+                intent.putStringArrayListExtra("selectedIds", (ArrayList<String>) selectedIds);
                 // set the afterSelectImage
                 intent.putExtra("isSelected", true);
 
@@ -112,6 +115,11 @@ public class SelectImageActivity extends AppCompatActivity implements ImageAdapt
         for (int i = 0; i < count; i++) {
             selectedImageURLs.add(imageURIs.get(i));
             Log.d("Deleted images", selectedImageURLs.get(i));
+        }
+
+        for (int i = 0; i < count; i++) {
+            selectedIds.add(ids.get(i));
+            Log.d("ids", ids.get(i));
         }
     }
 

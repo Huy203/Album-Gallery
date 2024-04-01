@@ -1,22 +1,37 @@
 package com.example.albumgallery.view.fragment;
 
 import android.content.Intent;
-import android.media.Image;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
 
 import com.example.albumgallery.R;
+import com.example.albumgallery.controller.MainController;
+import com.example.albumgallery.view.activity.AlbumContentActivity;
 import com.example.albumgallery.view.activity.CreateAlbumActivity;
+import com.example.albumgallery.view.adapter.AlbumAdapter;
+import com.example.albumgallery.view.adapter.AlbumAdapterListener;
 
-public class AlbumsMainFragment extends Fragment {
+import java.util.ArrayList;
+import java.util.List;
+
+public class AlbumsMainFragment extends Fragment implements AlbumAdapterListener {
+    private RecyclerView recyclerView;
+    private AlbumAdapter albumAdapter;
+    private List<String> albumNames;
+    private MainController mainController;
+    private AlbumAdapterListener listener;
+
     public AlbumsMainFragment() {
         // Required empty public constructor
     }
@@ -35,13 +50,37 @@ public class AlbumsMainFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        mainController = new MainController(getActivity());
+        handleInteractions(view);
+
+        initializeData(); // just for testing
+
+        recyclerView = (RecyclerView) view.findViewById(R.id.albumsRecyclerView);
+        recyclerView.setLayoutManager(new GridLayoutManager(view.getContext(), 2, GridLayoutManager.HORIZONTAL, false));
+
+        albumAdapter = new AlbumAdapter(getActivity(), albumNames);
+        albumAdapter.setAlbumAdapterListener(this);
+        recyclerView.setAdapter(albumAdapter);
+    }
+
+    private void handleInteractions(View view) {
         ImageButton btnCreateAlbum = (ImageButton) view.findViewById(R.id.btnCreateAlbum);
         btnCreateAlbum.setOnClickListener(view1 -> {
             Intent intent = new Intent(getContext(), CreateAlbumActivity.class);
             startActivity(intent);
             getActivity().finish();
         });
+    }
 
+    private void initializeData() {
+        this.albumNames = new ArrayList<>();
+        albumNames = mainController.getAlbumController().getAlbumNames();
+    }
 
+    @Override
+    public void onAlbumClicked(String albumName) {
+        Intent intent = new Intent(getContext(), AlbumContentActivity.class);
+        intent.putExtra("albumName", albumName);
+        startActivity(intent);
     }
 }

@@ -21,6 +21,9 @@ import com.example.albumgallery.view.adapter.ImageAdapterListener;
 import com.example.albumgallery.view.fragment.AlbumsMainFragment;
 import com.example.albumgallery.view.fragment.HomeScreenFragment;
 
+import java.util.ArrayList;
+import java.util.List;
+
 
 public class MainFragmentController extends AppCompatActivity implements BackgroundProcessingCallback, ImageAdapterListener {
     ActivityFragmentControllerBinding binding;
@@ -36,9 +39,10 @@ public class MainFragmentController extends AppCompatActivity implements Backgro
 
         binding = ActivityFragmentControllerBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
+
+
         // fragment đầu tiên khi vừa vào app
 //        replaceFragment(new HomeScreenFragment());
-
         String fragmentToLoad = getIntent().getStringExtra("fragmentToLoad");
         if(fragmentToLoad != null && fragmentToLoad.equals("AlbumMain")) {
             replaceFragment(new AlbumsMainFragment());

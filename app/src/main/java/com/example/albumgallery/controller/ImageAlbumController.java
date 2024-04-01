@@ -38,7 +38,8 @@ public class ImageAlbumController implements Controller {
     }
     @Override
     public void insert(Model model) {
-        dbHelper.insert("ImageAlbum", model);
+//        dbHelper.insert("ImageAlbum", model);
+        dbHelper.insertByCustomId("Image_Album", model);
         dbHelper.close();
     }
 
@@ -58,6 +59,10 @@ public class ImageAlbumController implements Controller {
         // Add an ImageAlbum
         ImageAlbumModel imageAlbumModel = new ImageAlbumModel(id_image, id_album);
         this.insert((imageAlbumModel));
+    }
+
+    public List<Long> getImageIdsByAlbumId(long albumId) {
+        return dbHelper.getImageIdsByAlbumId(albumId);
     }
 
     public void deleteImageAlbum() {

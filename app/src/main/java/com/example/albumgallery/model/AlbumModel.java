@@ -17,7 +17,7 @@ public class AlbumModel implements Model{
     private String ref;
     private String password;
     private int num_of_images;   // number of images
-    private boolean is_deleted; // is album deleted
+    private int is_deleted; // is album deleted
 
     public DatabaseHelper getDbHelper() {
         return dbHelper;
@@ -91,11 +91,11 @@ public class AlbumModel implements Model{
         this.num_of_images = num_of_images;
     }
 
-    public boolean isIs_deleted() {
+    public int isIs_deleted() {
         return is_deleted;
     }
 
-    public void setIs_deleted(boolean is_deleted) {
+    public void setIs_deleted(int is_deleted) {
         this.is_deleted = is_deleted;
     }
 
@@ -109,7 +109,7 @@ public class AlbumModel implements Model{
         this.capacity = capacity;
         this.created_at = (Calendar.getInstance().getTime()).toString();
         this.notice = "";
-        this.is_deleted = false;
+        this.is_deleted = 0;
     }
 
     public AlbumModel(int id, String name, int capacity, String ref, String password, int num_of_images) {
@@ -119,19 +119,26 @@ public class AlbumModel implements Model{
         this.ref = ref;
         this.password = password;
         this.created_at = (Calendar.getInstance().getTime()).toString();
-        this.is_deleted = false;
+        this.is_deleted = 0;
         this.password = "";
         this.notice = "";
         this.num_of_images = num_of_images;
     }
-    public AlbumModel(String name, String password){
+    public AlbumModel(String name, String password, int num_of_images){
         this.name = name;
+        this.capacity = 0;
         this.password = password;
+        this.created_at = (Calendar.getInstance().getTime()).toString();
+        this.notice = "";
+        this.ref = "";
+        this.is_deleted = 0;
+        this.num_of_images = num_of_images;
     }
 
     @Override
     public String insert() {
-        return "INSERT INTO Album (name, capacity, created_at, notice, is_deleted, password, num_of_images) VALUES ('" + name + "', " + capacity + ", '" + created_at + "', '" + notice + "', " + is_deleted + ", '" + password + "', " + num_of_images + ")";
+        return "INSERT INTO Album (name, capacity, created_at, notice, ref, is_deleted, num_of_images, password) " +
+                "VALUES ('" + name + "', " + capacity + ", '" + created_at + "', '" + notice + "', '" + ref + "', " + is_deleted + ", " + num_of_images + ", '" + password + "')";
     }
 
 

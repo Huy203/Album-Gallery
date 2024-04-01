@@ -22,6 +22,7 @@ import com.example.albumgallery.R;
 import com.example.albumgallery.view.activity.DetailPicture;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -29,15 +30,26 @@ import java.util.List;
 public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> implements View.OnClickListener {
     private final Context context;
     private final List<String> imageURLs;
+    private final List<String> ids;
     private final SparseBooleanArray selectedItems;
     private boolean isMultipleChoice = false;
     private ImageAdapterListener listener;
+
 
     public ImageAdapter(Activity activity, List<String> imageURLs) {
         this.context = activity;
         this.imageURLs = imageURLs;
         this.selectedItems = new SparseBooleanArray();
         this.listener = (ImageAdapterListener) activity;
+        this.ids = new ArrayList<>();
+    }
+
+    public ImageAdapter(Activity activity, List<String> imageURLs, List<String> ids) {
+        this.context = activity;
+        this.imageURLs = imageURLs;
+        this.selectedItems = new SparseBooleanArray();
+        this.listener = (ImageAdapterListener) activity;
+        this.ids = ids;
     }
 
     @NonNull
