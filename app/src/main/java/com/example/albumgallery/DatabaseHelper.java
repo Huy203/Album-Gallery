@@ -278,19 +278,40 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return -1;
     }
 
+//    public List<String> getAll(String table) {
+//        List<String> data = new ArrayList<>();
+//        SQLiteDatabase db = getWritableDatabase();
+//        Cursor cursor = db.rawQuery("SELECT * FROM " + table, null);
+//        if (cursor.moveToFirst()) {
+//            while (!cursor.isAfterLast()) {
+//                String temp = cursor.getString(0) + "," + cursor.getString(1) + "," + cursor.getString(2)+ "," + cursor.getString(3)+ "," + cursor.getString(4)+ "," + cursor.getString(5)+ "," + cursor.getString(6)+ "," + cursor.getString(7)+ "," + cursor.getString(8)+ "," + cursor.getString(9)+ "," + cursor.getString(10);
+//                data.add(temp);
+//                cursor.moveToNext();
+//            }
+//        }
+//        return data;
+//    }
     public List<String> getAll(String table) {
         List<String> data = new ArrayList<>();
         SQLiteDatabase db = getWritableDatabase();
         Cursor cursor = db.rawQuery("SELECT * FROM " + table, null);
         if (cursor.moveToFirst()) {
-            while (!cursor.isAfterLast()) {
-                String temp = cursor.getString(0) + "," + cursor.getString(1) + "," + cursor.getString(2)+ "," + cursor.getString(3)+ "," + cursor.getString(4)+ "," + cursor.getString(5)+ "," + cursor.getString(6)+ "," + cursor.getString(7)+ "," + cursor.getString(8)+ "," + cursor.getString(9)+ "," + cursor.getString(10);
-                data.add(temp);
-                cursor.moveToNext();
-            }
+            int numColumns = cursor.getColumnCount();
+            do {
+                StringBuilder temp = new StringBuilder();
+                for (int i = 0; i < numColumns; i++) {
+                    temp.append(cursor.getString(i));
+                    if (i < numColumns - 1) {
+                        temp.append(",");
+                    }
+                }
+                data.add(temp.toString());
+            } while (cursor.moveToNext());
         }
+        cursor.close();
         return data;
     }
+
     public List<String> getAllRef(String table){
         List<String> data = new ArrayList<>();
         SQLiteDatabase db = getWritableDatabase();
@@ -349,8 +370,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         Cursor cursor = db.rawQuery("SELECT id FROM " + ALBUM_TABLE + " WHERE name = ?", new String[]{albumName});
         long albumId = -1;
         if (cursor != null) {
+            // Log.d("cursor", cursor.toString());
             if (cursor.moveToFirst()) {
                 albumId = cursor.getLong(0);
+                // Log.d("album id", String.valueOf(albumId));
             }
             cursor.close();
         }

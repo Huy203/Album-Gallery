@@ -5,6 +5,7 @@ import com.example.albumgallery.model.AlbumModel;
 import com.example.albumgallery.model.Model;
 
 import android.content.Context;
+import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,6 +24,7 @@ public class AlbumController implements Controller {
     public List<AlbumModel> getAllAlbums() {
         // Get all albums
         List<String> data = dbHelper.getAll("Album");
+        Log.d("check delete data", String.valueOf(data));
         List<AlbumModel> albumModels = new ArrayList<>();
         for (String s : data) {
             String[] temp = s.split(",");
@@ -73,8 +75,10 @@ public class AlbumController implements Controller {
         return res;
     }
 
-    public void deleteAlbum() {
+    public void deleteAlbum(String name) {
         // Delete an album
+        dbHelper.delete("Album", "name='" + name + "'");
+        dbHelper.close();
     }
 
     public void editAlbum() {

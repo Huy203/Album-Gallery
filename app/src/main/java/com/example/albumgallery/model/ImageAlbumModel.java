@@ -1,4 +1,4 @@
-package com.example.albumgallery.model.auth;
+package com.example.albumgallery.model;
 
 import android.content.Context;
 import android.util.Log;
@@ -7,11 +7,11 @@ import com.example.albumgallery.DatabaseHelper;
 import com.example.albumgallery.model.Model;
 
 public class ImageAlbumModel implements Model {
-    int image_id;
-    int album_id;
+    long image_id;
+    long album_id;
     DatabaseHelper dbHelper;
 
-    public int getImage_id() {
+    public long getImage_id() {
         return image_id;
     }
 
@@ -22,22 +22,22 @@ public class ImageAlbumModel implements Model {
     public DatabaseHelper getDbHelper() {
         return dbHelper;
     }
-    public void setImage_id(int image_id) {
+    public void setImage_id(long image_id) {
         this.image_id = image_id;
     }
 
-    public int getAlbum_id() {
+    public long getAlbum_id() {
         return album_id;
     }
 
-    public void setAlbum_id(int album_id) {
+    public void setAlbum_id(long album_id) {
         this.album_id = album_id;
     }
 
     public ImageAlbumModel(Context context) {
         dbHelper = new DatabaseHelper(context);
     }
-    public ImageAlbumModel(int image_id, int album_id){
+    public ImageAlbumModel(long image_id, long album_id){
         this.image_id = image_id;
         this.album_id = album_id;
     }
