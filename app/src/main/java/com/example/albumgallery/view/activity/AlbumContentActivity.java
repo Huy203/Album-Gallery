@@ -135,8 +135,6 @@ public class AlbumContentActivity extends AppCompatActivity implements ImageAdap
             public void onClick(DialogInterface dialog, int which) {
                 // Call deleteSelectedImage() method from ImageController
 
-                mainController.getAlbumController().deleteAlbum(albumName);
-
                 long id_album = mainController.getAlbumController().getAlbumIdByName(albumName);
 
                 Log.d("check before name", albumName);
@@ -150,6 +148,8 @@ public class AlbumContentActivity extends AppCompatActivity implements ImageAdap
                         Log.d("check delete album", String.valueOf(image_album.getAlbum_id()));
                     }
                 }
+
+                mainController.getAlbumController().deleteAlbum(albumName);
 
                 Intent albumMainActivity = new Intent(AlbumContentActivity.this, MainFragmentController.class);
                 albumMainActivity.putExtra("fragmentToLoad", "AlbumMain");

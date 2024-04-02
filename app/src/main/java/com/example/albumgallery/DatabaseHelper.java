@@ -370,10 +370,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         Cursor cursor = db.rawQuery("SELECT id FROM " + ALBUM_TABLE + " WHERE name = ?", new String[]{albumName});
         long albumId = -1;
         if (cursor != null) {
-            // Log.d("cursor", cursor.toString());
+            Log.d("cursor", cursor.toString());
             if (cursor.moveToFirst()) {
                 albumId = cursor.getLong(0);
-                // Log.d("album id", String.valueOf(albumId));
+                Log.d("album id", String.valueOf(albumId));
             }
             cursor.close();
         }
