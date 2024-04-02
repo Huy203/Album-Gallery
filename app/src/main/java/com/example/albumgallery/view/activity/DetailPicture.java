@@ -18,6 +18,7 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
+import android.media.Image;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
@@ -25,6 +26,7 @@ import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.Toast;
 
@@ -40,10 +42,12 @@ import java.util.List;
 public class DetailPicture extends AppCompatActivity implements ImageInfoListener {
     private MainController mainController;
     private ImageView imageView;
+    private ImageView heartButton;
     private List<String> imagePaths;
     private int currentPosition;
     private View view;
     private boolean isImageInfoVisible = false;
+    private boolean isFavorite = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -79,6 +83,7 @@ public class DetailPicture extends AppCompatActivity implements ImageInfoListene
 
         ImageView backButton = findViewById(R.id.backButton);
         ImageView pencilButton = findViewById(R.id.pencilButton);
+        heartButton = (ImageView) findViewById(R.id.heartButton);
         ImageView ellipsisButton = findViewById(R.id.ellipsisButton);
         ImageView trashButton = findViewById(R.id.trashButton);
         Button ImageInfo = findViewById(R.id.ImageInfo);
@@ -113,6 +118,19 @@ public class DetailPicture extends AppCompatActivity implements ImageInfoListene
             }
         });
 
+        // set image to favorite
+        long id = mainController.getImageController().getIdByRef(imagePaths.get(currentPosition));
+        isFavorite = mainController.getImageController().isFavoriteImage(id);
+        setFavoriteIcon(isFavorite);
+        heartButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                mainController.getImageController().toggleFavoriteImage(id);
+                isFavorite = mainController.getImageController().isFavoriteImage(id);
+                setFavoriteIcon(isFavorite);
+            }
+        });
+
         //        // Lấy ảnh từ image adapter, hiển thị vào edit image screen.
 //        String imagePath = getIntent().getStringExtra("imagePath");
 //        ImageView imageView = findViewById(R.id.memeImageView);
@@ -120,6 +138,8 @@ public class DetailPicture extends AppCompatActivity implements ImageInfoListene
         ImageInfo.setOnClickListener(v -> {
             toggleImageInfo();
         });
+
+
 
         imageInfoFragment.setImageInfo(getImageModel());
 
@@ -239,6 +259,14 @@ public class DetailPicture extends AppCompatActivity implements ImageInfoListene
                 })
                 .submit();
         Toast.makeText(DetailPicture.this, "Wallpaper set successfully", Toast.LENGTH_SHORT).show();
+    }
+
+    public void setFavoriteIcon(boolean isFavorite) {
+        if(isFavorite) {
+            heartButton.setImageResource(R.drawable.heart_red);
+        } else {
+            heartButton.setImageResource(R.drawable.heart);
+        }
     }
 
 }

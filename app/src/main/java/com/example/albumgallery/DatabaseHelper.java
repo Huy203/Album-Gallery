@@ -1,6 +1,7 @@
 package com.example.albumgallery;
 
 import android.annotation.SuppressLint;
+import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -368,4 +369,57 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return ref;
     }
 
+    public void toggleFavoriteImage(long imageId) {
+        SQLiteDatabase db = getWritableDatabase();
+        Cursor cursor = db.rawQuery("SELECT is_favourited FROM " + IMAGE_TABLE + " WHERE id = ?", new String[]{String.valueOf(imageId)});
+        int isFavourited = 0; // Mặc định không yêu thích
+
+        if (cursor != null) {
+            if (cursor.moveToFirst()) {
+                isFavourited = cursor.getInt(0);
+            }
+            cursor.close();
+        }
+
+        // Thay đổi trạng thái yêu thích
+        int newFavouritedState = isFavourited == 1 ? 0 : 1;
+
+        // Cập nhật trạng thái yêu thích trong cơ sở dữ liệu
+        ContentValues values = new ContentValues();
+        values.put("is_favourited", newFavouritedState);
+        db.update(IMAGE_TABLE, values, "id = ?", new String[]{String.valueOf(imageId)});
+    }
+
+
+    public boolean isFavoriteImage(long imageId) {
+        SQLiteDatabase db = getReadableDatabase();
+        Cursor cursor = db.rawQuery("SELECT is_favourited FROM " + IMAGE_TABLE + " WHERE id = ?", new String[]{String.valueOf(imageId)});
+        boolean isFavourited = false;
+
+        if (cursor != null) {
+            if (cursor.moveToFirst()) {
+                int favValue = cursor.getInt(0);
+                isFavourited = favValue == 1;
+            }
+            cursor.close();
+        }
+        return isFavourited;
+    }
+
+    public List<String> getAllFavoriteImageRef() {
+        List<String> favoriteRefs = new ArrayList<>();
+        SQLiteDatabase db = getReadableDatabase();
+        Cursor cursor = db.rawQuery("SELECT ref FROM " + IMAGE_TABLE + " WHERE is_favourited = 1", null);
+
+        if (cursor != null) {
+            if (cursor.moveToFirst()) {
+                do {
+                    String ref = cursor.getString(0);
+                    favoriteRefs.add(ref);
+                } while (cursor.moveToNext());
+            }
+            cursor.close();
+        }
+        return favoriteRefs;
+    }
 }

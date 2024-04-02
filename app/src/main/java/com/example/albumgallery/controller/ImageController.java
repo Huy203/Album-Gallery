@@ -304,6 +304,16 @@ public class ImageController implements Controller {
     public String getImageRefById(long imageId) {
         return dbHelper.getImageRefById(imageId);
     }
+
+    public void toggleFavoriteImage(long imageId) {
+        dbHelper.toggleFavoriteImage(imageId);
+    }
+    public boolean isFavoriteImage(long imageId) {
+        return dbHelper.isFavoriteImage(imageId);
+    }
+    public List<String> getAllFavoriteImageRef() {
+        return dbHelper.getAllFavoriteImageRef();
+    }
     public List<String> getSelectedImageURLs() {
         final String replace = idSelectedImages.toString().replace("[", "").replace("]", "");
         Log.v("Image", "Selected images: " + "ref" + "id IN (" + replace + ")");

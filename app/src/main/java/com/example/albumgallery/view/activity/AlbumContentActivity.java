@@ -39,9 +39,9 @@ public class AlbumContentActivity extends AppCompatActivity implements ImageAdap
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_album_content);
 
+        mainController = new MainController(this);
         handleInteractions();
 
-        mainController = new MainController(this);
         image_ids = new ArrayList<>();
         imageURIs = new ArrayList<>();
         albumName = getIntent().getStringExtra("albumName");
