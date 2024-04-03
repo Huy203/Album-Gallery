@@ -1,13 +1,11 @@
 package com.example.albumgallery.view.activity;
 
-import android.content.DialogInterface;
+import static com.example.albumgallery.utils.Utilities.bitmapToByteArray;
+
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.net.Uri;
 import android.os.Bundle;
-
-import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -15,17 +13,21 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.Spinner;
 
-import com.theartofdev.edmodo.cropper.CropImage;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
+
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.target.SimpleTarget;
+import com.example.albumgallery.R;
+import com.example.albumgallery.controller.MainController;
 import com.theartofdev.edmodo.cropper.CropImageView;
 
-
-import com.example.albumgallery.R;
-
-
 public class CropImageActivity extends AppCompatActivity {
+    private MainController mainController;
     private CropImageView cropImageView;
     private Spinner aspectRatioSpinner;
-    private boolean check = false;
+    private boolean hasChanges = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,37 +37,41 @@ public class CropImageActivity extends AppCompatActivity {
         cropImageView = findViewById(R.id.cropImageView);
         aspectRatioSpinner = findViewById(R.id.aspectRatioSpinner);
 
-        Uri imageUri = getIntent().getParcelableExtra("imageUri");
+        mainController = new MainController(this);
 
-        if (imageUri != null) {
-            cropImageView.setImageUriAsync(imageUri);
+//        byte[] imageByteArray = getIntent().getByteArrayExtra("imageByteArray");
+//        if (imageByteArray != null) {
+//            cropImageView.setImageBitmap(byteArrayToBitmap(imageByteArray));
+//        }
+        long id = getIntent().getLongExtra("id", -1);
+        String imageURL = mainController.getImageController().getImageById(id).getRef();
+        try {
+            Glide.with(this)
+                    .asBitmap()
+                    .load(imageURL)
+                    .into(new SimpleTarget<Bitmap>() {
+                        @Override
+                        public void onResourceReady(@NonNull Bitmap resource, @Nullable com.bumptech.glide.request.transition.Transition<? super Bitmap> transition) {
+                            cropImageView.setImageBitmap(resource);
+                        }
+                    });
+        } catch (Exception e) {
+            Log.e("CropImageActivity", "Error loading image: " + e.getMessage());
         }
 
         setupAspectRatioSpinner();
+
         Button buttonSave = findViewById(R.id.buttonSave);
-        buttonSave.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                goToEditActivity(true);
-            }
-        });
+        buttonSave.setOnClickListener(v -> goBack(true));
 
         ImageView buttonBack = findViewById(R.id.backButton);
-        buttonBack.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                showAcceptChangesDialog();
-            }
-        });
+        buttonBack.setOnClickListener(v -> goBack(false));
 
         Button buttonCrop = findViewById(R.id.buttonCrop);
-        buttonCrop.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                check = true;
-                Bitmap croppedImage = cropImageView.getCroppedImage();
-                cropImageView.setImageBitmap(croppedImage);
-            }
+        buttonCrop.setOnClickListener(v -> {
+            hasChanges = true;
+            Bitmap croppedImage = cropImageView.getCroppedImage();
+            cropImageView.setImageBitmap(croppedImage);
         });
     }
 
@@ -77,13 +83,14 @@ public class CropImageActivity extends AppCompatActivity {
 
         aspectRatioSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
-            public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
-                String selectedRatio = (String) parentView.getItemAtPosition(position);
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                String selectedRatio = (String) parent.getItemAtPosition(position);
+                Log.v("CropImageActivity", "Selected ratio: " + selectedRatio);
                 setCropAspectRatio(selectedRatio);
             }
 
             @Override
-            public void onNothingSelected(AdapterView<?> parentView) {
+            public void onNothingSelected(AdapterView<?> parent) {
                 // Do nothing
             }
         });
@@ -109,49 +116,29 @@ public class CropImageActivity extends AppCompatActivity {
         }
     }
 
-    @Override
-    public void onBackPressed() {
-        showAcceptChangesDialog();
-    }
+//    private void showAcceptChangesDialog() {
+//        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+//        builder.setTitle("Accept Changes");
+//        builder.setMessage("Do you want to accept changes?");
+//        builder.setPositiveButton("Yes", (dialog, which) -> goBack(true));
+//        builder.setNegativeButton("No", (dialog, which) -> goBack(false));
+//        if (hasChanges) {
+//            builder.show();
+//        } else {
+//            goBack(false);
+//        }
+//    }
 
-
-    private void showAcceptChangesDialog() {
-        if(check){
-            AlertDialog.Builder builder = new AlertDialog.Builder(this);
-            builder.setTitle("Accept Changes");
-            builder.setMessage("Do you want to accept changes?");
-            builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    // Chấp nhận thay đổi và trở về màn hình chỉnh sửa với hình đã cắt
-                    goToEditActivity(true);
-                }
-            });
-            builder.setNegativeButton("No", new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    goToEditActivity(false);
-                }
-            });
-            builder.show();
-        }else{
-            goToEditActivity(false);
-        }
-
-    }
-
-    private void goToEditActivity(boolean acceptChanges) {
-        Intent intent = new Intent();
+    private void goBack(boolean acceptChanges) {
         if (acceptChanges) {
             Bitmap croppedImage = cropImageView.getCroppedImage();
-            intent.putExtra("croppedImage", croppedImage);
+
+            Intent intent = new Intent(this, EditImageActivity.class);
+            intent.putExtra("imageByteArray", bitmapToByteArray(croppedImage));
             setResult(RESULT_OK, intent);
         } else {
             setResult(RESULT_CANCELED);
         }
         finish();
     }
-
-
-
 }

@@ -2,12 +2,9 @@ package com.example.albumgallery.view.adapter;
 
 import android.app.Activity;
 import android.content.Context;
-import android.content.Intent;
-import android.media.Image;
 import android.net.Uri;
 import android.util.Log;
 import android.util.SparseBooleanArray;
-import android.view.ContentInfo;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,11 +16,10 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.example.albumgallery.R;
-import com.example.albumgallery.view.activity.DetailPicture;
+import com.example.albumgallery.view.listeners.ImageAdapterListener;
 
 import java.io.File;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
 public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> implements View.OnClickListener {

@@ -19,11 +19,9 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.albumgallery.R;
 import com.example.albumgallery.controller.MainController;
 import com.example.albumgallery.view.adapter.ImageAdapter;
-import com.example.albumgallery.view.adapter.ImageAdapterListener;
+import com.example.albumgallery.view.listeners.ImageAdapterListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.Tasks;
-
-import org.w3c.dom.Text;
 
 import java.util.ArrayList;
 import java.util.List;

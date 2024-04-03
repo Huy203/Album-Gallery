@@ -1,12 +1,9 @@
 package com.example.albumgallery.view.fragment;
 
 import static android.content.Context.INPUT_METHOD_SERVICE;
-import static androidx.core.content.ContextCompat.getSystemService;
 
 import android.content.Context;
 import android.os.Bundle;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -15,14 +12,13 @@ import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
 import com.example.albumgallery.R;
 import com.example.albumgallery.model.ImageModel;
-import com.example.albumgallery.view.adapter.ImageInfoListener;
+import com.example.albumgallery.view.listeners.ImageInfoListener;
 
 public class ImageInfo extends Fragment {
     private ImageModel image;

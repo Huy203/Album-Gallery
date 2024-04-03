@@ -1,5 +1,25 @@
 package com.example.albumgallery.view.activity;
 
+import static com.example.albumgallery.utils.Constant.REQUEST_CODE_EDIT_IMAGE;
+
+import android.app.WallpaperManager;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.graphics.Bitmap;
+import android.net.Uri;
+import android.os.Bundle;
+import android.os.Handler;
+import android.util.Log;
+import android.view.View;
+import android.widget.ImageView;
+import android.widget.TextView;
+import android.widget.Toast;
+
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.FragmentTransaction;
+
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.DataSource;
 import com.bumptech.glide.load.engine.GlideException;
@@ -7,42 +27,23 @@ import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.target.Target;
 import com.example.albumgallery.R;
 import com.example.albumgallery.controller.MainController;
-import com.example.albumgallery.controller.OnSwipeTouchListener;
 import com.example.albumgallery.model.ImageModel;
-import com.example.albumgallery.view.adapter.ImageInfoListener;
 import com.example.albumgallery.view.fragment.ImageInfo;
-
-import android.app.WallpaperManager;
-import android.content.DialogInterface;
-import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.Drawable;
-import android.net.Uri;
-import android.os.Bundle;
-import android.util.Log;
-import android.view.View;
-import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
-import android.widget.Button;
-import android.widget.ImageView;
-import android.widget.Toast;
-
-import androidx.annotation.AnimRes;
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.fragment.app.FragmentTransaction;
+import com.example.albumgallery.view.listeners.ImageInfoListener;
+import com.example.albumgallery.view.listeners.OnSwipeTouchListener;
 
 import java.io.IOException;
 import java.util.List;
 
 public class DetailPicture extends AppCompatActivity implements ImageInfoListener {
+
     private MainController mainController;
     private ImageView imageView;
     private List<String> imagePaths;
+    private TextView qrLink;
     private int currentPosition;
-    private View view;
+    private View imageInfoView;
+    private ImageInfo imageInfoFragment;
     private boolean isImageInfoVisible = false;
 
     @Override
@@ -50,14 +51,26 @@ public class DetailPicture extends AppCompatActivity implements ImageInfoListene
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_detail_image);
 
+        initializeViews();
+        setupListeners();
+        loadImage(currentPosition);
+        loadImageInfo();
+        loadQRCodeLink();
+    }
+
+    private void initializeViews() {
         mainController = new MainController(this);
         imagePaths = mainController.getImagePaths();
         currentPosition = getIntent().getIntExtra("position", 0);
 
         imageView = findViewById(R.id.memeImageView);
-        loadImage(currentPosition);
+        qrLink = findViewById(R.id.qrLink);
+        imageInfoView = findViewById(R.id.imageInfo);
+        imageInfoFragment = new ImageInfo();
+    }
 
-        // Detect swipe gestures
+    private void setupListeners() {
+        // Swipe gestures
         imageView.setOnTouchListener(new OnSwipeTouchListener(this, imageView) {
             @Override
             public void onSwipeLeft() {
@@ -75,139 +88,18 @@ public class DetailPicture extends AppCompatActivity implements ImageInfoListene
                 }
             }
         });
-        ImageInfo imageInfoFragment = new ImageInfo();
 
-        ImageView backButton = findViewById(R.id.backButton);
-        ImageView pencilButton = findViewById(R.id.pencilButton);
-        ImageView ellipsisButton = findViewById(R.id.ellipsisButton);
-        ImageView trashButton = findViewById(R.id.trashButton);
-        Button ImageInfo = findViewById(R.id.ImageInfo);
-        view = findViewById(R.id.imageInfo);
-
-        pencilButton.setOnClickListener(v -> {
-            Intent intent = new Intent(DetailPicture.this, EditImageActivity.class);
-
-            long id = mainController.getImageController().getIdByRef(imagePaths.get(currentPosition));
-            intent.putExtra("id", id);
-            startActivity(intent);
-            finish();
-        });
-        backButton.setOnClickListener(v -> {
-            //Intent intent = new Intent(DetailPicture.this, HomeScreen.class);
-//            startActivity(intent);
+        // Buttons
+        findViewById(R.id.backButton).setOnClickListener(v -> {
+            Intent intent = new Intent();
+            intent.putExtra("updateUI", false);
+            setResult(RESULT_OK, intent);
             supportFinishAfterTransition();
         });
-
-        ellipsisButton.setOnClickListener(v -> {
-            // Hiển thị menu hoặc dialog chọn tùy chọn
-            showOptionsDialog();
-        });
-        String uri = getImageModel().getRef();
-        trashButton.setOnClickListener(v -> {
-            if (uri != null) {
-                // Call deleteSelectedImage() method from ImageController
-                // mainController.getImageController().deleteSelectedImage(uri, 0);
-                showDeleteConfirmationDialog(uri);
-            } else {
-                Toast.makeText(this, "No image to delete", Toast.LENGTH_SHORT).show();
-            }
-        });
-
-        //        // Lấy ảnh từ image adapter, hiển thị vào edit image screen.
-//        String imagePath = getIntent().getStringExtra("imagePath");
-//        ImageView imageView = findViewById(R.id.memeImageView);
-//        Glide.with(this).load(Uri.parse(imagePath)).into(imageView);
-        ImageInfo.setOnClickListener(v -> {
-            toggleImageInfo();
-        });
-
-        imageInfoFragment.setImageInfo(getImageModel());
-
-        // Add ImageInfo fragment to activity
-        getSupportFragmentManager().beginTransaction()
-                .setCustomAnimations(R.anim.slide_up, R.anim.slide_down)
-                .add(R.id.imageInfo, imageInfoFragment)
-                .commit();
-
-
-        ImageView imageView = findViewById(R.id.memeImageView);
-        Glide.with(this).load(Uri.parse(uri)).into(imageView);
-    }
-
-    private void showDeleteConfirmationDialog(String uri) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("Confirm Deletion");
-        builder.setMessage("Are you sure you want to delete this image?");
-        builder.setPositiveButton("Delete", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                // Call deleteSelectedImage() method from ImageController
-                mainController.getImageController().deleteSelectedImage(uri);
-            }
-        });
-        builder.setNegativeButton("Cancel", null);
-        builder.show();
-    }
-
-    private void loadImage(int position) {
-        Glide.with(this).load(Uri.parse(imagePaths.get(position))).into(imageView);
-    }
-
-
-    private void showOptionsDialog() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("Options");
-        builder.setItems(new CharSequence[]{"Add to album", "Set as Wallpaper", "Start referencing", "Detail"}, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                // Xử lý khi người dùng chọn một tùy chọn
-                switch (which) {
-                    case 0:
-                        // Xử lý khi người dùng chọn "Add to album"
-                        break;
-                    case 1:
-                        // Xử lý khi người dùng chọn "Set as Wallpaper"
-                        setAsWallpaper(imagePaths.get(currentPosition));
-                        break;
-                    case 2:
-                        // Xử lý khi người dùng chọn "Start referencing"
-                        break;
-                    case 3:
-                        // Xử lý khi người dùng chọn "Detail"
-                        break;
-                }
-            }
-        });
-        builder.show();
-    }
-
-    private void toggleImageInfo() {
-        isImageInfoVisible = !isImageInfoVisible;
-        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-        Log.v("DetailPicture", "toggleImageInfo: " + getSupportFragmentManager().findFragmentById(R.id.imageInfo).getView().getVisibility());
-        if (isImageInfoVisible) {
-            view.setVisibility(View.VISIBLE);
-            transaction.setCustomAnimations(R.anim.slide_up, R.anim.slide_down);
-        } else {
-            view.setVisibility(View.GONE);
-            transaction.setCustomAnimations(R.anim.slide_down, R.anim.slide_up);
-        }
-        transaction.commit();
-    }
-
-    public ImageModel getImageModel() {
-        long id = getIntent().getLongExtra("id", 0);
-        return mainController.getImageController().getImageById(id);
-    }
-
-    @Override
-    public void onNoticePassed(String data) {
-        String where = "id = " + getIntent().getLongExtra("id", 0);
-        mainController.getImageController().update("notice", data, where);
-    }
-
-    public MainController getMainController() {
-        return mainController;
+        findViewById(R.id.pencilButton).setOnClickListener(v -> launchEditImageActivity());
+        findViewById(R.id.ellipsisButton).setOnClickListener(v -> showOptionsDialog());
+        findViewById(R.id.trashButton).setOnClickListener(v -> deleteImage());
+        findViewById(R.id.ImageInfo).setOnClickListener(v -> toggleImageInfo());
     }
 
     private void setAsWallpaper(String imagePath) {
@@ -241,5 +133,114 @@ public class DetailPicture extends AppCompatActivity implements ImageInfoListene
         Toast.makeText(DetailPicture.this, "Wallpaper set successfully", Toast.LENGTH_SHORT).show();
     }
 
+    private void showOptionsDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Options");
+        builder.setItems(new CharSequence[]{"Add to album", "Set as Wallpaper", "Start referencing", "Detail"}, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                // Xử lý khi người dùng chọn một tùy chọn
+                switch (which) {
+                    case 0:
+                        // Xử lý khi người dùng chọn "Add to album"
+                        break;
+                    case 1:
+                        // Xử lý khi người dùng chọn "Set as Wallpaper"
+                        setAsWallpaper(imagePaths.get(currentPosition));
+                        break;
+                    case 2:
+                        // Xử lý khi người dùng chọn "Start referencing"
+                        break;
+                    case 3:
+                        // Xử lý khi người dùng chọn "Detail"
+                        break;
+                }
+            }
+        });
+        builder.show();
+    }
+
+    private void loadImage(int position) {
+        Glide.with(this).load(Uri.parse(imagePaths.get(position))).into(imageView);
+    }
+
+    private void loadImageInfo() {
+        imageInfoFragment.setImageInfo(getImageModel());
+        // Add ImageInfo fragment to activity
+        getSupportFragmentManager().beginTransaction()
+                .setCustomAnimations(R.anim.slide_up, R.anim.slide_down)
+                .add(R.id.imageInfo, imageInfoFragment)
+                .commit();
+    }
+
+    private void loadQRCodeLink() {
+        String uri = getImageModel().getRef();
+        String qrCodeData = mainController.getImageController().recognizeQRCode(uri);
+        if (qrCodeData != null) {
+            qrLink.setText(qrCodeData);
+            new Handler().postDelayed(() -> qrLink.setText(""), 5000);
+        } else {
+            Log.v("DetailPicture", "No QR Code data found");
+        }
+    }
+
+    private void launchEditImageActivity() {
+        Intent intent = new Intent(DetailPicture.this, EditImageActivity.class);
+        long id = mainController.getImageController().getIdByRef(imagePaths.get(currentPosition));
+        intent.putExtra("id", id);
+        startActivityForResult(intent, REQUEST_CODE_EDIT_IMAGE);
+    }
+
+    private void deleteImage() {
+        String uri = getImageModel().getRef();
+        if (uri != null) {
+            showDeleteConfirmationDialog(uri);
+        } else {
+            Toast.makeText(this, "No image to delete", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void toggleImageInfo() {
+        isImageInfoVisible = !isImageInfoVisible;
+        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+        Log.v("DetailPicture", "toggleImageInfo: " + getSupportFragmentManager().findFragmentById(R.id.imageInfo).getView().getVisibility());
+        if (isImageInfoVisible) {
+            imageInfoView.setVisibility(View.VISIBLE);
+            transaction.setCustomAnimations(R.anim.slide_up, R.anim.slide_down);
+        } else {
+            imageInfoView.setVisibility(View.GONE);
+            transaction.setCustomAnimations(R.anim.slide_down, R.anim.slide_up);
+        }
+        transaction.commit();
+    }
+
+    private void showDeleteConfirmationDialog(String uri) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Confirm Deletion");
+        builder.setMessage("Are you sure you want to delete this image?");
+        builder.setPositiveButton("Delete", (dialog, which) -> mainController.getImageController().deleteSelectedImage(uri));
+        builder.setNegativeButton("Cancel", null);
+        builder.show();
+    }
+
+    private ImageModel getImageModel() {
+        long id = getIntent().getLongExtra("id", 0);
+        return mainController.getImageController().getImageById(id);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == REQUEST_CODE_EDIT_IMAGE && resultCode == RESULT_OK && data != null) {
+            setResult(RESULT_OK, data);
+            finish();
+        }
+    }
+
+    @Override
+    public void onNoticePassed(String data) {
+        String where = "id = " + getIntent().getLongExtra("id", 0);
+        mainController.getImageController().update("notice", data, where);
+    }
 }
 
