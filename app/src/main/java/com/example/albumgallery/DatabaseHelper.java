@@ -422,4 +422,19 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         }
         return favoriteRefs;
     }
+
+    public String getPasswordByAlbumName(String albumName) {
+        SQLiteDatabase db = getReadableDatabase();
+        String password = null;
+
+        Cursor cursor = db.rawQuery("SELECT password FROM " + ALBUM_TABLE + " WHERE name = ?", new String[]{albumName});
+        if (cursor != null) {
+            if (cursor.moveToFirst()) {
+                password = cursor.getString(0);
+            }
+            cursor.close();
+        }
+        return password;
+    }
+
 }

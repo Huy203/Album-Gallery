@@ -73,6 +73,10 @@ public class AlbumController implements Controller {
         return res;
     }
 
+    public String getPasswordByAlbumName(String albumName) {
+        return dbHelper.getPasswordByAlbumName(albumName);
+    }
+
     public void deleteAlbum() {
         // Delete an album
     }
