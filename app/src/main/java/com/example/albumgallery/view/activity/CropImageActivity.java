@@ -39,10 +39,6 @@ public class CropImageActivity extends AppCompatActivity {
 
         mainController = new MainController(this);
 
-//        byte[] imageByteArray = getIntent().getByteArrayExtra("imageByteArray");
-//        if (imageByteArray != null) {
-//            cropImageView.setImageBitmap(byteArrayToBitmap(imageByteArray));
-//        }
         long id = getIntent().getLongExtra("id", -1);
         String imageURL = mainController.getImageController().getImageById(id).getRef();
         try {

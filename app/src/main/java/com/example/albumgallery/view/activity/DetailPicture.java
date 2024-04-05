@@ -2,6 +2,7 @@ package com.example.albumgallery.view.activity;
 
 import static com.example.albumgallery.utils.Constant.REQUEST_CODE_EDIT_IMAGE;
 
+import android.annotation.SuppressLint;
 import android.app.WallpaperManager;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -11,6 +12,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -69,6 +71,7 @@ public class DetailPicture extends AppCompatActivity implements ImageInfoListene
         imageInfoFragment = new ImageInfo();
     }
 
+    @SuppressLint("NonConstantResourceId")
     private void setupListeners() {
         // Swipe gestures
         imageView.setOnTouchListener(new OnSwipeTouchListener(this, imageView) {
@@ -88,18 +91,37 @@ public class DetailPicture extends AppCompatActivity implements ImageInfoListene
                 }
             }
         });
+        appBarAction();
+    }
 
-        // Buttons
-        findViewById(R.id.backButton).setOnClickListener(v -> {
-            Intent intent = new Intent();
-            intent.putExtra("updateUI", false);
-            setResult(RESULT_OK, intent);
-            supportFinishAfterTransition();
-        });
-        findViewById(R.id.pencilButton).setOnClickListener(v -> launchEditImageActivity());
-        findViewById(R.id.ellipsisButton).setOnClickListener(v -> showOptionsDialog());
-        findViewById(R.id.trashButton).setOnClickListener(v -> deleteImage());
-        findViewById(R.id.ImageInfo).setOnClickListener(v -> toggleImageInfo());
+    @SuppressLint("UseCompatTextViewDrawableApis")
+    private void appBarAction() {
+        int[] buttonIds = {R.id.action_edit, R.id.action_menu, R.id.action_share, R.id.action_like, R.id.action_info, R.id.action_delete, R.id.action_back};
+
+        for (int buttonId : buttonIds) {
+            Button button = findViewById(buttonId);
+            button.setOnClickListener(v -> {
+                if (buttonId == buttonIds[0]) {
+                    launchEditImageActivity();
+                } else if (buttonId == buttonIds[1]) {
+                    showOptionsDialog();
+                } else if (buttonId == buttonIds[2]) {
+                    button.setCompoundDrawableTintList(getResources().getColorStateList(isImageInfoVisible ? R.color.blue_700 : R.color.black));
+                } else if (buttonId == buttonIds[3]) {
+//                    toggleImageInfo();
+                } else if (buttonId == buttonIds[4]) {
+                    toggleImageInfo();
+                    button.setCompoundDrawableTintList(getResources().getColorStateList(isImageInfoVisible ? R.color.blue_700 : R.color.black));
+                } else if (buttonId == buttonIds[5]) {
+                    deleteImage();
+                } else if (buttonId == buttonIds[6]) {
+                    Intent intent = new Intent();
+                    intent.putExtra("updateUI", false);
+                    setResult(RESULT_OK, intent);
+                    supportFinishAfterTransition();
+                }
+            });
+        }
     }
 
     private void setAsWallpaper(String imagePath) {
@@ -165,7 +187,12 @@ public class DetailPicture extends AppCompatActivity implements ImageInfoListene
     }
 
     private void loadImageInfo() {
-        imageInfoFragment.setImageInfo(getImageModel());
+        ImageModel imageModel = getImageModel();
+        TextView nameImage = findViewById(R.id.nameTextView);
+        nameImage.setText(imageModel.getName());
+        TextView dateImage = findViewById(R.id.timeTextView);
+        dateImage.setText(imageModel.getCreated_at());
+        imageInfoFragment.setImage(imageModel);
         // Add ImageInfo fragment to activity
         getSupportFragmentManager().beginTransaction()
                 .setCustomAnimations(R.anim.slide_up, R.anim.slide_down)

@@ -2,7 +2,7 @@ package com.example.albumgallery.model.auth;
 
 import android.content.Context;
 
-import com.example.albumgallery.DatabaseHelper;
+import com.example.albumgallery.helper.DatabaseHelper;
 import com.example.albumgallery.model.Model;
 
 public class ImageAlbumModel implements Model {

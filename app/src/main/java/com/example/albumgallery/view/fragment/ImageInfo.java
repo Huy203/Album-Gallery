@@ -48,11 +48,11 @@ public class ImageInfo extends Fragment {
         TextView addLocation = view.findViewById(R.id.imageLocation);
 
         addLocation.setOnClickListener(v -> {
-            // Add location
             Log.v("ImageInfo", "Add location");
         });
 
         notice.setOnEditorActionListener((v, actionId, event) -> {
+            Log.v("ImageInfo", "Action ID: " + actionId);
             if (actionId == EditorInfo.IME_ACTION_DONE) {
                 InputMethodManager imm = (InputMethodManager) requireActivity().getSystemService(INPUT_METHOD_SERVICE);
                 imm.hideSoftInputFromWindow(notice.getWindowToken(), 0);
@@ -65,23 +65,28 @@ public class ImageInfo extends Fragment {
             return false;
         });
 
-        name.setText(image.getName());
-        size.setText(image.getWidth() + "x" + image.getHeight());
+        try {
+            name.setText(image.getName());
+            size.setText(String.format("%dx%d", image.getWidth(), image.getHeight()));
 
-        if (image.getCapacity() > 1024) {
-            capacity.setText(image.getCapacity() / 1024 + " KB");
-        } else if (image.getCapacity() > 1024 * 1024) {
-            capacity.setText(image.getCapacity() / (1024 * 1024) + " MB");
-        } else if (image.getCapacity() > 1024 * 1024 * 1024) {
-            capacity.setText(image.getCapacity() / (1024 * 1024 * 1024) + " GB");
-        } else capacity.setText(image.getCapacity() + " bytes");
+            if (image.getCapacity() > 1024) {
+                capacity.setText(image.getCapacity() / 1024 + " KB");
+            } else if (image.getCapacity() > 1024 * 1024) {
+                capacity.setText(image.getCapacity() / (1024 * 1024) + " MB");
+            } else if (image.getCapacity() > 1024 * 1024 * 1024) {
+                capacity.setText(image.getCapacity() / (1024 * 1024 * 1024) + " GB");
+            } else capacity.setText(image.getCapacity() + " bytes");
 
-        created_at.setText(image.getCreated_at());
-        notice.setText(image.getNotice());
-        return view;
+            created_at.setText(image.getCreated_at());
+            notice.setText(image.getNotice());
+            return view;
+        } catch (Exception e) {
+            Log.e("ImageInfo", "Error loading image info: " + e.getMessage());
+            return null;
+        }
     }
 
-    public void setImageInfo(ImageModel image) {
+    public void setImage(ImageModel image) {
         this.image = image;
     }
 

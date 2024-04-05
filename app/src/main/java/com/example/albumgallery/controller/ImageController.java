@@ -6,7 +6,6 @@ import static com.example.albumgallery.utils.Constant.REQUEST_CODE_EDIT_IMAGE;
 import static com.example.albumgallery.utils.Constant.REQUEST_CODE_PICK_MULTIPLE_IMAGES;
 import static com.example.albumgallery.utils.Constant.imageExtensions;
 import static com.example.albumgallery.utils.Utilities.byteArrayToBitmap;
-import static com.example.albumgallery.utils.Utilities.imageToBitmap;
 
 
 import android.annotation.SuppressLint;
@@ -24,7 +23,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 
-import com.example.albumgallery.DatabaseHelper;
+import com.example.albumgallery.helper.DatabaseHelper;
 import com.example.albumgallery.FirebaseManager;
 import com.example.albumgallery.model.ImageModel;
 import com.example.albumgallery.model.Model;

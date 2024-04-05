@@ -1,4 +1,4 @@
-package com.example.albumgallery;
+package com.example.albumgallery.helper;
 
 import android.content.Context;
 import android.database.Cursor;

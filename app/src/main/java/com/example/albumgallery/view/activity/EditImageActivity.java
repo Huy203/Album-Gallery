@@ -13,6 +13,7 @@ import android.util.Log;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.Toast;
 
@@ -42,21 +43,9 @@ public class EditImageActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_edit_image);
         mainController = new MainController(this);
-
-        ImageView backButton = findViewById(R.id.backButton);
         mImageView = findViewById(R.id.imageView);
 
-        backButton.setOnClickListener(v -> {
-            Intent intent = new Intent();
-            intent.putExtra("update", true);
-            setResult(RESULT_OK, intent);
-            finish();
-        });
-
-        ImageView zoomInButton = findViewById(R.id.zoomInButton);
-        ImageView zoomOutButton = findViewById(R.id.zoomOutButton);
-        ImageView rotateButton = findViewById(R.id.rotateButton);
-        ImageView cutButton = findViewById(R.id.cutButton);
+        appBarAction();
 
         mImageView.setOnTouchListener((v, event) -> {
             switch (event.getActionMasked()) {
@@ -92,38 +81,12 @@ public class EditImageActivity extends AppCompatActivity {
             }
         });
 
-
-        zoomInButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // Khi nút zoom in được bấm, tăng scaleFactor và cập nhật ảnh
-                scaleFactor += 0.1f;
-                scaleFactor = Math.min(scaleFactor, 3.0f);
-                mImageView.setScaleX(scaleFactor);
-                mImageView.setScaleY(scaleFactor);
-            }
-        });
-
-        zoomOutButton.setOnClickListener(v -> {
-            // Khi nút zoom out được bấm, giảm scaleFactor và cập nhật ảnh
-            scaleFactor -= 0.1f;
-            scaleFactor = Math.max(0.1f, scaleFactor);
-            mImageView.setScaleX(scaleFactor);
-            mImageView.setScaleY(scaleFactor);
-        });
-
-        rotateButton.setOnClickListener(v -> {
-            // Xoay ảnh 90 độ theo chiều kim đồng hồ
-            mImageView.setRotation(mImageView.getRotation() + 90);
-        });
-
-        cutButton.setOnClickListener(v -> startImageCropActivity());
         Bitmap croppedImage = getIntent().getParcelableExtra("croppedImage");
 
         // Kiểm tra xem hình ảnh đã cắt có tồn tại hay không
         if (croppedImage != null) {
-            ImageView imageView = findViewById(R.id.imageView);
-            imageView.setImageBitmap(croppedImage);
+            mImageView = findViewById(R.id.imageView);
+            mImageView.setImageBitmap(croppedImage);
         } else {
             long id = getIntent().getLongExtra("id", 0);
             String imageURL = mainController.getImageController().getImageById(id).getRef();
@@ -136,9 +99,38 @@ public class EditImageActivity extends AppCompatActivity {
         super.onResume();
         mImageView.setScaleX(scaleFactor);
         mImageView.setScaleY(scaleFactor);
-        Toast.makeText(this, "Double tap to zoom in/out", Toast.LENGTH_SHORT).show();
+        //Toast.makeText(this, "Double tap to zoom in/out", Toast.LENGTH_SHORT).show();
     }
 
+    private void appBarAction() {
+        int[] buttonIds = {R.id.action_zoom_in, R.id.action_zoom_out, R.id.action_rotate, R.id.action_crop, R.id.action_back};
+
+        for (int buttonId : buttonIds) {
+            Button button = findViewById(buttonId);
+            button.setOnClickListener(v -> {
+                if (buttonId == buttonIds[0]) {
+                    scaleFactor += 0.1f;
+                    scaleFactor = Math.min(scaleFactor, 3.0f);
+                    mImageView.setScaleX(scaleFactor);
+                    mImageView.setScaleY(scaleFactor);
+                } else if (buttonId == buttonIds[1]) {
+                    scaleFactor -= 0.1f;
+                    scaleFactor = Math.max(0.1f, scaleFactor);
+                    mImageView.setScaleX(scaleFactor);
+                    mImageView.setScaleY(scaleFactor);
+                } else if (buttonId == buttonIds[2]) {
+                    mImageView.setRotation(mImageView.getRotation() + 90);
+                } else if (buttonId == buttonIds[3]) {
+                    startImageCropActivity();
+                } else if (buttonId == buttonIds[4]) {
+                    Intent intent = new Intent();
+                    intent.putExtra("update", true);
+                    setResult(RESULT_OK, intent);
+                    finish();
+                }
+            });
+        }
+    }
 
     private boolean isMotionEventInsideView(float x, float y, View view) {
         int[] location = new int[2];
@@ -181,40 +173,13 @@ public class EditImageActivity extends AppCompatActivity {
 //        goBackToDetailScreen();
 //    }
 
-    private void goBackToDetailScreen() {
-        finish();
-    }
-
     private void startImageCropActivity() {
         Intent intent = new Intent(EditImageActivity.this, CropImageActivity.class);
         long id = getIntent().getLongExtra("id", -1);
         intent.putExtra("id", id);
-//        Uri imageUri = Uri.parse(mainController.getImageController().getImageById(id).getRef());
-//        byte[] byteArray = bitmapToByteArray(uriToBitmap(imageUri, (Context)this));
-//        intent.putExtra("imageByteArray", byteArray);
         startActivityForResult(intent, 100);
     }
 
-
-    private Uri getImageUri() {
-        // Lấy Bitmap từ ImageView
-        Bitmap bitmap = ((BitmapDrawable) mImageView.getDrawable()).getBitmap();
-
-        // Tạo một file tạm thời để lưu ảnh
-        File tempFile = null;
-        try {
-            tempFile = File.createTempFile("temp_image", ".jpg", getCacheDir());
-            FileOutputStream out = new FileOutputStream(tempFile);
-            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, out);
-            out.flush();
-            out.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        // Trả về Uri của file tạm thời
-        return tempFile != null ? Uri.fromFile(tempFile) : null;
-    }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {

@@ -164,21 +164,6 @@ public class HomeScreenFragment extends Fragment {
     public void getSelectedItemsCount(int count) {
         Log.v("SelectedItems", count + " items selected");
         numberOfImagesSelected.setText(count + " images selected");
-
-//        List<Task<Uri>> task =  new ArrayList<>();
-//        for (String uri : imageURIs) {
-//            task.add(Tasks.forResult(Uri.parse(uri)));
-//        }
-
-        for (int i = 0; i < count; i++) {
-            selectedImageURLsTask.add(Tasks.forResult(Uri.parse(imageURIs.get(i))));
-            Log.d("Deleted images task", selectedImageURLsTask.get(i).getResult().toString());
-        }
-
-        for (int i = 0; i < count; i++) {
-            selectedImageURLs.add(imageURIs.get(i));
-            Log.d("Deleted images", selectedImageURLs.get(i));
-        }
     }
 
     private void showDeleteConfirmationDialog() {

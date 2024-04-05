@@ -1,15 +1,10 @@
 package com.example.albumgallery.controller;
 
-import com.example.albumgallery.DatabaseHelper;
-import com.example.albumgallery.FirebaseManager;
+import com.example.albumgallery.helper.DatabaseHelper;
 import com.example.albumgallery.model.AlbumModel;
-import com.example.albumgallery.model.ImageModel;
 import com.example.albumgallery.model.Model;
 
-import android.app.Activity;
 import android.content.Context;
-import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 
 import java.util.ArrayList;
 import java.util.List;
