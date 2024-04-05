@@ -77,6 +77,14 @@ public class AlbumController implements Controller {
         return dbHelper.getPasswordByAlbumName(albumName);
     }
 
+    public void updateThumbnailByAlbumName(String albumName, String thumbnail) {
+        dbHelper.updateThumbnailByAlbumName(albumName, thumbnail);
+    }
+
+    public List<String> getAllThumbnails() {
+        return dbHelper.getAllThumbnails();
+    }
+
     public void deleteAlbum() {
         // Delete an album
     }

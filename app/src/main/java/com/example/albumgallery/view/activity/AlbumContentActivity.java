@@ -2,8 +2,6 @@ package com.example.albumgallery.view.activity;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;
-import android.media.Image;
-import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -20,7 +18,6 @@ import com.example.albumgallery.R;
 import com.example.albumgallery.controller.MainController;
 import com.example.albumgallery.view.adapter.ImageAdapter;
 import com.example.albumgallery.view.adapter.ImageAdapterListener;
-import com.google.android.gms.tasks.Tasks;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -112,5 +109,10 @@ public class AlbumContentActivity extends AppCompatActivity implements ImageAdap
         intent.putExtra("position", position);
         Log.v("ImageAdapter", "Image selected: " + itemView);
         startActivity(intent, options.toBundle());
+    }
+
+    @Override
+    public void getInteractedURIs(String uri) {
+
     }
 }

@@ -6,11 +6,13 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
 import com.example.albumgallery.R;
 
 import java.util.List;
@@ -18,11 +20,13 @@ import java.util.List;
 public class AlbumAdapter extends RecyclerView.Adapter<AlbumAdapter.ViewHolder> {
     private final Context context;
     private final List<String> albumNames;
+    private final List<String> thumbnails;
     private AlbumAdapterListener listener;
 
-    public AlbumAdapter(Activity activity, List<String> albumNames) {
+    public AlbumAdapter(Activity activity, List<String> albumNames, List<String> thumbnails) {
         this.context = activity;
         this.albumNames = albumNames;
+        this.thumbnails = thumbnails;
     }
 
     public void setAlbumAdapterListener(AlbumAdapterListener listener) {
@@ -38,7 +42,13 @@ public class AlbumAdapter extends RecyclerView.Adapter<AlbumAdapter.ViewHolder> 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         String albumName = albumNames.get(position);
+        String thumbnail = thumbnails.get(position);
         holder.albumNameTxtView.setText(albumName);
+        Glide.with(context)
+                .load(thumbnail)
+                .placeholder(R.drawable.baseline_add_24)
+                .error(R.drawable.back_arrow)
+                .into(holder.thumbnailImageView);
     }
 
     @Override
@@ -51,14 +61,14 @@ public class AlbumAdapter extends RecyclerView.Adapter<AlbumAdapter.ViewHolder> 
 
     public class ViewHolder extends RecyclerView.ViewHolder {
         TextView albumNameTxtView;
+        ImageView thumbnailImageView;
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
             albumNameTxtView = (TextView) itemView.findViewById(R.id.albumNameItemAlbum);
+            thumbnailImageView = (ImageView) itemView.findViewById(R.id.albumThumbnail);
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    Log.d("onclick album", "here");
-
                     if(listener != null) {
                         int position = getAdapterPosition();
                         if (position != RecyclerView.NO_POSITION) {

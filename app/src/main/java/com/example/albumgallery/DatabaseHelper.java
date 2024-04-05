@@ -70,7 +70,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                     "    ref TEXT,\n" +
                     "    is_deleted INTEGER,\n" +
                     "    num_of_images INTEGER,\n" +
-                    "    password TEXT\n" +
+                    "    password TEXT, \n" +
+                    "    thumbnail TEXT\n" +
                     ");");
             db.execSQL("CREATE TABLE " + IMAGE_TABLE + " (\n" +
                     "    id INTEGER PRIMARY KEY AUTOINCREMENT,\n" +
@@ -371,22 +372,30 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     public void toggleFavoriteImage(long imageId) {
         SQLiteDatabase db = getWritableDatabase();
-        Cursor cursor = db.rawQuery("SELECT is_favourited FROM " + IMAGE_TABLE + " WHERE id = ?", new String[]{String.valueOf(imageId)});
-        int isFavourited = 0; // Mặc định không yêu thích
+//        Cursor cursor = db.rawQuery("SELECT is_favourited FROM " + IMAGE_TABLE + " WHERE id = ?", new String[]{String.valueOf(imageId)});
+//        int isFavourited = 0;
+//
+//        if (cursor != null) {
+//            if (cursor.moveToFirst()) {
+//                isFavourited = cursor.getInt(0);
+//            }
+//            cursor.close();
+//        }
 
-        if (cursor != null) {
-            if (cursor.moveToFirst()) {
-                isFavourited = cursor.getInt(0);
-            }
-            cursor.close();
-        }
+        boolean isFavorite = isFavoriteImage(imageId);
 
         // Thay đổi trạng thái yêu thích
-        int newFavouritedState = isFavourited == 1 ? 0 : 1;
+        int newFavorite;
+        if(isFavorite) {
+            newFavorite = 0;
+        } else {
+            newFavorite = 1;
+        }
+//        int newFavouritedState = isFavourited == 1 ? 0 : 1;
 
         // Cập nhật trạng thái yêu thích trong cơ sở dữ liệu
         ContentValues values = new ContentValues();
-        values.put("is_favourited", newFavouritedState);
+        values.put("is_favourited", newFavorite);
         db.update(IMAGE_TABLE, values, "id = ?", new String[]{String.valueOf(imageId)});
     }
 
@@ -436,5 +445,30 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         }
         return password;
     }
+
+    public void updateThumbnailByAlbumName(String albumName, String newThumbnail) {
+        SQLiteDatabase db = getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put("thumbnail", newThumbnail);
+        db.update(ALBUM_TABLE, values, "name = ?", new String[]{albumName});
+    }
+
+    public List<String> getAllThumbnails() {
+        List<String> thumbnails = new ArrayList<>();
+        SQLiteDatabase db = getWritableDatabase();
+        Cursor cursor = db.rawQuery("SELECT thumbnail FROM " + ALBUM_TABLE, null);
+        if (cursor != null) {
+            if (cursor.moveToFirst()) {
+                while (!cursor.isAfterLast()) {
+                    String thumbnail = cursor.getString(0);
+                    thumbnails.add(thumbnail);
+                    cursor.moveToNext();
+                }
+            }
+            cursor.close();
+        }
+        return thumbnails;
+    }
+
 
 }

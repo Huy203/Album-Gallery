@@ -191,4 +191,9 @@ public class HomeScreen extends AppCompatActivity implements BackgroundProcessin
         Log.v("ImageAdapter", "Image selected: " + itemView);
         startActivity(intent, options.toBundle());
     }
+
+    @Override
+    public void getInteractedURIs(String uri) {
+
+    }
 }

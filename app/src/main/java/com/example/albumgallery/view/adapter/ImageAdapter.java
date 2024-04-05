@@ -35,6 +35,8 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> 
     private boolean isMultipleChoice = false;
     private ImageAdapterListener listener;
 
+    private List<String> selectedURIs;
+
 
     public ImageAdapter(Activity activity, List<String> imageURLs) {
         this.context = activity;
@@ -42,6 +44,7 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> 
         this.selectedItems = new SparseBooleanArray();
         this.listener = (ImageAdapterListener) activity;
         this.ids = new ArrayList<>();
+        this.selectedURIs = new ArrayList<>();
     }
 
     public ImageAdapter(Activity activity, List<String> imageURLs, List<String> ids) {
@@ -50,6 +53,7 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> 
         this.selectedItems = new SparseBooleanArray();
         this.listener = (ImageAdapterListener) activity;
         this.ids = ids;
+        this.selectedURIs = new ArrayList<>();
     }
 
     @NonNull
@@ -94,6 +98,7 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> 
 
     public void clearSelectedItems() {
         selectedItems.clear();
+        selectedURIs.clear();
         notifyDataSetChanged();
     }
 
@@ -121,7 +126,8 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> 
                 if (!isMultipleChoice) {
                     listener.handleImagePick(imageView, imageURL, position);
                 } else {
-                    toggleSelection(position);
+                    toggleSelection(position, imageURL);
+                    listener.getInteractedURIs(imageURL);
                     listener.getSelectedItemsCount(selectedItems.size());
                 }
             });
@@ -130,7 +136,7 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> 
         }
     }
 
-    private void toggleSelection(int position) {
+    private void toggleSelection(int position, String uri) {
         if (selectedItems.get(position, false)) {
             selectedItems.delete(position);
         } else {
@@ -138,6 +144,7 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> 
         }
         notifyItemChanged(position);
     }
+
 
     // Xử lý sắp xếp hình ảnh theo date
     public void sortImageByDate() {

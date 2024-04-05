@@ -115,6 +115,7 @@ public class HomeScreenFragment extends Fragment {
                 btnPickMultipleImages.setText("Select");
                 numberOfImagesSelected.setVisibility(TextView.GONE);
                 imageAdapter.clearSelectedItems();
+
             }
         });
 
@@ -169,6 +170,7 @@ public class HomeScreenFragment extends Fragment {
         for (int i = 0; i < count; i++) {
             selectedImageURLs.add(imageURIs.get(i));
             Log.d("Deleted images", selectedImageURLs.get(i));
+            Log.d("Selected URIs", imageURIs.get(i));
         }
     }
 

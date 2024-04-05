@@ -9,21 +9,16 @@ import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityOptionsCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
 import com.example.albumgallery.R;
-import com.example.albumgallery.controller.MainController;
 import com.example.albumgallery.databinding.ActivityFragmentControllerBinding;
 import com.example.albumgallery.view.adapter.ImageAdapterListener;
 import com.example.albumgallery.view.fragment.AlbumsMainFragment;
 import com.example.albumgallery.view.fragment.FavoriteFragment;
 import com.example.albumgallery.view.fragment.HomeScreenFragment;
-
-import java.util.ArrayList;
-import java.util.List;
 
 
 public class MainFragmentController extends AppCompatActivity implements BackgroundProcessingCallback, ImageAdapterListener {
@@ -139,5 +134,10 @@ public class MainFragmentController extends AppCompatActivity implements Backgro
                 favoriteFragment.handleImagePick(itemView, uri, position);
             }
         }
+    }
+
+    @Override
+    public void getInteractedURIs(String uri) {
+
     }
 }

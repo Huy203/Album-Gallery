@@ -63,7 +63,7 @@ public class AlbumsMainFragment extends Fragment implements AlbumAdapterListener
         recyclerView = (RecyclerView) view.findViewById(R.id.albumsRecyclerView);
         recyclerView.setLayoutManager(new GridLayoutManager(view.getContext(), 2, GridLayoutManager.HORIZONTAL, false));
 
-        albumAdapter = new AlbumAdapter(getActivity(), albumNames);
+        albumAdapter = new AlbumAdapter(getActivity(), albumNames, thumbnails);
         albumAdapter.setAlbumAdapterListener(this);
         recyclerView.setAdapter(albumAdapter);
     }
@@ -81,8 +81,7 @@ public class AlbumsMainFragment extends Fragment implements AlbumAdapterListener
         this.albumNames = new ArrayList<>();
         this.thumbnails = new ArrayList<>();
         albumNames = mainController.getAlbumController().getAlbumNames();
-
-
+        thumbnails = mainController.getAlbumController().getAllThumbnails();
     }
 
     @Override

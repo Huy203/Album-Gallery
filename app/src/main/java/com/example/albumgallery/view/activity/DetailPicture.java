@@ -47,7 +47,7 @@ public class DetailPicture extends AppCompatActivity implements ImageInfoListene
     private int currentPosition;
     private View view;
     private boolean isImageInfoVisible = false;
-    private boolean isFavorite = false;
+    private boolean isFavorite;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -119,8 +119,11 @@ public class DetailPicture extends AppCompatActivity implements ImageInfoListene
         });
 
         // set image to favorite
-        long id = mainController.getImageController().getIdByRef(imagePaths.get(currentPosition));
+//        long id = mainController.getImageController().getIdByRef(imagePaths.get(currentPosition));
+        long id = mainController.getImageController().getIdByRef(uri);
         isFavorite = mainController.getImageController().isFavoriteImage(id);
+        Log.d("test favorite", Long.toString(id));
+        Log.d("test favorite", Boolean.toString(isFavorite));
         setFavoriteIcon(isFavorite);
         heartButton.setOnClickListener(new View.OnClickListener() {
             @Override
