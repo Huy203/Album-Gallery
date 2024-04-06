@@ -150,7 +150,8 @@ public class HomeScreenFragment extends Fragment {
         imageURIs.clear();
 //        imageURIs.addAll(mainController.getImageController().getAllImageURLs());
         // lấy ảnh sort theo date (mới nhất xếp trước).
-        imageURIs.addAll(mainController.getImageController().getAllImageURLsSortByDate());
+//       imageURIs.addAll(mainController.getImageController().getAllImageURLsSortByDate());
+        imageURIs.addAll(mainController.getImageController().getAllImageURLs());
         imageAdapter = new ImageAdapter(getActivity(), imageURIs);
         recyclerMediaView.setLayoutManager(new GridLayoutManager(getContext(), 3));
         recyclerMediaView.setAdapter(imageAdapter);

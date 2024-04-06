@@ -76,7 +76,7 @@ public class ImageInfo extends Fragment {
             } else if (image.getCapacity() > 1024 * 1024 * 1024) {
                 capacity.setText(image.getCapacity() / (1024 * 1024 * 1024) + " GB");
             } else capacity.setText(image.getCapacity() + " bytes");
-
+            Log.v("ImageInfo", "Created at: " + image.getCreated_at());
             created_at.setText(image.getCreated_at());
             notice.setText(image.getNotice());
             return view;

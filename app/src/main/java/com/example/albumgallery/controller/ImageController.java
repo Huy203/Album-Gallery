@@ -6,6 +6,7 @@ import static com.example.albumgallery.utils.Constant.REQUEST_CODE_EDIT_IMAGE;
 import static com.example.albumgallery.utils.Constant.REQUEST_CODE_PICK_MULTIPLE_IMAGES;
 import static com.example.albumgallery.utils.Constant.imageExtensions;
 import static com.example.albumgallery.utils.Utilities.byteArrayToBitmap;
+import static com.example.albumgallery.utils.Utilities.getImageAddedDate;
 import static java.text.DateFormat.getDateTimeInstance;
 
 import android.annotation.SuppressLint;
@@ -27,7 +28,7 @@ import com.example.albumgallery.FirebaseManager;
 import com.example.albumgallery.helper.DatabaseHelper;
 import com.example.albumgallery.model.ImageModel;
 import com.example.albumgallery.model.Model;
-import com.example.albumgallery.utils.qrCodeRecognization;
+import com.example.albumgallery.utils.QRCodeRecognization;
 import com.example.albumgallery.view.activity.MainFragmentController;
 import com.example.albumgallery.view.listeners.BackgroundProcessingCallback;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -45,7 +46,6 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 
@@ -67,6 +67,14 @@ public class ImageController implements Controller {
     }
 
     public void create(String name, int width, int height, long capacity, String dateAdded) {
+        // Check if the image already exists in the database
+//        if (dbHelper.checkExist("Image", "name = '" + name + "'")) {
+//            if(showAlertDialog(activity, "Image already exists", "The image already exists in the database\nDo you want to replace it?", "Yes", "No")) {
+//                ImageModel imageModel = new ImageModel(name, width, height, capacity, dateAdded);
+//                String value = "'" + imageModel.getName() + "', " + imageModel.getWidth() + ", " + imageModel.getHeight() + ", " + imageModel.getCapacity() + ", '" + imageModel.getCreated_at() + "'";
+//                this.update("(name, width, height, capacity, dateAdded)", value, "id = " + dbHelper.getId("Image", "name = '" + name + "'"));
+//            }
+//        } else {
         ImageModel imageModel = new ImageModel(name, width, height, capacity, dateAdded);
         this.insert(imageModel);
     }
@@ -75,8 +83,6 @@ public class ImageController implements Controller {
     public void insert(Model model) {
         idSelectedImages.add(dbHelper.insert("Image", model));
         dbHelper.close();
-        firebaseManager.getStorage();
-        // FirebaseStorage storage = FirebaseStorage.getInstance();
     }
 
     @Override
@@ -166,7 +172,8 @@ public class ImageController implements Controller {
                 if (task1.isSuccessful()) {
                     try {
                         Uri uriImage = task1.getResult(); // The uri with the location of the file in firebase
-                        update("ref", uriImage.toString(), "id = " + idSelectedImages.get(uploadTasks.indexOf(task1))); // Update the reference of the image
+                        Log.v("Image", String.valueOf(idSelectedImages.get(uploadTasks.indexOf(task1))));
+                        this.update("ref", uriImage.toString(), "id = " + idSelectedImages.get(uploadTasks.indexOf(task1))); // Update the reference of the image
                         Log.v("Image", "Image uploaded" + " at " + idSelectedImages.get(uploadTasks.indexOf(task1)));
                         if (allTasksCompleted(uploadTasks)) {
                             activity.runOnUiThread(() -> {
@@ -221,7 +228,7 @@ public class ImageController implements Controller {
                 capacity = cursor.getLong(cursor.getColumnIndex(MediaStore.Images.Media.SIZE));
                 long temp = cursor.getLong(cursor.getColumnIndex(MediaStore.Images.Media.DATE_ADDED));
                 // Convert milliseconds to a more readable format (optional)
-                dateAdded = getDateTimeInstance().format(new Date(temp * 1000));
+                dateAdded = getImageAddedDate();
             }
         }
         // Get width and height of the image
@@ -425,7 +432,7 @@ public class ImageController implements Controller {
     }
 
     public String recognizeQRCode(String uri) {
-        qrCodeRecognization qrCodeRecognization = new qrCodeRecognization();
+        QRCodeRecognization qrCodeRecognization = new QRCodeRecognization();
         try {
             return qrCodeRecognization.execute(uri).get();
         } catch (Exception e) {

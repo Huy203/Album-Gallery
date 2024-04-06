@@ -2,6 +2,7 @@ package com.example.albumgallery.utils;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Matrix;
 import android.os.AsyncTask;
 import android.util.Log;
 
@@ -13,26 +14,36 @@ import com.google.zxing.common.HybridBinarizer;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.HttpURLConnection;
 import java.net.URL;
 
-public class qrCodeRecognization extends AsyncTask<String, Void, String> {
+public class QRCodeRecognization extends AsyncTask<String, Void, String> {
+    private static final int MAX_BITMAP_DIMENSION = 2048; // Maximum dimension for resizing the image with size if 1024x1024 pixels
+
     @Override
     protected String doInBackground(String... urls) {
         String uri = urls[0];
-        Bitmap bitmap = downloadImage(uri);
-        if (bitmap != null) {
-            return recognizeQRCode(bitmap);
+        Bitmap bitmap = null;
+        try {
+            URL url = new URL(uri);
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            connection.setDoInput(true);
+            connection.connect();
+            InputStream inputStream = connection.getInputStream();
+            bitmap = BitmapFactory.decodeStream(inputStream);
+            if (bitmap != null) {
+                return recognizeQRCode(bitmap);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
         }
         return null;
     }
-
 
     // This method is used to calculate the sample size of the image which is used to reduce the size of the image
     private Bitmap downloadImage(String uri) {
         try {
             InputStream in = new URL(uri).openStream();
-            Log.v("Image Size", "Size of the image: " + in.available());
-            Log.v("Image Size", "Width of the image: " + BitmapFactory.decodeStream(in).getWidth());
             BitmapFactory.Options options = new BitmapFactory.Options();
             options.inJustDecodeBounds = false;
             options.inSampleSize = calculateInSampleSize(options, 1024, 1024); // Adjust this to a suitable size
@@ -63,6 +74,7 @@ public class qrCodeRecognization extends AsyncTask<String, Void, String> {
     }
 
     private String recognizeQRCode(Bitmap bitmap) {
+        bitmap = resizeBitmap(bitmap);
         // Recognize QR code from the bitmap
         try {
             int[] pixels = new int[bitmap.getWidth() * bitmap.getHeight()];
@@ -77,6 +89,18 @@ public class qrCodeRecognization extends AsyncTask<String, Void, String> {
             e.printStackTrace();
         }
         return null;
+    }
+
+    private Bitmap resizeBitmap(Bitmap bitmap){
+        Log.v("Image Size", "Original size: " + bitmap.getHeight() + "x" + bitmap.getWidth());
+        float scaleFactor = Math.min((float) MAX_BITMAP_DIMENSION / bitmap.getWidth(),
+                (float) MAX_BITMAP_DIMENSION / bitmap.getHeight());
+
+        Matrix matrix = new Matrix();
+        matrix.postScale(scaleFactor, scaleFactor);
+        Log.v("Image Size", "Scale factor: " + scaleFactor);
+
+        return Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
     }
 
     @Override

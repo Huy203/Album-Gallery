@@ -151,10 +151,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.execSQL("DELETE FROM " + table + " WHERE " + where);
     }
 
-    public void update(String table, String column, String value, String where) {
+    public long update(String table, String column, String value, String where) {
         Log.v("DatabaseHelper", "Updating data");
         SQLiteDatabase db = getWritableDatabase();
         db.execSQL("UPDATE " + table + " SET " + column + " = " + "'" + value + "'" + " WHERE " + where);
+        return getId(table, where);
     }
 
     public List<String> select(String table, String column, String where) {
@@ -274,5 +275,14 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             }
         }
         return data;
+    }
+
+    public boolean checkExist(String table, String s) {
+        SQLiteDatabase db = getWritableDatabase();
+        Cursor cursor = db.rawQuery("SELECT * FROM " + table + " WHERE " + s, null);
+        if (cursor.moveToFirst()) {
+            return true;
+        }
+        return false;
     }
 }

@@ -129,6 +129,7 @@ public class ImageModel implements Model {
         this.is_favourited = is_favourited;
     }
 
+
     @Override
     public String toString() {
         return "name='" + name + '\'' +
@@ -162,4 +163,6 @@ public class ImageModel implements Model {
     public void select() {
 
     }
+
+
 }
