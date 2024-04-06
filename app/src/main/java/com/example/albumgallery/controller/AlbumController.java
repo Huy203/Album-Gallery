@@ -8,6 +8,7 @@ import android.content.Context;
 import android.util.Log;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class AlbumController implements Controller {
@@ -28,7 +29,7 @@ public class AlbumController implements Controller {
         List<AlbumModel> albumModels = new ArrayList<>();
         for (String s : data) {
             String[] temp = s.split(",");
-            albumModels.add(new AlbumModel(Integer.parseInt(temp[0]), temp[1], Integer.parseInt(temp[2]), temp[3], temp[4], Integer.parseInt(temp[5])));
+            albumModels.add(new AlbumModel(Integer.parseInt(temp[0]), temp[1], Integer.parseInt(temp[2]), temp[4], temp[5], Integer.parseInt(temp[7])));
         }
         return albumModels;
     }
@@ -99,5 +100,12 @@ public class AlbumController implements Controller {
 
     public void unfavouriteAlbum() {
         // Unfavourite an album
+    }
+
+    public AlbumModel getAlbumById(long id) {
+        String data = dbHelper.getById("Album", id);
+        String[] temp = data.split(",");
+        Log.d("temp data", Arrays.toString(temp));
+        return new AlbumModel(Integer.parseInt(temp[0]), temp[1], Integer.parseInt(temp[2]), temp[4], temp[5], Integer.parseInt(temp[7]));
     }
 }

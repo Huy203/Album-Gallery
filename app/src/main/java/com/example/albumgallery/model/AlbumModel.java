@@ -112,16 +112,14 @@ public class AlbumModel implements Model{
         this.is_deleted = 0;
     }
 
-    public AlbumModel(int id, String name, int capacity, String ref, String password, int num_of_images) {
+    public AlbumModel(int id, String name, int capacity, String notice, String ref, int num_of_images) {
         this.id = id;
         this.name = name;
         this.capacity = capacity;
         this.ref = ref;
-        this.password = password;
         this.created_at = (Calendar.getInstance().getTime()).toString();
         this.is_deleted = 0;
-        this.password = "";
-        this.notice = "";
+        this.notice = notice;
         this.num_of_images = num_of_images;
     }
     public AlbumModel(String name, String password, int num_of_images){

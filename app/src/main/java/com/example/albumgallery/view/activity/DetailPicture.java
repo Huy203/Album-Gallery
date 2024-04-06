@@ -197,6 +197,7 @@ public class DetailPicture extends AppCompatActivity implements ImageInfoListene
 
     public ImageModel getImageModel() {
         long id = getIntent().getLongExtra("id", 0);
+        Log.d("image content id", String.valueOf(id));
         return mainController.getImageController().getImageById(id);
     }
 

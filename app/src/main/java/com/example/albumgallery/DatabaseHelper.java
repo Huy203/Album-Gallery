@@ -260,11 +260,27 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return -1;
     }
 
+//    public String getById(String table, long id) {
+//        SQLiteDatabase db = getWritableDatabase();
+//        Cursor cursor = db.rawQuery("SELECT * FROM " + table + " WHERE id = " + id, null);
+//        if (cursor.moveToFirst()) {
+//            return cursor.getString(0) + "," + cursor.getString(1) + "," + cursor.getString(2)+ "," + cursor.getString(3)+ "," + cursor.getString(4)+ "," + cursor.getString(5)+ "," + cursor.getString(6)+ "," + cursor.getString(7)+ "," + cursor.getString(8)+ "," + cursor.getString(9)+ "," + cursor.getString(10);
+//        }
+//        return null;
+//    }
+
     public String getById(String table, long id) {
         SQLiteDatabase db = getWritableDatabase();
         Cursor cursor = db.rawQuery("SELECT * FROM " + table + " WHERE id = " + id, null);
         if (cursor.moveToFirst()) {
-            return cursor.getString(0) + "," + cursor.getString(1) + "," + cursor.getString(2)+ "," + cursor.getString(3)+ "," + cursor.getString(4)+ "," + cursor.getString(5)+ "," + cursor.getString(6)+ "," + cursor.getString(7)+ "," + cursor.getString(8)+ "," + cursor.getString(9)+ "," + cursor.getString(10);
+            StringBuilder stringBuilder = new StringBuilder();
+            for (int i = 0; i < cursor.getColumnCount(); i++) {
+                stringBuilder.append(cursor.getString(i));
+                if (i < cursor.getColumnCount() - 1) {
+                    stringBuilder.append(",");
+                }
+            }
+            return stringBuilder.toString();
         }
         return null;
     }
