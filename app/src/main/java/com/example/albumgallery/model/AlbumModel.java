@@ -6,6 +6,8 @@ import com.example.albumgallery.DatabaseHelper;
 
 import java.util.Date;
 import java.util.Calendar;
+import java.util.List;
+
 public class AlbumModel implements Model{
     // AlbumModel class is used to store the data of the album.
     private DatabaseHelper dbHelper;

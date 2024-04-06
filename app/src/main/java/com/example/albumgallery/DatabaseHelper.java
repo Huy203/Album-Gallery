@@ -425,4 +425,20 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return ref;
     }
 
+    @SuppressLint("Range")
+    public long getTotalCapacityFromImageIDs(List<Long> imageIDs){
+        long totalCapacity = 0;
+        SQLiteDatabase db = getReadableDatabase();
+
+        for (Long imageId : imageIDs) {
+            Cursor cursor = db.rawQuery("SELECT capacity FROM " + IMAGE_TABLE + " WHERE id = ?", new String[]{String.valueOf(imageId)});
+            if (cursor != null && cursor.moveToFirst()) {
+                // Get the capacity from the cursor and add it to the total capacity
+                long capacity = cursor.getLong(cursor.getColumnIndex("capacity"));
+                totalCapacity += capacity;
+                cursor.close();
+            }
+        }
+        return totalCapacity;
+    }
 }

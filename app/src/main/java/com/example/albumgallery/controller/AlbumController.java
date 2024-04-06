@@ -2,6 +2,7 @@ package com.example.albumgallery.controller;
 
 import com.example.albumgallery.DatabaseHelper;
 import com.example.albumgallery.model.AlbumModel;
+import com.example.albumgallery.model.ImageModel;
 import com.example.albumgallery.model.Model;
 
 import android.content.Context;
@@ -108,4 +109,5 @@ public class AlbumController implements Controller {
         Log.d("temp data", Arrays.toString(temp));
         return new AlbumModel(Integer.parseInt(temp[0]), temp[1], Integer.parseInt(temp[2]), temp[4], temp[5], Integer.parseInt(temp[7]));
     }
+
 }

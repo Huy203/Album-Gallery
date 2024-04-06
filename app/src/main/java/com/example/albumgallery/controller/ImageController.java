@@ -417,4 +417,7 @@ public class ImageController implements Controller {
             }
         }
     }
+    public long getTotalCapacityFromImageIDs(List<Long> imageIDs){
+        return dbHelper.getTotalCapacityFromImageIDs(imageIDs);
+    }
 }

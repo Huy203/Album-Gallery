@@ -71,6 +71,8 @@ public class AlbumContentActivity extends AppCompatActivity implements ImageAdap
 
         image_ids = mainController.getImageAlbumController().getImageIdsByAlbumId(album_id);
 
+        updateCapacity();
+
         for(Long image_id: image_ids) {
             String ref = mainController.getImageController().getImageRefById(image_id);
             Log.d("ref from id", ref);
@@ -206,5 +208,10 @@ public class AlbumContentActivity extends AppCompatActivity implements ImageAdap
 //        String where = "id = " + getIntent().getLongExtra("id", 0);
         Log.d("test update where clause", String.valueOf(album_id));
         mainController.getAlbumController().update("notice", data, String.valueOf(album_id));
+    }
+
+    public void updateCapacity(){
+        long capacity = mainController.getImageController().getTotalCapacityFromImageIDs(image_ids);
+        mainController.getAlbumController().update("capacity", String.valueOf(capacity), String.valueOf(album_id));
     }
 }
