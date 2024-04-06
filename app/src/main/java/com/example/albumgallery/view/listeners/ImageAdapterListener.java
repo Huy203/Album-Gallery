@@ -1,4 +1,4 @@
-package com.example.albumgallery.view.adapter;
+package com.example.albumgallery.view.listeners;
 
 import android.view.View;
 

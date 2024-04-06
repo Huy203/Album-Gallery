@@ -1,8 +1,13 @@
 package com.example.albumgallery.view.fragment;
 
+import static com.example.albumgallery.utils.Constant.REQUEST_CODE_DETAIL_IMAGE;
+import static com.example.albumgallery.utils.Constant.REQUEST_CODE_EDIT_IMAGE;
+
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.util.Log;
@@ -16,6 +21,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.core.app.ActivityOptionsCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
@@ -27,7 +33,9 @@ import com.example.albumgallery.controller.MainController;
 import com.example.albumgallery.view.activity.BackgroundProcessingCallback;
 import com.example.albumgallery.view.activity.DetailPicture;
 import com.example.albumgallery.view.adapter.ImageAdapter;
-import com.example.albumgallery.view.adapter.ImageAdapterListener;
+import com.example.albumgallery.view.listeners.ImageAdapterListener;
+import com.google.android.gms.tasks.Task;
+import com.google.android.gms.tasks.Tasks;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -42,6 +50,8 @@ public class HomeScreenFragment extends Fragment {
     private TextView numberOfImagesSelected;
     private ImageAdapterListener iListener;
     private BackgroundProcessingCallback bgListener;
+    List<String> selectedImageURLs;
+    List<Task> selectedImageURLsTask;
 
     public HomeScreenFragment() {
         // Required empty public constructor
@@ -54,7 +64,7 @@ public class HomeScreenFragment extends Fragment {
             iListener = (ImageAdapterListener) context;
             bgListener = (BackgroundProcessingCallback) context;
         } else {
-            throw new RuntimeException(context.toString()
+            throw new RuntimeException(context
                     + " must implement Interface");
         }
     }
@@ -74,6 +84,8 @@ public class HomeScreenFragment extends Fragment {
         mainController = new MainController(getActivity());
         // imageURIs
         imageURIs = new ArrayList<>();
+        selectedImageURLs = new ArrayList<>();
+        selectedImageURLsTask = new ArrayList<>();
         imageAdapter = new ImageAdapter(getActivity(), imageURIs);
 //      imageAdapter.setImageAdapterListener(this);
         recyclerMediaView = view.findViewById(R.id.recyclerMediaView);
@@ -83,12 +95,18 @@ public class HomeScreenFragment extends Fragment {
 
         Button btnPickImageFromDevice = view.findViewById(R.id.btnPickImageFromDevice);
         Button btnPickMultipleImages = view.findViewById(R.id.btnPickMultipleImages);
+        Button btnDeleteMultipleImages = view.findViewById(R.id.btnDeleteMultipleImages);
 
         numberOfImagesSelected = view.findViewById(R.id.numberOfSelectedImages);
 
         btnPickImageFromDevice.setOnClickListener(v -> {
             isBackgroundTaskCompleted = false;
             mainController.getImageController().pickMultipleImages(bgListener);
+        });
+
+        btnDeleteMultipleImages.setOnClickListener(v -> {
+            // mainController.getImageController().deleteSelectedImageAtHomeScreeen(selectedImageURLsTask, 1);
+            showDeleteConfirmationDialog();
         });
 
         btnPickMultipleImages.setOnClickListener(v -> {
@@ -115,14 +133,20 @@ public class HomeScreenFragment extends Fragment {
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (data != null) {
-            if (data.getData() == null) {
-                Log.d("Check data", "is null");
-            } else {
-                Log.d("Check data", "is not null");
+        Log.v("HomeScreenFragment", "onActivityResult: " + requestCode + " " + resultCode);
+        if(requestCode == CAMERA_REQUEST_CODE && resultCode == getActivity().RESULT_OK) {
+            mainController.getImageController().onActivityResult(requestCode, resultCode, data);
+        }
+        else if(requestCode == REQUEST_CODE_DETAIL_IMAGE && resultCode == getActivity().RESULT_OK) {
+            boolean isUpdate = data.getBooleanExtra("update", false);
+            Log.v("HomeScreenFragment", "onActivityResult: " + isUpdate);
+            if(isUpdate) {
+                updateUI();
             }
         }
-        mainController.getImageController().onActivityResult(requestCode, resultCode, data);
+        else {
+            mainController.getImageController().onActivityResult(requestCode, resultCode, data);
+        }
     }
 
     public void updateUI() {
@@ -136,9 +160,27 @@ public class HomeScreenFragment extends Fragment {
         imageAdapter.notifyDataSetChanged();
     }
 
+    @SuppressLint("SetTextI18n")
     public void getSelectedItemsCount(int count) {
+        Log.v("SelectedItems", count + " items selected");
         numberOfImagesSelected.setText(count + " images selected");
     }
+
+    private void showDeleteConfirmationDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        builder.setTitle("Confirm Deletion");
+        builder.setMessage("Are you sure you want to delete this image?");
+        builder.setPositiveButton("Delete", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                // Call deleteSelectedImage() method from ImageController
+                mainController.getImageController().deleteSelectedImageAtHomeScreeen(selectedImageURLsTask);
+            }
+        });
+        builder.setNegativeButton("Cancel", null);
+        builder.show();
+    }
+
 
     public void handleImagePick(View view, String uri, int position) {
         FragmentActivity activity = getActivity();
@@ -151,7 +193,7 @@ public class HomeScreenFragment extends Fragment {
         intent.putExtra("id", id);
         intent.putExtra("position", position);
         Log.v("ImageAdapter", "Image selected: " + view);
-        startActivity(intent, options.toBundle());
+        startActivityForResult(intent, REQUEST_CODE_DETAIL_IMAGE, options.toBundle());
     }
 
     private void openCamera() {
@@ -166,11 +208,13 @@ public class HomeScreenFragment extends Fragment {
         super.onDetach();
         iListener = null;
         bgListener = null;
+        Log.v("HomeScreenFragment", "onDetach");
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
         mainController = null;
+        Log.v("HomeScreenFragment", "onDestroy");
     }
 }

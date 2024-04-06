@@ -5,6 +5,8 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
 import android.util.Log;
 
+import com.example.albumgallery.helper.DatabaseHelper;
+
 public class DatabaseManager {
     private DatabaseHelper dbHelper;
     private final Context context;

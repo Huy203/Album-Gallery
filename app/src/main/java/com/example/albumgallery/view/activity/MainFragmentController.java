@@ -9,14 +9,13 @@ import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityOptionsCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
 import com.example.albumgallery.R;
 import com.example.albumgallery.databinding.ActivityFragmentControllerBinding;
-import com.example.albumgallery.view.adapter.ImageAdapterListener;
+import com.example.albumgallery.view.listeners.ImageAdapterListener;
 import com.example.albumgallery.view.fragment.AlbumsMainFragment;
 import com.example.albumgallery.view.fragment.HomeScreenFragment;
 
@@ -38,6 +37,12 @@ public class MainFragmentController extends AppCompatActivity implements Backgro
         // fragment đầu tiên khi vừa vào app
 //        replaceFragment(new HomeScreenFragment());
 
+        String fragmentToLoad = getIntent().getStringExtra("fragmentToLoad");
+        if(fragmentToLoad != null && fragmentToLoad.equals("AlbumMain")) {
+            replaceFragment(new AlbumsMainFragment());
+        }
+
+
         binding.bottomNavigationView.setOnItemSelectedListener(item -> {
             int itemId = item.getItemId();
             if (itemId == R.id.photos) {
@@ -56,7 +61,11 @@ public class MainFragmentController extends AppCompatActivity implements Backgro
     public void onResume() {
         Toast.makeText(this, "onResume", Toast.LENGTH_SHORT).show();
         super.onResume();
-        HomeScreenFragment fragment = (HomeScreenFragment) getSupportFragmentManager().findFragmentById(R.id.fragment_container);
+        Fragment currentFragment = getSupportFragmentManager().findFragmentById(R.id.fragment_container);
+        HomeScreenFragment fragment = null;
+        if(currentFragment instanceof HomeScreenFragment) {
+            fragment = (HomeScreenFragment) getSupportFragmentManager().findFragmentById(R.id.fragment_container);
+        }
         if (fragment != null) {
             if (isBackgroundTaskCompleted)
                 fragment.updateUI();
@@ -68,6 +77,7 @@ public class MainFragmentController extends AppCompatActivity implements Backgro
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
+        Log.v("MainFragmentController", "onActivityResult: " + requestCode + " " + resultCode);
         if (data != null) {
             if (data.getData() == null) {
                 Log.d("Check data", "is null");

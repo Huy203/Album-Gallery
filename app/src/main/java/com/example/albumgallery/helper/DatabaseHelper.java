@@ -1,4 +1,4 @@
-package com.example.albumgallery;
+package com.example.albumgallery.helper;
 
 import android.content.Context;
 import android.database.Cursor;
@@ -62,13 +62,12 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             db.execSQL("CREATE TABLE " + ALBUM_TABLE + " (\n" +
                     "    id INTEGER PRIMARY KEY AUTOINCREMENT,\n" +
                     "    name TEXT,\n" +
-                    "    width REAL,\n" +
-                    "    height REAL,\n" +
                     "    capacity INTEGER,\n" +
                     "    created_at TIMESTAMP,\n" +
                     "    notice TEXT,\n" +
                     "    ref TEXT,\n" +
-                    "    user_id INTEGER,\n" +
+                    "    is_deleted INTEGER,\n" +
+                    "    num_of_images INTEGER,\n" +
                     "    password TEXT\n" +
                     ");");
             db.execSQL("CREATE TABLE " + IMAGE_TABLE + " (\n" +
@@ -90,7 +89,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                     "    PRIMARY KEY (image_id, album_id)\n" +
                     ");");
             db.execSQL("CREATE TABLE " + IMAGE_TAG_TABLE + "(\n" +
-                    "    image_id INTEGER REFERENCES " + IMAGE_TABLE + "(id),\n" +
+                    "    image_id INTEGER REFERENCES "   + IMAGE_TABLE + "(id),\n" +
                     "    tag_id INTEGER REFERENCES " + TAG_TABLE + "(id),\n" +
                     "    PRIMARY KEY (image_id, tag_id)\n" +
                     ");");

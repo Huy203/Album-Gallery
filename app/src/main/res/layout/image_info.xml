@@ -1,14 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:background="@color/white"
     android:orientation="vertical">
 
     <EditText
         android:id="@+id/imageNotice"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_centerInParent="true"
         android:layout_margin="8dp"
         android:layout_marginTop="8dp"
         android:layout_marginBottom="8dp"
@@ -32,7 +33,7 @@
 
             <TextView
                 android:id="@+id/imageCreatedAt"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
                 android:layout_marginTop="8dp"
@@ -65,7 +66,8 @@
             android:padding="8dp"
             android:text="Tên ảnh"
             android:textColor="@color/black"
-            android:textSize="16sp" />
+            android:textSize="16sp"
+            tools:ignore="HardcodedText" />
     </LinearLayout>
 
     <LinearLayout
@@ -102,13 +104,14 @@
         android:id="@+id/imageLocation"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="30dp"
+        android:layout_marginBottom="10dp"
         android:gravity="center"
         android:onClick="addLocation"
         android:padding="8dp"
         android:text="Thêm vị trí"
         android:textColor="@color/black"
         android:textSize="20sp" />
+
 </LinearLayout>
 
 
