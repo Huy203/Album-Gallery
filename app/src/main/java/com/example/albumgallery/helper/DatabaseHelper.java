@@ -372,28 +372,15 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     public void toggleFavoriteImage(long imageId) {
         SQLiteDatabase db = getWritableDatabase();
-//        Cursor cursor = db.rawQuery("SELECT is_favourited FROM " + IMAGE_TABLE + " WHERE id = ?", new String[]{String.valueOf(imageId)});
-//        int isFavourited = 0;
-//
-//        if (cursor != null) {
-//            if (cursor.moveToFirst()) {
-//                isFavourited = cursor.getInt(0);
-//            }
-//            cursor.close();
-//        }
-
         boolean isFavorite = isFavoriteImage(imageId);
 
-        // Thay đổi trạng thái yêu thích
         int newFavorite;
         if(isFavorite) {
             newFavorite = 0;
         } else {
             newFavorite = 1;
         }
-//        int newFavouritedState = isFavourited == 1 ? 0 : 1;
 
-        // Cập nhật trạng thái yêu thích trong cơ sở dữ liệu
         ContentValues values = new ContentValues();
         values.put("is_favourited", newFavorite);
         db.update(IMAGE_TABLE, values, "id = ?", new String[]{String.valueOf(imageId)});
@@ -470,5 +457,12 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return thumbnails;
     }
 
+    public void setFavorite(long imageId, boolean isFavorite) {
+        SQLiteDatabase db = getWritableDatabase();
+        int favorite = isFavorite ? 1 : 0;
+        ContentValues values = new ContentValues();
+        values.put("is_favourited", favorite);
+        db.update(IMAGE_TABLE, values, "id = ?", new String[]{String.valueOf(imageId)});
+    }
 
 }

@@ -2,6 +2,7 @@ package com.example.albumgallery.view.adapter;
 
 import android.app.Activity;
 import android.content.Context;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.util.Log;
 import android.util.SparseBooleanArray;
@@ -12,11 +13,17 @@ import android.widget.CheckBox;
 import android.widget.ImageView;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.DataSource;
+import com.bumptech.glide.load.engine.GlideException;
+import com.bumptech.glide.request.RequestListener;
+import com.bumptech.glide.request.target.Target;
 import com.example.albumgallery.R;
 import com.example.albumgallery.view.listeners.ImageAdapterListener;
+import com.google.android.material.progressindicator.CircularProgressIndicator;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -107,16 +114,34 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> 
 
         private final ImageView imageView;
         private final CheckBox checkbox;
+        private final CircularProgressIndicator progressIndicator;
 
         public ViewHolder(View itemView) {
             super(itemView);
             imageView = itemView.findViewById(R.id.imageView);
             checkbox = itemView.findViewById(R.id.checkbox);
+            progressIndicator = (CircularProgressIndicator) itemView.findViewById(R.id.circularProgressIndicator);
+            progressIndicator.setVisibility(View.VISIBLE);
         }
 
         public void bind(String imageURL, int position) {
             checkbox.setChecked(selectedItems.get(position, false));
-            Glide.with(context).load(Uri.parse(imageURL)).into(imageView);
+            Glide.with(context)
+                    .load(Uri.parse(imageURL))
+                    .listener(new RequestListener<Drawable>() {
+                        @Override
+                        public boolean onLoadFailed(@Nullable GlideException e, @Nullable Object model, @NonNull Target<Drawable> target, boolean isFirstResource) {
+                            progressIndicator.setVisibility(View.GONE);
+                            return false;
+                        }
+
+                        @Override
+                        public boolean onResourceReady(@NonNull Drawable resource, @NonNull Object model, Target<Drawable> target, @NonNull DataSource dataSource, boolean isFirstResource) {
+                            progressIndicator.setVisibility(View.GONE);
+                            return false;
+                        }
+                    })
+                    .into(imageView);
 
             itemView.setOnClickListener(view -> {
                 if (!isMultipleChoice) {

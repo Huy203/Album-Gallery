@@ -335,6 +335,9 @@ public class ImageController implements Controller {
     public void toggleFavoriteImage(long imageId) {
         dbHelper.toggleFavoriteImage(imageId);
     }
+    public void setFavorite(long imageId, boolean isFavorite) {
+        dbHelper.setFavorite(imageId, isFavorite);
+    }
     public boolean isFavoriteImage(long imageId) {
         return dbHelper.isFavoriteImage(imageId);
     }

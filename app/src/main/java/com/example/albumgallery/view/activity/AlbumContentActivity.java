@@ -17,7 +17,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.albumgallery.R;
 import com.example.albumgallery.controller.MainController;
 import com.example.albumgallery.view.adapter.ImageAdapter;
-import com.example.albumgallery.view.adapter.ImageAdapterListener;
+import com.example.albumgallery.view.listeners.ImageAdapterListener;
 
 import java.util.ArrayList;
 import java.util.List;
