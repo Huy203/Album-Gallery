@@ -2,11 +2,25 @@ package com.example.albumgallery.view.activity;
 
 import static com.example.albumgallery.utils.Constant.REQUEST_CODE_EDIT_IMAGE;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.DataSource;
+import com.bumptech.glide.load.engine.GlideException;
+import com.bumptech.glide.request.RequestListener;
+import com.bumptech.glide.request.target.Target;
+import com.example.albumgallery.R;
+import com.example.albumgallery.controller.MainController;
+//import com.example.albumgallery.listeners.OnSwipeTouchListener;
+import com.example.albumgallery.model.ImageModel;
+//import com.example.albumgallery.view.adapter.ImageInfoListener;
+import com.example.albumgallery.view.fragment.ImageInfo;
+
 import android.annotation.SuppressLint;
 import android.app.WallpaperManager;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.PorterDuff;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
@@ -14,6 +28,7 @@ import android.provider.MediaStore;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -21,6 +36,8 @@ import android.widget.Toast;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
+import androidx.core.graphics.drawable.DrawableCompat;
 import androidx.fragment.app.FragmentTransaction;
 
 import com.bumptech.glide.Glide;
@@ -50,11 +67,16 @@ public class DetailPicture extends AppCompatActivity implements ImageInfoListene
     private ImageInfo imageInfoFragment;
     private boolean isImageInfoVisible = false;
     private AlertDialog optionsDialog;
+    private boolean isFavorite;
+    private Button favoriteButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_detail_image);
+
+//        favoriteButton = (Button) findViewById(R.id.action_like);
+//        favoriteButton.setCompoundDrawableTintList(getResources().getColorStateList(R.color.red_500));
 
         initializeViews();
         setupListeners();
@@ -72,6 +94,11 @@ public class DetailPicture extends AppCompatActivity implements ImageInfoListene
         qrLink = findViewById(R.id.qrLink);
         imageInfoView = findViewById(R.id.imageInfo);
         imageInfoFragment = new ImageInfo();
+
+//        String uri = getImageModel().getRef();
+//        long id = mainController.getImageController().getIdByRef(uri);
+//        isFavorite = mainController.getImageController().isFavoriteImage(id);
+//        favoriteButton.setCompoundDrawableTintList(getResources().getColorStateList(isFavorite ? R.color.red_500 : R.color.black));
     }
 
     @SuppressLint("NonConstantResourceId")
@@ -100,9 +127,16 @@ public class DetailPicture extends AppCompatActivity implements ImageInfoListene
     @SuppressLint("UseCompatTextViewDrawableApis")
     private void appBarAction() {
         int[] buttonIds = {R.id.action_edit, R.id.action_menu, R.id.action_share, R.id.action_like, R.id.action_info, R.id.action_delete, R.id.action_back};
-
+        String uri = getImageModel().getRef();
+        long id = mainController.getImageController().getIdByRef(uri);
+        isFavorite = mainController.getImageController().isFavoriteImage(id);
         for (int buttonId : buttonIds) {
-            Button button = findViewById(buttonId);
+            Button button = (Button) findViewById(buttonId);
+            if(buttonId == buttonIds[3]) {
+                Log.d("favorite init", Boolean.toString(isFavorite));
+                button.setCompoundDrawableTintList(getResources().getColorStateList(isFavorite ? R.color.red_500 : R.color.black));
+            }
+
             button.setOnClickListener(v -> {
                 if (buttonId == buttonIds[0]) {
                     launchEditImageActivity();
@@ -112,7 +146,9 @@ public class DetailPicture extends AppCompatActivity implements ImageInfoListene
                     shareImage();
                     button.setCompoundDrawableTintList(getResources().getColorStateList(isImageInfoVisible ? R.color.blue_700 : R.color.black));
                 } else if (buttonId == buttonIds[3]) {
-//                    toggleImageInfo();
+                    toggleFavoriteImage(id);
+                    button.setCompoundDrawableTintList(getResources().getColorStateList(isFavorite ? R.color.red_500 : R.color.black));
+//                    handleFavoriteButton();
                 } else if (buttonId == buttonIds[4]) {
                     toggleImageInfo();
                     button.setCompoundDrawableTintList(getResources().getColorStateList(isImageInfoVisible ? R.color.blue_700 : R.color.black));
@@ -314,6 +350,27 @@ public class DetailPicture extends AppCompatActivity implements ImageInfoListene
     public void onNoticePassed(String data) {
         String where = "id = " + getIntent().getLongExtra("id", 0);
         mainController.getImageController().update("notice", data, where);
+    }
+
+    private void handleFavoriteButton() {
+        String uri = getImageModel().getRef();
+        long id = mainController.getImageController().getIdByRef(uri);
+        mainController.getImageController().toggleFavoriteImage(id);
+        isFavorite = mainController.getImageController().isFavoriteImage(id);
+        setFavoriteIcon(isFavorite);
+    }
+
+    private void setFavoriteIcon(boolean isFavorite) {
+        if(isFavorite) {
+            favoriteButton.setCompoundDrawableTintList(getResources().getColorStateList(R.color.red_500));
+        } else {
+            favoriteButton.setCompoundDrawableTintList(getResources().getColorStateList(R.color.black));
+        }
+    }
+
+    private void toggleFavoriteImage(long id) {
+        isFavorite = !isFavorite;
+        mainController.getImageController().setFavorite(id, isFavorite);
     }
 
     @Override

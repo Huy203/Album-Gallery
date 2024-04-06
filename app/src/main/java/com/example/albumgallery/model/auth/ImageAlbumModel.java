@@ -1,6 +1,7 @@
 package com.example.albumgallery.model.auth;
 
 import android.content.Context;
+import android.util.Log;
 
 import com.example.albumgallery.helper.DatabaseHelper;
 import com.example.albumgallery.model.Model;
@@ -42,7 +43,9 @@ public class ImageAlbumModel implements Model {
     }
     @Override
     public String insert() {
-        return "INSERT INTO Album (image_id, album_id) VALUES ('" + image_id + ", " + album_id + ", '" + ")";
+        String query = "INSERT INTO Image_Album (image_id, album_id) VALUES (" + image_id + ", " + album_id + ")";
+        Log.d("insert image album", query);
+        return query;
     }
 
     @Override

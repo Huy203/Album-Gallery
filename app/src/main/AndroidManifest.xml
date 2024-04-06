@@ -43,6 +43,8 @@
         <activity android:name=".view.activity.CreateAlbumActivity" />
         <activity android:name=".view.activity.SelectImageActivity" />
         <activity android:name=".view.activity.CropImageActivity" />
+        <activity android:name=".view.activity.AlbumContentActivity" />
+        <activity android:name=".view.activity.PasswordAlbumActivity" />
 
         <provider
             android:name="androidx.core.content.FileProvider"

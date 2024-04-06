@@ -320,7 +320,35 @@ public class ImageController implements Controller {
     public List<String> getAllImageURLsSortByDate() {
         return dbHelper.selectImagesSortByDate("Image", "ref", "descending");
     }
+    public List<String> getAllImageIds() {
+        return dbHelper.getFromImage("id");
+    }
 
+    public String getImageRefById(long imageId) {
+        return dbHelper.getImageRefById(imageId);
+    }
+
+<<<<<<< HEAD
+=======
+    public void toggleFavoriteImage(long imageId) {
+        dbHelper.toggleFavoriteImage(imageId);
+    }
+    public void setFavorite(long imageId, boolean isFavorite) {
+        dbHelper.setFavorite(imageId, isFavorite);
+    }
+    public boolean isFavoriteImage(long imageId) {
+        return dbHelper.isFavoriteImage(imageId);
+    }
+    public List<String> getAllFavoriteImageRef() {
+        return dbHelper.getAllFavoriteImageRef();
+    }
+    public List<String> getSelectedImageURLs() {
+        final String replace = idSelectedImages.toString().replace("[", "").replace("]", "");
+        Log.v("Image", "Selected images: " + "ref" + "id IN (" + replace + ")");
+        return dbHelper.select("Image", "ref", "id IN (" + replace + ")");
+    }
+
+>>>>>>> a8467197c22cc413df721c01f158e8a2cd52d543
     private String parseURL(String url) {
         String filename = null;
         try {

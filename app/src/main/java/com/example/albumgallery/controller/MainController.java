@@ -14,12 +14,9 @@ public class MainController {
         imageController = new ImageController(activity);
         imageAlbumController = new ImageAlbumController(activity);
     }
-
-
     public AlbumController getAlbumController() {
         return albumController;
     }
-
     public ImageController getImageController() {
         return imageController;
     }
