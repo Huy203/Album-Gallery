@@ -2,9 +2,8 @@ package com.example.albumgallery.model;
 
 import android.content.Context;
 
-import com.example.albumgallery.DatabaseHelper;
+import com.example.albumgallery.helper.DatabaseHelper;
 
-import java.util.Date;
 import java.util.Calendar;
 public class AlbumModel implements Model{
     // AlbumModel class is used to store the data of the album.

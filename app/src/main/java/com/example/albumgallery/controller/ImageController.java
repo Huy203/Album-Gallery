@@ -1,8 +1,12 @@
 package com.example.albumgallery.controller;
 
 import static android.app.Activity.RESULT_OK;
+import static com.example.albumgallery.utils.Constant.REQUEST_CODE_CAMERA;
+import static com.example.albumgallery.utils.Constant.REQUEST_CODE_EDIT_IMAGE;
 import static com.example.albumgallery.utils.Constant.REQUEST_CODE_PICK_MULTIPLE_IMAGES;
 import static com.example.albumgallery.utils.Constant.imageExtensions;
+import static com.example.albumgallery.utils.Utilities.byteArrayToBitmap;
+
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
@@ -11,6 +15,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.provider.MediaStore;
 import android.util.Log;
@@ -18,21 +23,26 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 
-import com.example.albumgallery.view.activity.BackgroundProcessingCallback;
-import com.example.albumgallery.DatabaseHelper;
+import com.example.albumgallery.helper.DatabaseHelper;
 import com.example.albumgallery.FirebaseManager;
 import com.example.albumgallery.model.ImageModel;
 import com.example.albumgallery.model.Model;
-import com.example.albumgallery.view.activity.HomeScreen;
+import com.example.albumgallery.utils.qrCodeRecognization;
+import com.example.albumgallery.view.activity.BackgroundProcessingCallback;
 import com.example.albumgallery.view.activity.MainFragmentController;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
-import com.google.firebase.Firebase;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageMetadata;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
+import com.google.zxing.BinaryBitmap;
+import com.google.zxing.LuminanceSource;
+import com.google.zxing.MultiFormatReader;
+import com.google.zxing.RGBLuminanceSource;
+import com.google.zxing.Result;
+import com.google.zxing.common.HybridBinarizer;
 
 import java.io.ByteArrayOutputStream;
 import java.net.URI;
@@ -45,7 +55,6 @@ import java.util.List;
 import java.util.Objects;
 
 public class ImageController implements Controller {
-    private static final int CAMERA_REQUEST_CODE = 1000;
     final String[] PROJECTION = {MediaStore.Images.Media._ID, MediaStore.Images.Media.DISPLAY_NAME, MediaStore.Images.Media.WIDTH, MediaStore.Images.Media.HEIGHT, MediaStore.Images.Media.SIZE, MediaStore.Images.Media.DATE_ADDED,};
     private final Activity activity;
     private final DatabaseHelper dbHelper;
@@ -58,7 +67,7 @@ public class ImageController implements Controller {
         this.firebaseManager = FirebaseManager.getInstance(activity);
     }
 
-    private DatabaseHelper getDbHelper(){
+    private DatabaseHelper getDbHelper() {
         return dbHelper;
     }
 
@@ -98,21 +107,35 @@ public class ImageController implements Controller {
     }
 
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == REQUEST_CODE_PICK_MULTIPLE_IMAGES && resultCode == RESULT_OK && data != null) {
-            handleImagePicked(data);
-        }
-        // xử lý ảnh chụp từ camera trong app
-        if (requestCode == CAMERA_REQUEST_CODE && resultCode == RESULT_OK && data != null) {
-            Bitmap bitmap = (Bitmap) data.getExtras().get("data");
-            if (bitmap != null) {
-                Uri imageUri = convertFromBitmapToURI(activity, bitmap);
-                handleImageFromCamera(imageUri);
-
-            } else {
-                Log.d("Camera in app", "Bitmap Image is null");
+        if (resultCode == RESULT_OK && data != null) {
+            Bitmap bitmap;
+            switch (requestCode) {
+                case REQUEST_CODE_PICK_MULTIPLE_IMAGES:
+                    handleImagePicked(data);
+                    break;
+                case REQUEST_CODE_CAMERA:
+                    bitmap = (Bitmap) Objects.requireNonNull(data.getExtras()).get("data");
+                    if (bitmap != null) {
+                        Uri imageUri = convertFromBitmapToURI(activity, bitmap);
+                        handleImage(imageUri, requestCode);
+                    } else {
+                        Log.d("Camera in app", "Bitmap Image is null");
+                    }
+                    break;
+                case REQUEST_CODE_EDIT_IMAGE:
+                    byte[] byteArray = data.getByteArrayExtra("imageByteArray");
+                    bitmap = byteArrayToBitmap(byteArray);
+                    if (bitmap != null) {
+                        Uri imageUri = convertFromBitmapToURI(activity, bitmap);
+                        handleImage(imageUri, requestCode);
+                    } else {
+                        Log.d("Edit image", "Bitmap Image is null");
+                    }
+                    break;
             }
         }
     }
+
 
     private Uri convertFromBitmapToURI(Context inContext, Bitmap inImage) {
         String imageName = "IMG_" + System.currentTimeMillis() + ".jpg";
@@ -165,11 +188,10 @@ public class ImageController implements Controller {
         }
     }
 
-    private void handleImageFromCamera(Uri imageUri) {
+    private void handleImage(Uri imageUri, int requestCode) {
         retrieveDataImageFromURL(imageUri);
-        Log.d("Camera in app", "here");
         try {
-            Long id = dbHelper.getLastId("Image");
+            long id = dbHelper.getLastId("Image");
             String id_string = Long.toString(id);
             Task<Uri> uploadTask = uploadImage(imageUri);
             uploadTask.addOnCompleteListener(task -> {
@@ -177,9 +199,12 @@ public class ImageController implements Controller {
                     Uri firebaseURI = task.getResult();
                     Log.d("test firebase uri", firebaseURI.toString());
                     update("ref", firebaseURI.toString(), "id = " + id_string);
-                    activity.runOnUiThread(() -> {
-                        ((MainFragmentController) activity).onBackgroundTaskCompleted();
-                    });
+                    if (requestCode == REQUEST_CODE_CAMERA) {
+                        activity.runOnUiThread(() -> {
+                            ((MainFragmentController) activity).onBackgroundTaskCompleted();
+                        });
+                    } else {
+                    }
                 }
             });
         } catch (Exception e) {
@@ -257,6 +282,7 @@ public class ImageController implements Controller {
         }
         return true;
     }
+
     private boolean allTasksCompletedGeneric(List<Task> tasks) {
         for (Task<Uri> task : tasks) {
             if (!task.isSuccessful()) {
@@ -284,10 +310,11 @@ public class ImageController implements Controller {
     public List<String> getAllImageURLs() {
         return dbHelper.getAllRef("Image");
     }
+
     public ImageModel getImageById(long id) {
         String data = dbHelper.getById("Image", id);
         String[] temp = data.split(",");
-        return new ImageModel(Integer.parseInt(temp[0]),temp[1], Integer.parseInt(temp[2]), Integer.parseInt(temp[3]), Long.parseLong(temp[4]), temp[5], temp[6], temp[7], temp[8], Boolean.parseBoolean(temp[9]), Boolean.parseBoolean(temp[10]));
+        return new ImageModel(Integer.parseInt(temp[0]), temp[1], Integer.parseInt(temp[2]), Integer.parseInt(temp[3]), Long.parseLong(temp[4]), temp[5], temp[6], temp[7], temp[8], Boolean.parseBoolean(temp[9]), Boolean.parseBoolean(temp[10]));
     }
 
     public long getIdByRef(String ref) {
@@ -335,7 +362,7 @@ public class ImageController implements Controller {
         return filename;
     }
 
-    public void deleteSelectedImage(String imageURL){
+    public void deleteSelectedImage(String imageURL) {
         String URL = parseURL(imageURL);
         Log.d("URL", URL);
 
@@ -388,10 +415,12 @@ public class ImageController implements Controller {
         }
         return null;
     }
+
     public List<String> getImagePaths() {
         return getAllImageURLs();
     }
-    public void deleteSelectedImageAtHomeScreeen(List<Task> imageURLs){
+
+    public void deleteSelectedImageAtHomeScreeen(List<Task> imageURLs) {
         FirebaseStorage storage = FirebaseStorage.getInstance();
         // Create a storage reference from our app
         StorageReference storageRef = storage.getReference();
@@ -426,5 +455,39 @@ public class ImageController implements Controller {
                 });
             }
         }
+    }
+
+    public String decodeQRCode(String filePath) {
+        try {
+            BitmapFactory.Options options = new BitmapFactory.Options();
+            options.inPreferredConfig = Bitmap.Config.RGB_565;
+            Bitmap bitmap = BitmapFactory.decodeFile(filePath, options);
+            if (bitmap != null) {
+                int[] intArray = new int[bitmap.getWidth() * bitmap.getHeight()];
+                //copy pixel data from the Bitmap into the 'intArray' array
+                bitmap.getPixels(intArray, 0, bitmap.getWidth(), 0, 0, bitmap.getWidth(), bitmap.getHeight());
+
+                LuminanceSource source = new RGBLuminanceSource(bitmap.getWidth(), bitmap.getHeight(), intArray);
+                BinaryBitmap binaryBitmap = new BinaryBitmap(new HybridBinarizer(source));
+
+                MultiFormatReader reader = new MultiFormatReader();
+                Result result = reader.decode(binaryBitmap);
+
+                return result.getText();
+            }
+        } catch (Exception e) {
+            Log.e("QRCodeDecoder", "Error decoding QR code", e);
+        }
+        return null;
+    }
+
+    public String recognizeQRCode(String uri) {
+        qrCodeRecognization qrCodeRecognization = new qrCodeRecognization();
+        try {
+            return qrCodeRecognization.execute(uri).get();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 }

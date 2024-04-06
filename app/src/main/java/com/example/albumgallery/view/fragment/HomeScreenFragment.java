@@ -1,5 +1,8 @@
 package com.example.albumgallery.view.fragment;
 
+import static com.example.albumgallery.utils.Constant.REQUEST_CODE_DETAIL_IMAGE;
+import static com.example.albumgallery.utils.Constant.REQUEST_CODE_EDIT_IMAGE;
+
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -30,7 +33,7 @@ import com.example.albumgallery.controller.MainController;
 import com.example.albumgallery.view.activity.BackgroundProcessingCallback;
 import com.example.albumgallery.view.activity.DetailPicture;
 import com.example.albumgallery.view.adapter.ImageAdapter;
-import com.example.albumgallery.view.adapter.ImageAdapterListener;
+import com.example.albumgallery.view.listeners.ImageAdapterListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.Tasks;
 
@@ -61,7 +64,7 @@ public class HomeScreenFragment extends Fragment {
             iListener = (ImageAdapterListener) context;
             bgListener = (BackgroundProcessingCallback) context;
         } else {
-            throw new RuntimeException(context.toString()
+            throw new RuntimeException(context
                     + " must implement Interface");
         }
     }
@@ -115,7 +118,6 @@ public class HomeScreenFragment extends Fragment {
                 btnPickMultipleImages.setText("Select");
                 numberOfImagesSelected.setVisibility(TextView.GONE);
                 imageAdapter.clearSelectedItems();
-
             }
         });
 
@@ -131,14 +133,20 @@ public class HomeScreenFragment extends Fragment {
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (data != null) {
-            if (data.getData() == null) {
-                Log.d("Check data", "is null");
-            } else {
-                Log.d("Check data", "is not null");
+        Log.v("HomeScreenFragment", "onActivityResult: " + requestCode + " " + resultCode);
+        if(requestCode == CAMERA_REQUEST_CODE && resultCode == getActivity().RESULT_OK) {
+            mainController.getImageController().onActivityResult(requestCode, resultCode, data);
+        }
+        else if(requestCode == REQUEST_CODE_DETAIL_IMAGE && resultCode == getActivity().RESULT_OK) {
+            boolean isUpdate = data.getBooleanExtra("update", false);
+            Log.v("HomeScreenFragment", "onActivityResult: " + isUpdate);
+            if(isUpdate) {
+                updateUI();
             }
         }
-        mainController.getImageController().onActivityResult(requestCode, resultCode, data);
+        else {
+            mainController.getImageController().onActivityResult(requestCode, resultCode, data);
+        }
     }
 
     public void updateUI() {
@@ -156,22 +164,6 @@ public class HomeScreenFragment extends Fragment {
     public void getSelectedItemsCount(int count) {
         Log.v("SelectedItems", count + " items selected");
         numberOfImagesSelected.setText(count + " images selected");
-
-//        List<Task<Uri>> task =  new ArrayList<>();
-//        for (String uri : imageURIs) {
-//            task.add(Tasks.forResult(Uri.parse(uri)));
-//        }
-
-        for (int i = 0; i < count; i++) {
-            selectedImageURLsTask.add(Tasks.forResult(Uri.parse(imageURIs.get(i))));
-            Log.d("Deleted images task", selectedImageURLsTask.get(i).getResult().toString());
-        }
-
-        for (int i = 0; i < count; i++) {
-            selectedImageURLs.add(imageURIs.get(i));
-            Log.d("Deleted images", selectedImageURLs.get(i));
-            Log.d("Selected URIs", imageURIs.get(i));
-        }
     }
 
     private void showDeleteConfirmationDialog() {
@@ -201,7 +193,7 @@ public class HomeScreenFragment extends Fragment {
         intent.putExtra("id", id);
         intent.putExtra("position", position);
         Log.v("ImageAdapter", "Image selected: " + view);
-        startActivity(intent, options.toBundle());
+        startActivityForResult(intent, REQUEST_CODE_DETAIL_IMAGE, options.toBundle());
     }
 
     private void openCamera() {
@@ -216,11 +208,13 @@ public class HomeScreenFragment extends Fragment {
         super.onDetach();
         iListener = null;
         bgListener = null;
+        Log.v("HomeScreenFragment", "onDetach");
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
         mainController = null;
+        Log.v("HomeScreenFragment", "onDestroy");
     }
 }

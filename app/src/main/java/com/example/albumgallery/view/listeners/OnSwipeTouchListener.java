@@ -1,4 +1,4 @@
-package com.example.albumgallery.controller;
+package com.example.albumgallery.view.listeners;
 
 import android.content.Context;
 import android.view.GestureDetector;

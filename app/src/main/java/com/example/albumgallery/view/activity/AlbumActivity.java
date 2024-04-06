@@ -51,7 +51,7 @@ public class AlbumActivity extends AppCompatActivity {
         TextView textAlbums = findViewById(R.id.textPhotos);
         textAlbums.setOnClickListener(view -> {
             // Chuyển sang màn hình mới
-            Intent intent = new Intent(AlbumActivity.this, HomeScreen.class);
+            Intent intent = new Intent(AlbumActivity.this, MainFragmentController.class);
             startActivity(intent);
             finish();
         });

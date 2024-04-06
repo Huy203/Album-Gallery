@@ -15,7 +15,7 @@ import androidx.fragment.app.FragmentTransaction;
 
 import com.example.albumgallery.R;
 import com.example.albumgallery.databinding.ActivityFragmentControllerBinding;
-import com.example.albumgallery.view.adapter.ImageAdapterListener;
+import com.example.albumgallery.view.listeners.ImageAdapterListener;
 import com.example.albumgallery.view.fragment.AlbumsMainFragment;
 import com.example.albumgallery.view.fragment.FavoriteFragment;
 import com.example.albumgallery.view.fragment.HomeScreenFragment;
@@ -81,6 +81,7 @@ public class MainFragmentController extends AppCompatActivity implements Backgro
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
+        Log.v("MainFragmentController", "onActivityResult: " + requestCode + " " + resultCode);
         if (data != null) {
             if (data.getData() == null) {
                 Log.d("Check data", "is null");
