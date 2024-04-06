@@ -58,6 +58,9 @@ public class MainFragmentController extends AppCompatActivity implements Backgro
             } else if (itemId == R.id.favorites) {
                 // xử lý cho màn hình favorites
             }
+            else if (itemId == R.id.bin) {
+                replaceFragment(new AlbumsMainFragment());
+            }
             return true;
         });
     }
