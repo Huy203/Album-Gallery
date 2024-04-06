@@ -28,7 +28,7 @@ public class MainActivity extends ComponentActivity {
             startActivity(intent);
         });
         editButton.setOnClickListener(v -> {
-            Intent intent = new Intent(this, CropImageActivity.class);
+            Intent intent = new Intent(this, LoginScreen.class);
             startActivity(intent);
         });
 
