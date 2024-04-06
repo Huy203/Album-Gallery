@@ -10,6 +10,7 @@ import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
+import android.provider.MediaStore;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -34,6 +35,7 @@ import com.example.albumgallery.view.fragment.ImageInfo;
 import com.example.albumgallery.view.listeners.ImageInfoListener;
 import com.example.albumgallery.view.listeners.OnSwipeTouchListener;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.List;
 
@@ -47,6 +49,7 @@ public class DetailPicture extends AppCompatActivity implements ImageInfoListene
     private View imageInfoView;
     private ImageInfo imageInfoFragment;
     private boolean isImageInfoVisible = false;
+    private AlertDialog optionsDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -106,6 +109,7 @@ public class DetailPicture extends AppCompatActivity implements ImageInfoListene
                 } else if (buttonId == buttonIds[1]) {
                     showOptionsDialog();
                 } else if (buttonId == buttonIds[2]) {
+                    shareImage();
                     button.setCompoundDrawableTintList(getResources().getColorStateList(isImageInfoVisible ? R.color.blue_700 : R.color.black));
                 } else if (buttonId == buttonIds[3]) {
 //                    toggleImageInfo();
@@ -122,6 +126,27 @@ public class DetailPicture extends AppCompatActivity implements ImageInfoListene
                 }
             });
         }
+    }
+
+    private void shareImage() {
+        Glide.with(this)
+                .asBitmap()
+                .load(Uri.parse(imagePaths.get(currentPosition)))
+                .addListener(new RequestListener<Bitmap>() {
+                    @Override
+                    public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Bitmap> target, boolean isFirstResource) {
+                        Log.e("DetailPicture", "Failed to load image: " + e.getMessage());
+                        Toast.makeText(DetailPicture.this, "Failed to share image", Toast.LENGTH_SHORT).show();
+                        return false;
+                    }
+
+                    @Override
+                    public boolean onResourceReady(Bitmap resource, Object model, Target<Bitmap> target, DataSource dataSource, boolean isFirstResource) {
+                        shareImageandText(resource);
+                        return false;
+                    }
+                })
+                .submit();
     }
 
     private void setAsWallpaper(String imagePath) {
@@ -179,7 +204,9 @@ public class DetailPicture extends AppCompatActivity implements ImageInfoListene
                 }
             }
         });
-        builder.show();
+
+        optionsDialog = builder.create();
+        optionsDialog.show();
     }
 
     private void loadImage(int position) {
@@ -195,8 +222,8 @@ public class DetailPicture extends AppCompatActivity implements ImageInfoListene
         imageInfoFragment.setImage(imageModel);
         // Add ImageInfo fragment to activity
         getSupportFragmentManager().beginTransaction()
-                .setCustomAnimations(R.anim.slide_up, R.anim.slide_down)
                 .add(R.id.imageInfo, imageInfoFragment)
+                .addToBackStack(null)
                 .commit();
     }
 
@@ -230,16 +257,35 @@ public class DetailPicture extends AppCompatActivity implements ImageInfoListene
     private void toggleImageInfo() {
         isImageInfoVisible = !isImageInfoVisible;
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-        Log.v("DetailPicture", "toggleImageInfo: " + getSupportFragmentManager().findFragmentById(R.id.imageInfo).getView().getVisibility());
         if (isImageInfoVisible) {
             imageInfoView.setVisibility(View.VISIBLE);
-            transaction.setCustomAnimations(R.anim.slide_up, R.anim.slide_down);
         } else {
             imageInfoView.setVisibility(View.GONE);
-            transaction.setCustomAnimations(R.anim.slide_down, R.anim.slide_up);
         }
         transaction.commit();
     }
+
+    private void shareImageandText(Bitmap bitmap) {
+        Uri uri = mainController.getImageController().convertFromBitmapToURI(this, bitmap);
+        Intent intent = new Intent(Intent.ACTION_SEND);
+
+        // putting uri of image to be shared
+        intent.putExtra(Intent.EXTRA_STREAM, uri);
+
+        // adding text to share
+        intent.putExtra(Intent.EXTRA_TEXT, "Sharing Image");
+
+        // Add subject Here
+        intent.putExtra(Intent.EXTRA_SUBJECT, "Subject Here");
+
+        // setting type to image
+        intent.setType("image/png");
+
+        // calling startactivity() to share
+        startActivity(Intent.createChooser(intent, "Share Via"));
+    }
+
+    // Retrieving the url to share
 
     private void showDeleteConfirmationDialog(String uri) {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -268,6 +314,27 @@ public class DetailPicture extends AppCompatActivity implements ImageInfoListene
     public void onNoticePassed(String data) {
         String where = "id = " + getIntent().getLongExtra("id", 0);
         mainController.getImageController().update("notice", data, where);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        if (optionsDialog != null) {
+            optionsDialog.dismiss();
+            optionsDialog = null;
+        }
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        mainController = null;
+        imageView = null;
+        imagePaths = null;
+        qrLink = null;
+        imageInfoView = null;
+        imageInfoFragment = null;
+        optionsDialog = null;
     }
 }
 

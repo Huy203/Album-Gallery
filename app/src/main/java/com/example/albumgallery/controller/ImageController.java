@@ -6,7 +6,7 @@ import static com.example.albumgallery.utils.Constant.REQUEST_CODE_EDIT_IMAGE;
 import static com.example.albumgallery.utils.Constant.REQUEST_CODE_PICK_MULTIPLE_IMAGES;
 import static com.example.albumgallery.utils.Constant.imageExtensions;
 import static com.example.albumgallery.utils.Utilities.byteArrayToBitmap;
-
+import static java.text.DateFormat.getDateTimeInstance;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
@@ -23,13 +23,13 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 
-import com.example.albumgallery.helper.DatabaseHelper;
 import com.example.albumgallery.FirebaseManager;
+import com.example.albumgallery.helper.DatabaseHelper;
 import com.example.albumgallery.model.ImageModel;
 import com.example.albumgallery.model.Model;
 import com.example.albumgallery.utils.qrCodeRecognization;
-import com.example.albumgallery.view.activity.BackgroundProcessingCallback;
 import com.example.albumgallery.view.activity.MainFragmentController;
+import com.example.albumgallery.view.listeners.BackgroundProcessingCallback;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
@@ -37,25 +37,20 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageMetadata;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
-import com.google.zxing.BinaryBitmap;
-import com.google.zxing.LuminanceSource;
-import com.google.zxing.MultiFormatReader;
-import com.google.zxing.RGBLuminanceSource;
-import com.google.zxing.Result;
-import com.google.zxing.common.HybridBinarizer;
 
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.file.Paths;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 
 public class ImageController implements Controller {
-    final String[] PROJECTION = {MediaStore.Images.Media._ID, MediaStore.Images.Media.DISPLAY_NAME, MediaStore.Images.Media.WIDTH, MediaStore.Images.Media.HEIGHT, MediaStore.Images.Media.SIZE, MediaStore.Images.Media.DATE_ADDED,};
+    final String[] PROJECTION = {MediaStore.Images.Media._ID, MediaStore.Images.Media.DISPLAY_NAME, MediaStore.Images.Media.WIDTH, MediaStore.Images.Media.HEIGHT, MediaStore.Images.Media.SIZE, MediaStore.Images.Media.DATE_ADDED};
     private final Activity activity;
     private final DatabaseHelper dbHelper;
     private final FirebaseManager firebaseManager;
@@ -137,7 +132,7 @@ public class ImageController implements Controller {
     }
 
 
-    private Uri convertFromBitmapToURI(Context inContext, Bitmap inImage) {
+    public Uri convertFromBitmapToURI(Context inContext, Bitmap inImage) {
         String imageName = "IMG_" + System.currentTimeMillis() + ".jpg";
         ByteArrayOutputStream bytes = new ByteArrayOutputStream();
         inImage.compress(Bitmap.CompressFormat.JPEG, 100, bytes);
@@ -215,28 +210,31 @@ public class ImageController implements Controller {
 
     @SuppressLint("Range")
     private void retrieveDataImageFromURL(Uri uri) {
+        String name = null, dateAdded = null;
+        int width = 0, height = 0;
+        long capacity = 0;
+
+        // Get name, capacity and date added of the image
         try (Cursor cursor = activity.getContentResolver().query(uri, PROJECTION, null, null, null)) {
-            long id;
-            String name;
-            int width, height;
-            long capacity, dateAdded;
-
             if (cursor != null && cursor.moveToFirst()) {
-                // Get the column index of the image
-                id = cursor.getLong(cursor.getColumnIndex(MediaStore.Images.Media._ID));
                 name = cursor.getString(cursor.getColumnIndex(MediaStore.Images.Media.DISPLAY_NAME));
-                width = cursor.getInt(cursor.getColumnIndex(MediaStore.Images.Media.WIDTH));
-                height = cursor.getInt(cursor.getColumnIndex(MediaStore.Images.Media.HEIGHT));
                 capacity = cursor.getLong(cursor.getColumnIndex(MediaStore.Images.Media.SIZE));
-                dateAdded = cursor.getLong(cursor.getColumnIndex(MediaStore.Images.Media.DATE_ADDED));
+                long temp = cursor.getLong(cursor.getColumnIndex(MediaStore.Images.Media.DATE_ADDED));
                 // Convert milliseconds to a more readable format (optional)
-                @SuppressLint("SimpleDateFormat") String formattedDate = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date(dateAdded * 1000));
-
-                this.create(name, width, height, capacity, formattedDate); // Create an image
-
-                Log.v("Image", "Image added" + " " + id + " " + name + " " + capacity + " " + dateAdded + formattedDate);
+                dateAdded = getDateTimeInstance().format(new Date(temp * 1000));
             }
         }
+        // Get width and height of the image
+        try {
+            InputStream in = activity.getContentResolver().openInputStream(uri);
+            BitmapFactory.Options options = new BitmapFactory.Options();
+            Bitmap bitmap = BitmapFactory.decodeStream(in, null, options);
+            width = options.outWidth;
+            height = options.outHeight;
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        this.create(name, width, height, capacity, dateAdded); // Create an image
     }
 
     private Task<Uri> uploadImage(Uri uri) {
@@ -297,15 +295,6 @@ public class ImageController implements Controller {
         return fileName.split("\\.")[fileName.split("\\.").length - 1];
     }
 
-    public List<ImageModel> getAllImages() {
-        List<String> data = dbHelper.getAll("Image");
-        List<ImageModel> imageModels = new ArrayList<>();
-        for (String s : data) {
-            String[] temp = s.split(",");
-            imageModels.add(new ImageModel(Integer.parseInt(temp[0]), temp[1], Integer.parseInt(temp[2]), Integer.parseInt(temp[3]), Long.parseLong(temp[4]), temp[5], temp[6], temp[7], temp[8], Boolean.parseBoolean(temp[9]), Boolean.parseBoolean(temp[10])));
-        }
-        return imageModels;
-    }
 
     public List<String> getAllImageURLs() {
         return dbHelper.getAllRef("Image");
@@ -323,12 +312,6 @@ public class ImageController implements Controller {
 
     public List<String> getAllImageURLsSortByDate() {
         return dbHelper.selectImagesSortByDate("Image", "ref", "descending");
-    }
-
-    public List<String> getSelectedImageURLs() {
-        final String replace = idSelectedImages.toString().replace("[", "").replace("]", "");
-        Log.v("Image", "Selected images: " + "ref" + "id IN (" + replace + ")");
-        return dbHelper.select("Image", "ref", "id IN (" + replace + ")");
     }
 
     private String parseURL(String url) {
@@ -441,30 +424,6 @@ public class ImageController implements Controller {
         }
     }
 
-    public String decodeQRCode(String filePath) {
-        try {
-            BitmapFactory.Options options = new BitmapFactory.Options();
-            options.inPreferredConfig = Bitmap.Config.RGB_565;
-            Bitmap bitmap = BitmapFactory.decodeFile(filePath, options);
-            if (bitmap != null) {
-                int[] intArray = new int[bitmap.getWidth() * bitmap.getHeight()];
-                //copy pixel data from the Bitmap into the 'intArray' array
-                bitmap.getPixels(intArray, 0, bitmap.getWidth(), 0, 0, bitmap.getWidth(), bitmap.getHeight());
-
-                LuminanceSource source = new RGBLuminanceSource(bitmap.getWidth(), bitmap.getHeight(), intArray);
-                BinaryBitmap binaryBitmap = new BinaryBitmap(new HybridBinarizer(source));
-
-                MultiFormatReader reader = new MultiFormatReader();
-                Result result = reader.decode(binaryBitmap);
-
-                return result.getText();
-            }
-        } catch (Exception e) {
-            Log.e("QRCodeDecoder", "Error decoding QR code", e);
-        }
-        return null;
-    }
-
     public String recognizeQRCode(String uri) {
         qrCodeRecognization qrCodeRecognization = new qrCodeRecognization();
         try {
@@ -474,4 +433,5 @@ public class ImageController implements Controller {
         }
         return null;
     }
+
 }

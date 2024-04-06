@@ -12,27 +12,54 @@ import com.google.zxing.Result;
 import com.google.zxing.common.HybridBinarizer;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URL;
 
 public class qrCodeRecognization extends AsyncTask<String, Void, String> {
     @Override
     protected String doInBackground(String... urls) {
-        String imageUrl = urls[0];
-        Bitmap bitmap = downloadImage(imageUrl);
+        String uri = urls[0];
+        Bitmap bitmap = downloadImage(uri);
         if (bitmap != null) {
             return recognizeQRCode(bitmap);
         }
         return null;
     }
 
-    private Bitmap downloadImage(String imageUrl) {
+
+    // This method is used to calculate the sample size of the image which is used to reduce the size of the image
+    private Bitmap downloadImage(String uri) {
         try {
-            URL url = new URL(imageUrl);
-            return BitmapFactory.decodeStream(url.openConnection().getInputStream());
-        } catch (IOException e) {
+            InputStream in = new URL(uri).openStream();
+            Log.v("Image Size", "Size of the image: " + in.available());
+            Log.v("Image Size", "Width of the image: " + BitmapFactory.decodeStream(in).getWidth());
+            BitmapFactory.Options options = new BitmapFactory.Options();
+            options.inJustDecodeBounds = false;
+            options.inSampleSize = calculateInSampleSize(options, 1024, 1024); // Adjust this to a suitable size
+            Bitmap bitmap = BitmapFactory.decodeStream(in, null, options);
+            // Continue with your QR code recognition here
+        } catch (Exception e) {
             e.printStackTrace();
         }
         return null;
+    }
+
+    public static int calculateInSampleSize(BitmapFactory.Options options, int reqWidth, int reqHeight) {
+        final int height = options.outHeight;
+        final int width = options.outWidth;
+        Log.v("Image Size", "Root size: " + height + "x" + width);
+        int inSampleSize = 1;
+
+        if (height > reqHeight || width > reqWidth) {
+            final int halfHeight = height / 2;
+            final int halfWidth = width / 2;
+
+            while ((halfHeight / inSampleSize) >= reqHeight && (halfWidth / inSampleSize) >= reqWidth) {
+                inSampleSize *= 2;
+            }
+        }
+        Log.v("Image Size", "Sample size: " + inSampleSize);
+        return inSampleSize;
     }
 
     private String recognizeQRCode(Bitmap bitmap) {
