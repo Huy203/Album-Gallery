@@ -420,4 +420,20 @@ public class ImageController implements Controller {
     public long getTotalCapacityFromImageIDs(List<Long> imageIDs){
         return dbHelper.getTotalCapacityFromImageIDs(imageIDs);
     }
+    public void toggleDeleteImage(long imageId) {
+        dbHelper.toggleDeleteImage(imageId);
+    }
+    public void setDelete(long imageId, boolean isDelete) {
+        dbHelper.setDelete(imageId, isDelete);
+
+        Intent intent = new Intent(activity, MainFragmentController.class);
+        activity.startActivity(intent);
+        activity.finish();
+    }
+    public boolean isDeleteImage(long imageId) {
+        return dbHelper.isDeleteImage(imageId);
+    }
+    public List<String> getAllDeleteImageRef() {
+        return dbHelper.getAllDeleteImageRef();
+    }
 }

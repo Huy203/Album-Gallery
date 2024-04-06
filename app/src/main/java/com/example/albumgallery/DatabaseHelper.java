@@ -1,6 +1,7 @@
 package com.example.albumgallery;
 
 import android.annotation.SuppressLint;
+import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -213,7 +214,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public List<String> selectImagesSortByDate(String table, String column, String order) {
         List<String> data = new ArrayList<>();
         SQLiteDatabase db = getWritableDatabase();
-        String query = "SELECT " + column + " FROM " + table + " ORDER BY created_at";
+        String query = "SELECT " + column + " FROM " + table + " WHERE is_deleted = 0 ORDER BY created_at";
         if(Objects.equals(order, "ascending")) {
             query += " ASC;";
         } else if ( (Objects.equals(order,"descending"))) {
@@ -440,5 +441,57 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             }
         }
         return totalCapacity;
+    }
+    public boolean isDeleteImage(long imageId) {
+        SQLiteDatabase db = getReadableDatabase();
+        Cursor cursor = db.rawQuery("SELECT is_favourited FROM " + IMAGE_TABLE + " WHERE id = ?", new String[]{String.valueOf(imageId)});
+        boolean isDeleted = false;
+
+        if (cursor != null) {
+            if (cursor.moveToFirst()) {
+                int delValue = cursor.getInt(0);
+                isDeleted = delValue == 1;
+            }
+            cursor.close();
+        }
+        return isDeleted;
+    }
+    public void toggleDeleteImage(long imageId) {
+        SQLiteDatabase db = getWritableDatabase();
+        boolean isDelete = isDeleteImage(imageId);
+
+        int newDelete;
+        if(isDelete) {
+            newDelete = 0;
+        } else {
+            newDelete = 1;
+        }
+
+        ContentValues values = new ContentValues();
+        values.put("is_deleted", newDelete);
+        db.update(IMAGE_TABLE, values, "id = ?", new String[]{String.valueOf(imageId)});
+    }
+    public List<String> getAllDeleteImageRef() {
+        List<String> deleteRefs = new ArrayList<>();
+        SQLiteDatabase db = getReadableDatabase();
+        Cursor cursor = db.rawQuery("SELECT ref FROM " + IMAGE_TABLE + " WHERE is_deleted = 1", null);
+
+        if (cursor != null) {
+            if (cursor.moveToFirst()) {
+                do {
+                    String ref = cursor.getString(0);
+                    deleteRefs.add(ref);
+                } while (cursor.moveToNext());
+            }
+            cursor.close();
+        }
+        return deleteRefs;
+    }
+    public void setDelete(long imageId, boolean isDelete) {
+        SQLiteDatabase db = getWritableDatabase();
+        int delete = isDelete ? 1 : 0;
+        ContentValues values = new ContentValues();
+        values.put("is_deleted", delete);
+        db.update(IMAGE_TABLE, values, "id = ?", new String[]{String.valueOf(imageId)});
     }
 }

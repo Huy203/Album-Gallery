@@ -44,6 +44,7 @@ public class DetailPicture extends AppCompatActivity implements ImageInfoListene
     private int currentPosition;
     private View view;
     private boolean isImageInfoVisible = false;
+    private boolean isDeleted;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -142,7 +143,11 @@ public class DetailPicture extends AppCompatActivity implements ImageInfoListene
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 // Call deleteSelectedImage() method from ImageController
-                mainController.getImageController().deleteSelectedImage(uri);
+                // mainController.getImageController().deleteSelectedImage(uri);
+
+                long id = mainController.getImageController().getIdByRef(uri);
+                isDeleted = mainController.getImageController().isDeleteImage(id);
+                toggleDeleteImage(id);
             }
         });
         builder.setNegativeButton("Cancel", null);
@@ -240,6 +245,11 @@ public class DetailPicture extends AppCompatActivity implements ImageInfoListene
                 })
                 .submit();
         Toast.makeText(DetailPicture.this, "Wallpaper set successfully", Toast.LENGTH_SHORT).show();
+    }
+
+    private void toggleDeleteImage(long id) {
+        isDeleted = !isDeleted;
+        mainController.getImageController().setDelete(id, isDeleted);
     }
 
 }

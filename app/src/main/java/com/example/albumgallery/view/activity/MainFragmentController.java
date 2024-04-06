@@ -19,6 +19,7 @@ import com.example.albumgallery.controller.MainController;
 import com.example.albumgallery.databinding.ActivityFragmentControllerBinding;
 import com.example.albumgallery.view.adapter.ImageAdapterListener;
 import com.example.albumgallery.view.fragment.AlbumsMainFragment;
+import com.example.albumgallery.view.fragment.BinFragment;
 import com.example.albumgallery.view.fragment.HomeScreenFragment;
 
 import java.util.ArrayList;
@@ -59,7 +60,7 @@ public class MainFragmentController extends AppCompatActivity implements Backgro
                 // xử lý cho màn hình favorites
             }
             else if (itemId == R.id.bin) {
-                replaceFragment(new AlbumsMainFragment());
+                replaceFragment(new BinFragment());
             }
             return true;
         });
