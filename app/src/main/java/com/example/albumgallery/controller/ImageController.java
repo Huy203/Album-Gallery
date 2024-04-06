@@ -328,8 +328,6 @@ public class ImageController implements Controller {
         return dbHelper.getImageRefById(imageId);
     }
 
-<<<<<<< HEAD
-=======
     public void toggleFavoriteImage(long imageId) {
         dbHelper.toggleFavoriteImage(imageId);
     }
@@ -348,7 +346,6 @@ public class ImageController implements Controller {
         return dbHelper.select("Image", "ref", "id IN (" + replace + ")");
     }
 
->>>>>>> a8467197c22cc413df721c01f158e8a2cd52d543
     private String parseURL(String url) {
         String filename = null;
         try {
