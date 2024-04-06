@@ -36,7 +36,7 @@ public class LoginScreen extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Objects.requireNonNull(getSupportActionBar()).hide();
+//        Objects.requireNonNull(getSupportActionBar()).hide();
         setContentView(R.layout.activity_login);
 
         authManager = new AuthenticationManager(null);
@@ -241,7 +241,7 @@ public class LoginScreen extends AppCompatActivity {
             @Override
             public void onShow(DialogInterface dialogInterface) {
                 dialog.getButton(AlertDialog.BUTTON_POSITIVE).setTextColor(getResources().getColor(R.color.red_200));
-                dialog.getButton(AlertDialog.BUTTON_NEGATIVE).setTextColor(getResources().getColor(R.color.red_200));
+                dialog.getButton(AlertDialog.BUTTON_NEGATIVE).setTextColor(getResources().getColor(R.color.red_700));
             }
         });
 

@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools" >
+    xmlns:tools="http://schemas.android.com/tools">
 
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
-    <uses-permission android:name="android.permission.INTERNET"/>
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.SET_WALLPAPER" />
 
     <application
@@ -13,14 +13,14 @@
         android:fullBackupContent="@xml/backup_rules"
         android:icon="@mipmap/ic_launcher"
         android:label="AlbumGallery"
+        android:requestLegacyExternalStorage="true"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.AlbumGallery"
-        tools:targetApi="31"
-        android:requestLegacyExternalStorage="true"
         android:usesCleartextTraffic="true"
-        >
-        <activity android:name=".view.activity.MainFragmentController"
+        tools:targetApi="31">
+        <activity
+            android:name=".view.activity.MainFragmentController"
             android:exported="true"
             android:windowSoftInputMode="adjustResize" />
         <activity android:name=".view.activity.AlbumMain" />
@@ -28,7 +28,7 @@
             android:name=".MainActivity"
             android:exported="true"
             android:label="AlbumGallery"
-            android:windowSoftInputMode="adjustResize" >
+            android:windowSoftInputMode="adjustResize">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -41,11 +41,22 @@
         <activity android:name=".view.activity.LoginScreen" />
         <activity android:name=".view.activity.RegisterScreen" />
         <activity android:name=".view.activity.CreateAlbumActivity" />
-        <activity android:name=".view.activity.HomeScreen.java" />
         <activity android:name=".view.activity.SelectImageActivity" />
+        <activity android:name=".view.activity.CropImageActivity" />
+        <activity android:name=".view.activity.AlbumContentActivity" />
+        <activity android:name=".view.activity.PasswordAlbumActivity" />
 
-<!--        <activity android:name=".view.activity.CropImageActivity" />-->
-
-        <activity android:name=".view.activity.CropImageActivity"/>
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="${applicationId}.file-provider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <!-- we intend to request content
+                  URIs for the images/subdirectory
+                  of your private file area -->
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/paths" />
+        </provider>
     </application>
 </manifest>

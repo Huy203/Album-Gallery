@@ -1,5 +1,7 @@
 package com.example.albumgallery.helper;
 
+import android.annotation.SuppressLint;
+import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -68,7 +70,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                     "    ref TEXT,\n" +
                     "    is_deleted INTEGER,\n" +
                     "    num_of_images INTEGER,\n" +
-                    "    password TEXT\n" +
+                    "    password TEXT, \n" +
+                    "    thumbnail TEXT\n" +
                     ");");
             db.execSQL("CREATE TABLE " + IMAGE_TABLE + " (\n" +
                     "    id INTEGER PRIMARY KEY AUTOINCREMENT,\n" +
@@ -146,15 +149,25 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return getLastId(table);
     }
 
+    public void insertByCustomId(String table, Model model) {
+        SQLiteDatabase db = getWritableDatabase();
+        try {
+            db.execSQL(model.insert());
+        } catch (SQLiteException e) {
+            Log.e("database error", e.getMessage());
+        }
+    }
+
     public void delete(String table, String where){
         SQLiteDatabase db = getWritableDatabase();
         db.execSQL("DELETE FROM " + table + " WHERE " + where);
     }
 
-    public void update(String table, String column, String value, String where) {
+    public long update(String table, String column, String value, String where) {
         Log.v("DatabaseHelper", "Updating data");
         SQLiteDatabase db = getWritableDatabase();
         db.execSQL("UPDATE " + table + " SET " + column + " = " + "'" + value + "'" + " WHERE " + where);
+        return getId(table, where);
     }
 
     public List<String> select(String table, String column, String where) {
@@ -274,5 +287,191 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             }
         }
         return data;
+    }
+
+    public boolean checkExist(String table, String s) {
+        SQLiteDatabase db = getWritableDatabase();
+        Cursor cursor = db.rawQuery("SELECT * FROM " + table + " WHERE " + s, null);
+        if (cursor.moveToFirst()) {
+            return true;
+        }
+        return false;
+    }
+    public List<String> getFromAlbum(String column) {
+        List<String> res = new ArrayList<>();
+        SQLiteDatabase db = getReadableDatabase();
+        String query = "SELECT " + column + " FROM " + ALBUM_TABLE;
+        Cursor cursor = db.rawQuery(query, null);
+        if(cursor.moveToFirst()) {
+            while (!cursor.isAfterLast()) {
+                String name = cursor.getString(0);
+                res.add(name);
+                cursor.moveToNext();
+            }
+        }
+        return res;
+    }
+    public List<String> getFromImage(String column) {
+        List<String> res = new ArrayList<>();
+        SQLiteDatabase db = getReadableDatabase();
+        String query = "SELECT " + column + " FROM " + IMAGE_TABLE;
+        Cursor cursor = db.rawQuery(query, null);
+        if(cursor.moveToFirst()) {
+            while (!cursor.isAfterLast()) {
+                String name = cursor.getString(0);
+                res.add(name);
+                cursor.moveToNext();
+            }
+        }
+        return res;
+    }
+
+    public boolean isAlbumNameExists(String albumName) {
+        SQLiteDatabase db = getReadableDatabase();
+        Cursor cursor = db.rawQuery("SELECT COUNT(*) FROM " + ALBUM_TABLE + " WHERE name = ?", new String[]{albumName});
+        int count = 0;
+        if (cursor != null) {
+            cursor.moveToFirst();
+            count = cursor.getInt(0);
+            cursor.close();
+        }
+        return count > 0;
+    }
+
+    public long getAlbumIdByName(String albumName) {
+        SQLiteDatabase db = getReadableDatabase();
+        Cursor cursor = db.rawQuery("SELECT id FROM " + ALBUM_TABLE + " WHERE name = ?", new String[]{albumName});
+        long albumId = -1;
+        if (cursor != null) {
+            if (cursor.moveToFirst()) {
+                albumId = cursor.getLong(0);
+            }
+            cursor.close();
+        }
+        return albumId;
+    }
+
+    public List<Long> getImageIdsByAlbumId(long albumId) {
+        List<Long> imageIds = new ArrayList<>();
+        SQLiteDatabase db = getReadableDatabase();
+        Cursor cursor = db.rawQuery("SELECT image_id FROM " + IMAGE_ALBUM_TABLE + " WHERE album_id = ?", new String[]{String.valueOf(albumId)});
+        if (cursor != null) {
+            if (cursor.moveToFirst()) {
+                do {
+                    long imageId = cursor.getLong(0);
+                    imageIds.add(imageId);
+                } while (cursor.moveToNext());
+            }
+            cursor.close();
+        }
+        return imageIds;
+    }
+
+    public String getImageRefById(long imageId) {
+        SQLiteDatabase db = getReadableDatabase();
+        String ref = null;
+        Cursor cursor = db.rawQuery("SELECT ref FROM " + IMAGE_TABLE + " WHERE id = ?", new String[]{String.valueOf(imageId)});
+        if (cursor != null) {
+            if (cursor.moveToFirst()) {
+                ref = cursor.getString(0);
+            }
+            cursor.close();
+        }
+        return ref;
+    }
+
+    public void toggleFavoriteImage(long imageId) {
+        SQLiteDatabase db = getWritableDatabase();
+        boolean isFavorite = isFavoriteImage(imageId);
+
+        int newFavorite;
+        if(isFavorite) {
+            newFavorite = 0;
+        } else {
+            newFavorite = 1;
+        }
+
+        ContentValues values = new ContentValues();
+        values.put("is_favourited", newFavorite);
+        db.update(IMAGE_TABLE, values, "id = ?", new String[]{String.valueOf(imageId)});
+    }
+
+
+    public boolean isFavoriteImage(long imageId) {
+        SQLiteDatabase db = getReadableDatabase();
+        Cursor cursor = db.rawQuery("SELECT is_favourited FROM " + IMAGE_TABLE + " WHERE id = ?", new String[]{String.valueOf(imageId)});
+        boolean isFavourited = false;
+
+        if (cursor != null) {
+            if (cursor.moveToFirst()) {
+                int favValue = cursor.getInt(0);
+                isFavourited = favValue == 1;
+            }
+            cursor.close();
+        }
+        return isFavourited;
+    }
+
+    public List<String> getAllFavoriteImageRef() {
+        List<String> favoriteRefs = new ArrayList<>();
+        SQLiteDatabase db = getReadableDatabase();
+        Cursor cursor = db.rawQuery("SELECT ref FROM " + IMAGE_TABLE + " WHERE is_favourited = 1", null);
+
+        if (cursor != null) {
+            if (cursor.moveToFirst()) {
+                do {
+                    String ref = cursor.getString(0);
+                    favoriteRefs.add(ref);
+                } while (cursor.moveToNext());
+            }
+            cursor.close();
+        }
+        return favoriteRefs;
+    }
+
+    public String getPasswordByAlbumName(String albumName) {
+        SQLiteDatabase db = getReadableDatabase();
+        String password = null;
+
+        Cursor cursor = db.rawQuery("SELECT password FROM " + ALBUM_TABLE + " WHERE name = ?", new String[]{albumName});
+        if (cursor != null) {
+            if (cursor.moveToFirst()) {
+                password = cursor.getString(0);
+            }
+            cursor.close();
+        }
+        return password;
+    }
+
+    public void updateThumbnailByAlbumName(String albumName, String newThumbnail) {
+        SQLiteDatabase db = getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put("thumbnail", newThumbnail);
+        db.update(ALBUM_TABLE, values, "name = ?", new String[]{albumName});
+    }
+
+    public List<String> getAllThumbnails() {
+        List<String> thumbnails = new ArrayList<>();
+        SQLiteDatabase db = getWritableDatabase();
+        Cursor cursor = db.rawQuery("SELECT thumbnail FROM " + ALBUM_TABLE, null);
+        if (cursor != null) {
+            if (cursor.moveToFirst()) {
+                while (!cursor.isAfterLast()) {
+                    String thumbnail = cursor.getString(0);
+                    thumbnails.add(thumbnail);
+                    cursor.moveToNext();
+                }
+            }
+            cursor.close();
+        }
+        return thumbnails;
+    }
+
+    public void setFavorite(long imageId, boolean isFavorite) {
+        SQLiteDatabase db = getWritableDatabase();
+        int favorite = isFavorite ? 1 : 0;
+        ContentValues values = new ContentValues();
+        values.put("is_favourited", favorite);
+        db.update(IMAGE_TABLE, values, "id = ?", new String[]{String.valueOf(imageId)});
     }
 }
