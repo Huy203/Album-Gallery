@@ -48,10 +48,41 @@ public class AlbumController implements Controller {
         dbHelper.close();
     }
 
-    public void addAlbum(String name, String password) {
+    public void addAlbum(String name, String password, int numOfImages) {
         // Add an album
-        AlbumModel albumModel = new AlbumModel(name, password);
-        this.insert((albumModel));
+        AlbumModel albumModel = new AlbumModel(name, password, numOfImages);
+        this.insert(albumModel);
+    }
+
+    public boolean isAlbumNameExists(String albumName) {
+        return dbHelper.isAlbumNameExists(albumName);
+    }
+
+    public long getAlbumIdByName(String albumName) {
+        return dbHelper.getAlbumIdByName(albumName);
+    }
+
+    public List<String> getAlbumNames() {
+//        List<String> albumNames = dbHelper.select("Album","name", null);
+        List<String> albumNames = dbHelper.getFromAlbum("name");
+        return albumNames;
+    }
+
+    public long getLastAlbumId() {
+        long res = dbHelper.getLastId("Album");
+        return res;
+    }
+
+    public String getPasswordByAlbumName(String albumName) {
+        return dbHelper.getPasswordByAlbumName(albumName);
+    }
+
+    public void updateThumbnailByAlbumName(String albumName, String thumbnail) {
+        dbHelper.updateThumbnailByAlbumName(albumName, thumbnail);
+    }
+
+    public List<String> getAllThumbnails() {
+        return dbHelper.getAllThumbnails();
     }
 
     public void deleteAlbum() {
