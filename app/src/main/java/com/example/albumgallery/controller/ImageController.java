@@ -11,6 +11,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
+import android.media.Image;
 import android.net.Uri;
 import android.provider.MediaStore;
 import android.util.Log;
@@ -381,39 +382,65 @@ public class ImageController implements Controller {
     public List<String> getImagePaths() {
         return getAllImageURLs();
     }
-    public void deleteSelectedImageAtHomeScreeen(List<Task> imageURLs){
-        FirebaseStorage storage = FirebaseStorage.getInstance();
-        // Create a storage reference from our app
-        StorageReference storageRef = storage.getReference();
+//    public void deleteSelectedImageAtHomeScreeen(List<Task> imageURLs){
+//        FirebaseStorage storage = FirebaseStorage.getInstance();
+//        // Create a storage reference from our app
+//        StorageReference storageRef = storage.getReference();
+//
+//        for (Task taskImageURL : imageURLs) {
+//            if (taskImageURL.isSuccessful()) {
+//                String imageURL = taskImageURL.getResult().toString();
+//                Log.d("Image task", imageURL);
+//                String URL = parseURL(imageURL);
+//
+//                Log.d("delete url", URL);
+//
+//                // Create a reference to the file to delete
+//                StorageReference desertRef = storageRef.child(URL);
+//
+//                // Delete the file
+//                desertRef.delete().addOnSuccessListener(new OnSuccessListener<Void>() {
+//                    @Override
+//                    public void onSuccess(Void aVoid) {
+//                        // File deleted successfully
+//                        delete("ref = '" + imageURL + "'");
+//                        if (allTasksCompletedGeneric(imageURLs)) {
+//                            activity.runOnUiThread(() -> {
+//                                ((MainFragmentController) activity).onBackgroundTaskCompleted();
+//                            });
+//                        }
+//                    }
+//                }).addOnFailureListener(new OnFailureListener() {
+//                    @Override
+//                    public void onFailure(@NonNull Exception exception) {
+//                        // Uh-oh, an error occurred!
+//                        Toast.makeText(activity, "Image deleted failed", Toast.LENGTH_SHORT).show();
+//                    }
+//                });
+//            }
+//        }
+//    }
 
+    public void deleteSelectedImageAtHomeScreeen(List<Task> imageURLs){
         for (Task taskImageURL : imageURLs) {
             if (taskImageURL.isSuccessful()) {
                 String imageURL = taskImageURL.getResult().toString();
                 Log.d("Image task", imageURL);
                 String URL = parseURL(imageURL);
 
-                // Create a reference to the file to delete
-                StorageReference desertRef = storageRef.child(URL);
+                long imageID = dbHelper.getImageIdByURL(imageURL);
+
+                setDeleteAtHomeScreen(imageID, true);
+
+                Log.d("delete image url", imageURL);
+                Log.d("delete id", String.valueOf(imageID));
 
                 // Delete the file
-                desertRef.delete().addOnSuccessListener(new OnSuccessListener<Void>() {
-                    @Override
-                    public void onSuccess(Void aVoid) {
-                        // File deleted successfully
-                        delete("ref = '" + imageURL + "'");
-                        if (allTasksCompletedGeneric(imageURLs)) {
-                            activity.runOnUiThread(() -> {
-                                ((MainFragmentController) activity).onBackgroundTaskCompleted();
-                            });
-                        }
-                    }
-                }).addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception exception) {
-                        // Uh-oh, an error occurred!
-                        Toast.makeText(activity, "Image deleted failed", Toast.LENGTH_SHORT).show();
-                    }
-                });
+                if (allTasksCompletedGeneric(imageURLs)) {
+                    activity.runOnUiThread(() -> {
+                        ((MainFragmentController) activity).onBackgroundTaskCompleted();
+                    });
+                }
             }
         }
     }
@@ -429,6 +456,10 @@ public class ImageController implements Controller {
         Intent intent = new Intent(activity, MainFragmentController.class);
         activity.startActivity(intent);
         activity.finish();
+    }
+
+    public void setDeleteAtHomeScreen(long imageId, boolean isDelete) {
+        dbHelper.setDelete(imageId, isDelete);
     }
     public boolean isDeleteImage(long imageId) {
         return dbHelper.isDeleteImage(imageId);

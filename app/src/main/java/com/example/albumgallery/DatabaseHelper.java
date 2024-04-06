@@ -494,4 +494,18 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         values.put("is_deleted", delete);
         db.update(IMAGE_TABLE, values, "id = ?", new String[]{String.valueOf(imageId)});
     }
+    public long getImageIdByURL(String URL){
+        SQLiteDatabase db = getReadableDatabase();
+        Cursor cursor = db.rawQuery("SELECT id FROM " + IMAGE_TABLE + " WHERE ref = ?", new String[]{URL});
+        long imageId = -1;
+        if (cursor != null) {
+            Log.d("cursor", cursor.toString());
+            if (cursor.moveToFirst()) {
+                imageId = cursor.getLong(0);
+                Log.d("album id", String.valueOf(imageId));
+            }
+            cursor.close();
+        }
+        return imageId;
+    }
 }
