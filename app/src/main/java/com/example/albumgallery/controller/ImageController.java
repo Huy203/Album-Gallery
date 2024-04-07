@@ -67,14 +67,6 @@ public class ImageController implements Controller {
     }
 
     public void create(String name, int width, int height, long capacity, String dateAdded) {
-        // Check if the image already exists in the database
-//        if (dbHelper.checkExist("Image", "name = '" + name + "'")) {
-//            if(showAlertDialog(activity, "Image already exists", "The image already exists in the database\nDo you want to replace it?", "Yes", "No")) {
-//                ImageModel imageModel = new ImageModel(name, width, height, capacity, dateAdded);
-//                String value = "'" + imageModel.getName() + "', " + imageModel.getWidth() + ", " + imageModel.getHeight() + ", " + imageModel.getCapacity() + ", '" + imageModel.getCreated_at() + "'";
-//                this.update("(name, width, height, capacity, dateAdded)", value, "id = " + dbHelper.getId("Image", "name = '" + name + "'"));
-//            }
-//        } else {
         ImageModel imageModel = new ImageModel(name, width, height, capacity, dateAdded);
         this.insert(imageModel);
     }
@@ -296,13 +288,10 @@ public class ImageController implements Controller {
         }
         return true;
     }
-
     public String getExtensionName(Uri uri) {
         String fileName = uri.getPathSegments().get(uri.getPathSegments().size() - 1);
         return fileName.split("\\.")[fileName.split("\\.").length - 1];
     }
-
-
     public List<String> getAllImageURLs() {
         return dbHelper.getAllRef("Image");
     }
@@ -310,8 +299,10 @@ public class ImageController implements Controller {
     public ImageModel getImageById(long id) {
         String data = dbHelper.getById("Image", id);
         String[] temp = data.split(",");
-        return new ImageModel(Integer.parseInt(temp[0]), temp[1], Integer.parseInt(temp[2]), Integer.parseInt(temp[3]), Long.parseLong(temp[4]), temp[5], temp[6], temp[7], temp[8], Boolean.parseBoolean(temp[9]), Boolean.parseBoolean(temp[10]));
-    }
+        boolean isFavourited = temp[10].equals("1");
+        boolean isDeleted = temp[9].equals("1");
+        return new ImageModel(Integer.parseInt(temp[0]), temp[1], Integer.parseInt(temp[2]), Integer.parseInt(temp[3]), Long.parseLong(temp[4]), temp[5], temp[6], temp[7], temp[8], isDeleted, isFavourited);
+     }
 
     public long getIdByRef(String ref) {
         return dbHelper.getId("Image", "ref = '" + ref + "'");
@@ -328,11 +319,10 @@ public class ImageController implements Controller {
         return dbHelper.getImageRefById(imageId);
     }
 
-    public void toggleFavoriteImage(long imageId) {
-        dbHelper.toggleFavoriteImage(imageId);
-    }
-    public void setFavorite(long imageId, boolean isFavorite) {
-        dbHelper.setFavorite(imageId, isFavorite);
+    public boolean toggleFavoriteImage(long imageId) {
+        boolean isFavourited = getImageById(imageId).getIs_favourited();
+        dbHelper.update("image", "is_favourited", isFavourited ? "0" : "1", "id = " + imageId);
+        return !isFavourited;
     }
     public boolean isFavoriteImage(long imageId) {
         return dbHelper.isFavoriteImage(imageId);

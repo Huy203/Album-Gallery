@@ -2,33 +2,17 @@ package com.example.albumgallery.view.activity;
 
 import static com.example.albumgallery.utils.Constant.REQUEST_CODE_EDIT_IMAGE;
 
-import com.bumptech.glide.Glide;
-import com.bumptech.glide.load.DataSource;
-import com.bumptech.glide.load.engine.GlideException;
-import com.bumptech.glide.request.RequestListener;
-import com.bumptech.glide.request.target.Target;
-import com.example.albumgallery.R;
-import com.example.albumgallery.controller.MainController;
-//import com.example.albumgallery.listeners.OnSwipeTouchListener;
-import com.example.albumgallery.model.ImageModel;
-//import com.example.albumgallery.view.adapter.ImageInfoListener;
-import com.example.albumgallery.view.fragment.ImageInfo;
-
 import android.annotation.SuppressLint;
 import android.app.WallpaperManager;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.res.ColorStateList;
 import android.graphics.Bitmap;
-import android.graphics.PorterDuff;
-import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
-import android.provider.MediaStore;
 import android.util.Log;
 import android.view.View;
-import android.widget.Button;
-import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -36,8 +20,6 @@ import android.widget.Toast;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.content.ContextCompat;
-import androidx.core.graphics.drawable.DrawableCompat;
 import androidx.fragment.app.FragmentTransaction;
 
 import com.bumptech.glide.Glide;
@@ -51,8 +33,8 @@ import com.example.albumgallery.model.ImageModel;
 import com.example.albumgallery.view.fragment.ImageInfo;
 import com.example.albumgallery.view.listeners.ImageInfoListener;
 import com.example.albumgallery.view.listeners.OnSwipeTouchListener;
+import com.google.android.material.button.MaterialButton;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.List;
 
@@ -67,16 +49,12 @@ public class DetailPicture extends AppCompatActivity implements ImageInfoListene
     private ImageInfo imageInfoFragment;
     private boolean isImageInfoVisible = false;
     private AlertDialog optionsDialog;
-    private boolean isFavorite;
-    private Button favoriteButton;
+    ImageModel imageModel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_detail_image);
-
-//        favoriteButton = (Button) findViewById(R.id.action_like);
-//        favoriteButton.setCompoundDrawableTintList(getResources().getColorStateList(R.color.red_500));
 
         initializeViews();
         setupListeners();
@@ -85,20 +63,23 @@ public class DetailPicture extends AppCompatActivity implements ImageInfoListene
         loadQRCodeLink();
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        update();
+    }
+
     private void initializeViews() {
         mainController = new MainController(this);
-        imagePaths = mainController.getImagePaths();
+        imagePaths = mainController.getImageController().getAllImageURLs();
         currentPosition = getIntent().getIntExtra("position", 0);
 
         imageView = findViewById(R.id.memeImageView);
         qrLink = findViewById(R.id.qrLink);
+
         imageInfoView = findViewById(R.id.imageInfo);
         imageInfoFragment = new ImageInfo();
-
-//        String uri = getImageModel().getRef();
-//        long id = mainController.getImageController().getIdByRef(uri);
-//        isFavorite = mainController.getImageController().isFavoriteImage(id);
-//        favoriteButton.setCompoundDrawableTintList(getResources().getColorStateList(isFavorite ? R.color.red_500 : R.color.black));
+        update();
     }
 
     @SuppressLint("NonConstantResourceId")
@@ -127,44 +108,48 @@ public class DetailPicture extends AppCompatActivity implements ImageInfoListene
     @SuppressLint("UseCompatTextViewDrawableApis")
     private void appBarAction() {
         int[] buttonIds = {R.id.action_edit, R.id.action_menu, R.id.action_share, R.id.action_like, R.id.action_info, R.id.action_delete, R.id.action_back};
-        String uri = getImageModel().getRef();
-        long id = mainController.getImageController().getIdByRef(uri);
-        isFavorite = mainController.getImageController().isFavoriteImage(id);
-        for (int buttonId : buttonIds) {
-            Button button = (Button) findViewById(buttonId);
-            if(buttonId == buttonIds[3]) {
-                Log.d("favorite init", Boolean.toString(isFavorite));
-                button.setCompoundDrawableTintList(getResources().getColorStateList(isFavorite ? R.color.red_500 : R.color.black));
-            }
 
-            button.setOnClickListener(v -> {
-                if (buttonId == buttonIds[0]) {
-                    launchEditImageActivity();
-                } else if (buttonId == buttonIds[1]) {
-                    showOptionsDialog();
-                } else if (buttonId == buttonIds[2]) {
-                    shareImage();
-                    button.setCompoundDrawableTintList(getResources().getColorStateList(isImageInfoVisible ? R.color.blue_700 : R.color.black));
-                } else if (buttonId == buttonIds[3]) {
-                    toggleFavoriteImage(id);
-                    button.setCompoundDrawableTintList(getResources().getColorStateList(isFavorite ? R.color.red_500 : R.color.black));
-//                    handleFavoriteButton();
-                } else if (buttonId == buttonIds[4]) {
+        for (int buttonId : buttonIds) {
+            MaterialButton button = findViewById(buttonId);
+
+            if (buttonId == buttonIds[0]) {
+                button.setOnClickListener(v -> launchEditImageActivity());
+            } else if (buttonId == buttonIds[1]) {
+                button.setOnClickListener(v -> showOptionsDialog());
+            } else if (buttonId == buttonIds[2]) {
+                button.setOnClickListener(v -> {
+                    share();
+                });
+            } else if (buttonId == buttonIds[3]) {
+                setIconTintButton(button, imageModel.getIs_favourited());
+                button.setOnClickListener(v -> {
+                    toggleFavoriteImage();
+                    update();
+                    setIconTintButton(button, imageModel.getIs_favourited());
+                });
+            } else if (buttonId == buttonIds[4]) {
+                button.setOnClickListener(v -> {
                     toggleImageInfo();
-                    button.setCompoundDrawableTintList(getResources().getColorStateList(isImageInfoVisible ? R.color.blue_700 : R.color.black));
-                } else if (buttonId == buttonIds[5]) {
-                    deleteImage();
-                } else if (buttonId == buttonIds[6]) {
+                    setIconTintButton(button, isImageInfoVisible);
+                });
+            } else if (buttonId == buttonIds[5]) {
+                button.setOnClickListener(v -> deleteImage());
+            } else if (buttonId == buttonIds[6]) {
+                button.setOnClickListener(v -> {
                     Intent intent = new Intent();
                     intent.putExtra("updateUI", false);
                     setResult(RESULT_OK, intent);
                     supportFinishAfterTransition();
-                }
-            });
+                });
+            }
         }
     }
 
-    private void shareImage() {
+    private void setIconTintButton(MaterialButton button, boolean temp) {
+        button.setIconTint(ColorStateList.valueOf(getResources().getColor(temp ? R.color.blue_500 : R.color.black)));
+    }
+
+    private void share() {
         Glide.with(this)
                 .asBitmap()
                 .load(Uri.parse(imagePaths.get(currentPosition)))
@@ -178,7 +163,7 @@ public class DetailPicture extends AppCompatActivity implements ImageInfoListene
 
                     @Override
                     public boolean onResourceReady(Bitmap resource, Object model, Target<Bitmap> target, DataSource dataSource, boolean isFirstResource) {
-                        shareImageandText(resource);
+                        shareImageAndText(resource);
                         return false;
                     }
                 })
@@ -250,10 +235,9 @@ public class DetailPicture extends AppCompatActivity implements ImageInfoListene
     }
 
     private void loadImageInfo() {
-        ImageModel imageModel = getImageModel();
         TextView nameImage = findViewById(R.id.nameTextView);
-        nameImage.setText(imageModel.getName());
         TextView dateImage = findViewById(R.id.timeTextView);
+        nameImage.setText(imageModel.getName());
         dateImage.setText(imageModel.getCreated_at());
         imageInfoFragment.setImage(imageModel);
         // Add ImageInfo fragment to activity
@@ -264,7 +248,7 @@ public class DetailPicture extends AppCompatActivity implements ImageInfoListene
     }
 
     private void loadQRCodeLink() {
-        String uri = getImageModel().getRef();
+        String uri = imageModel.getRef();
         String qrCodeData = mainController.getImageController().recognizeQRCode(uri);
         if (qrCodeData != null) {
             qrLink.setText(qrCodeData);
@@ -282,7 +266,7 @@ public class DetailPicture extends AppCompatActivity implements ImageInfoListene
     }
 
     private void deleteImage() {
-        String uri = getImageModel().getRef();
+        String uri = imageModel.getRef();
         if (uri != null) {
             showDeleteConfirmationDialog(uri);
         } else {
@@ -301,7 +285,7 @@ public class DetailPicture extends AppCompatActivity implements ImageInfoListene
         transaction.commit();
     }
 
-    private void shareImageandText(Bitmap bitmap) {
+    private void shareImageAndText(Bitmap bitmap) {
         Uri uri = mainController.getImageController().convertFromBitmapToURI(this, bitmap);
         Intent intent = new Intent(Intent.ACTION_SEND);
 
@@ -321,8 +305,6 @@ public class DetailPicture extends AppCompatActivity implements ImageInfoListene
         startActivity(Intent.createChooser(intent, "Share Via"));
     }
 
-    // Retrieving the url to share
-
     private void showDeleteConfirmationDialog(String uri) {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Confirm Deletion");
@@ -332,9 +314,9 @@ public class DetailPicture extends AppCompatActivity implements ImageInfoListene
         builder.show();
     }
 
-    private ImageModel getImageModel() {
+    private void update() {
         long id = getIntent().getLongExtra("id", 0);
-        return mainController.getImageController().getImageById(id);
+        imageModel = mainController.getImageController().getImageById(id);
     }
 
     @Override
@@ -352,25 +334,8 @@ public class DetailPicture extends AppCompatActivity implements ImageInfoListene
         mainController.getImageController().update("notice", data, where);
     }
 
-    private void handleFavoriteButton() {
-        String uri = getImageModel().getRef();
-        long id = mainController.getImageController().getIdByRef(uri);
-        mainController.getImageController().toggleFavoriteImage(id);
-        isFavorite = mainController.getImageController().isFavoriteImage(id);
-        setFavoriteIcon(isFavorite);
-    }
-
-    private void setFavoriteIcon(boolean isFavorite) {
-        if(isFavorite) {
-            favoriteButton.setCompoundDrawableTintList(getResources().getColorStateList(R.color.red_500));
-        } else {
-            favoriteButton.setCompoundDrawableTintList(getResources().getColorStateList(R.color.black));
-        }
-    }
-
-    private void toggleFavoriteImage(long id) {
-        isFavorite = !isFavorite;
-        mainController.getImageController().setFavorite(id, isFavorite);
+    private boolean toggleFavoriteImage() {
+        return mainController.getImageController().toggleFavoriteImage(imageModel.getId());
     }
 
     @Override

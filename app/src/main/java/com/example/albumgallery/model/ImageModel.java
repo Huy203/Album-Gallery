@@ -121,7 +121,7 @@ public class ImageModel implements Model {
         this.is_deleted = is_deleted;
     }
 
-    public boolean isIs_favourited() {
+    public boolean getIs_favourited() {
         return is_favourited;
     }
 
@@ -163,6 +163,5 @@ public class ImageModel implements Model {
     public void select() {
 
     }
-
 
 }

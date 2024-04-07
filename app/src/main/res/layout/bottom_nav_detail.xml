@@ -15,7 +15,7 @@
             app:alignItems="center"
             app:justifyContent="space_around">
 
-            <Button
+            <com.google.android.material.button.MaterialButton
                 android:id="@+id/action_share"
                 style="?attr/materialIconButtonStyle"
                 android:layout_width="wrap_content"
@@ -23,7 +23,7 @@
                 app:icon="@drawable/share_black"
                 app:iconTint="@color/black" />
 
-            <Button
+            <com.google.android.material.button.MaterialButton
                 android:id="@+id/action_like"
                 style="?attr/materialIconButtonStyle"
                 android:layout_width="wrap_content"
@@ -31,7 +31,7 @@
                 app:icon="@drawable/heart"
                 app:iconTint="@color/black" />
 
-            <Button
+            <com.google.android.material.button.MaterialButton
                 android:id="@+id/action_info"
                 style="?attr/materialIconButtonStyle"
                 android:layout_width="wrap_content"
@@ -39,7 +39,7 @@
                 app:icon="@drawable/info_black"
                 app:iconTint="@color/black" />
 
-            <Button
+            <com.google.android.material.button.MaterialButton
                 android:id="@+id/action_delete"
                 style="?attr/materialIconButtonStyle"
                 android:layout_width="wrap_content"
