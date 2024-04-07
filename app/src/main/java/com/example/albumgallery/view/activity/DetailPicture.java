@@ -38,13 +38,13 @@ import java.io.IOException;
 import java.util.List;
 
 public class DetailPicture extends AppCompatActivity implements ImageInfoListener {
-    private MainController mainController;
-    private ImageView imageView;
-    private List<String> imagePaths;
-    private int currentPosition;
-    private View view;
-    private boolean isImageInfoVisible = false;
-    private boolean isDeleted;
+    protected MainController mainController;
+    protected ImageView imageView;
+    protected List<String> imagePaths;
+    protected int currentPosition;
+    protected View view;
+    protected boolean isImageInfoVisible = false;
+    protected boolean isDeleted;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -135,7 +135,7 @@ public class DetailPicture extends AppCompatActivity implements ImageInfoListene
         Glide.with(this).load(Uri.parse(uri)).into(imageView);
     }
 
-    private void showDeleteConfirmationDialog(String uri) {
+    protected void showDeleteConfirmationDialog(String uri) {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Confirm Deletion");
         builder.setMessage("Are you sure you want to delete this image?");
@@ -154,7 +154,7 @@ public class DetailPicture extends AppCompatActivity implements ImageInfoListene
         builder.show();
     }
 
-    private void loadImage(int position) {
+    protected void loadImage(int position) {
         Glide.with(this).load(Uri.parse(imagePaths.get(position))).into(imageView);
     }
 
@@ -186,7 +186,7 @@ public class DetailPicture extends AppCompatActivity implements ImageInfoListene
         builder.show();
     }
 
-    private void toggleImageInfo() {
+    protected void toggleImageInfo() {
         isImageInfoVisible = !isImageInfoVisible;
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
         Log.v("DetailPicture", "toggleImageInfo: " + getSupportFragmentManager().findFragmentById(R.id.imageInfo).getView().getVisibility());
@@ -200,7 +200,7 @@ public class DetailPicture extends AppCompatActivity implements ImageInfoListene
         transaction.commit();
     }
 
-    public ImageModel getImageModel() {
+    protected ImageModel getImageModel() {
         long id = getIntent().getLongExtra("id", 0);
         Log.d("image content id", String.valueOf(id));
         return mainController.getImageController().getImageById(id);
@@ -212,7 +212,7 @@ public class DetailPicture extends AppCompatActivity implements ImageInfoListene
         mainController.getImageController().update("notice", data, where);
     }
 
-    public MainController getMainController() {
+    private MainController getMainController() {
         return mainController;
     }
 

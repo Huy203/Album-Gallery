@@ -111,26 +111,47 @@ public class MainFragmentController extends AppCompatActivity implements Backgro
     @Override
     public void onBackgroundTaskCompleted() {
         isBackgroundTaskCompleted = true;
-        HomeScreenFragment fragment = (HomeScreenFragment) getSupportFragmentManager().findFragmentById(R.id.fragment_container);
-        if (fragment != null) {
+        Fragment currentFragment = getSupportFragmentManager().findFragmentById(R.id.fragment_container);
+        if (currentFragment instanceof HomeScreenFragment) {
+            HomeScreenFragment fragment = (HomeScreenFragment) currentFragment;
+            fragment.updateUI();
+        }
+        else if (currentFragment instanceof BinFragment) {
+            BinFragment fragment = (BinFragment) currentFragment;
             fragment.updateUI();
         }
         isBackgroundTaskCompleted = false;
     }
 
+
     @Override
     public void getSelectedItemsCount(int count) {
-        HomeScreenFragment fragment = (HomeScreenFragment) getSupportFragmentManager().findFragmentById(R.id.fragment_container);
-        if (fragment != null) {
-            fragment.getSelectedItemsCount(count);
+        Fragment currentFragment = getSupportFragmentManager().findFragmentById(R.id.fragment_container);
+
+        if (currentFragment instanceof HomeScreenFragment) {
+            Log.d("home fragment", "ok");
+            ((HomeScreenFragment) currentFragment).getSelectedItemsCount(count);
+        } else if (currentFragment instanceof BinFragment) {
+            Log.d("bin fragment", "ok");
+            ((BinFragment) currentFragment).getSelectedItemsCount(count);
         }
     }
 
+
     @Override
     public void handleImagePick(View itemView, String uri, int position) {
-        HomeScreenFragment fragment = (HomeScreenFragment) getSupportFragmentManager().findFragmentById(R.id.fragment_container);
-        if (fragment != null) {
-            fragment.handleImagePick(itemView, uri, position);
+        Fragment currentFragment = getSupportFragmentManager().findFragmentById(R.id.fragment_container);
+        if(currentFragment instanceof HomeScreenFragment) {
+            HomeScreenFragment fragment = (HomeScreenFragment) getSupportFragmentManager().findFragmentById(R.id.fragment_container);
+            if (fragment != null) {
+                fragment.handleImagePick(itemView, uri, position);
+            }
+        }
+        else if (currentFragment instanceof BinFragment) {
+            BinFragment binFragment = (BinFragment) getSupportFragmentManager().findFragmentById(R.id.fragment_container);
+            if (binFragment != null) {
+                binFragment.handleDeletedImagePick(itemView, uri, position);
+            }
         }
     }
 }

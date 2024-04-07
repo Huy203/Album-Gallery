@@ -19,6 +19,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 
+import com.example.albumgallery.R;
 import com.example.albumgallery.view.activity.BackgroundProcessingCallback;
 import com.example.albumgallery.DatabaseHelper;
 import com.example.albumgallery.FirebaseManager;
@@ -26,6 +27,7 @@ import com.example.albumgallery.model.ImageModel;
 import com.example.albumgallery.model.Model;
 import com.example.albumgallery.view.activity.HomeScreen;
 import com.example.albumgallery.view.activity.MainFragmentController;
+import com.example.albumgallery.view.fragment.BinFragment;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
@@ -382,44 +384,44 @@ public class ImageController implements Controller {
     public List<String> getImagePaths() {
         return getAllImageURLs();
     }
-//    public void deleteSelectedImageAtHomeScreeen(List<Task> imageURLs){
-//        FirebaseStorage storage = FirebaseStorage.getInstance();
-//        // Create a storage reference from our app
-//        StorageReference storageRef = storage.getReference();
-//
-//        for (Task taskImageURL : imageURLs) {
-//            if (taskImageURL.isSuccessful()) {
-//                String imageURL = taskImageURL.getResult().toString();
-//                Log.d("Image task", imageURL);
-//                String URL = parseURL(imageURL);
-//
-//                Log.d("delete url", URL);
-//
-//                // Create a reference to the file to delete
-//                StorageReference desertRef = storageRef.child(URL);
-//
-//                // Delete the file
-//                desertRef.delete().addOnSuccessListener(new OnSuccessListener<Void>() {
-//                    @Override
-//                    public void onSuccess(Void aVoid) {
-//                        // File deleted successfully
-//                        delete("ref = '" + imageURL + "'");
-//                        if (allTasksCompletedGeneric(imageURLs)) {
-//                            activity.runOnUiThread(() -> {
-//                                ((MainFragmentController) activity).onBackgroundTaskCompleted();
-//                            });
-//                        }
-//                    }
-//                }).addOnFailureListener(new OnFailureListener() {
-//                    @Override
-//                    public void onFailure(@NonNull Exception exception) {
-//                        // Uh-oh, an error occurred!
-//                        Toast.makeText(activity, "Image deleted failed", Toast.LENGTH_SHORT).show();
-//                    }
-//                });
-//            }
-//        }
-//    }
+    public void deleteSelectedImageAtBin(List<Task> imageURLs){
+        FirebaseStorage storage = FirebaseStorage.getInstance();
+        // Create a storage reference from our app
+        StorageReference storageRef = storage.getReference();
+
+        for (Task taskImageURL : imageURLs) {
+            if (taskImageURL.isSuccessful()) {
+                String imageURL = taskImageURL.getResult().toString();
+                Log.d("Image task", imageURL);
+                String URL = parseURL(imageURL);
+
+                Log.d("delete url", URL);
+
+                // Create a reference to the file to delete
+                StorageReference desertRef = storageRef.child(URL);
+
+                // Delete the file
+                desertRef.delete().addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+                        // File deleted successfully
+                        delete("ref = '" + imageURL + "'");
+                        if (allTasksCompletedGeneric(imageURLs)) {
+                            activity.runOnUiThread(() -> {
+                                ((MainFragmentController) activity).onBackgroundTaskCompleted();
+                            });
+                        }
+                    }
+                }).addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception exception) {
+                        // Uh-oh, an error occurred!
+                        Toast.makeText(activity, "Image deleted failed", Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }
+        }
+    }
 
     public void deleteSelectedImageAtHomeScreeen(List<Task> imageURLs){
         for (Task taskImageURL : imageURLs) {
