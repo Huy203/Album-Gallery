@@ -2,7 +2,7 @@ package com.example.albumgallery.model;
 
 import android.content.Context;
 
-import com.example.albumgallery.DatabaseHelper;
+import com.example.albumgallery.helper.DatabaseHelper;
 
 public class TrashModel implements Model{
     private int id;

@@ -19,13 +19,10 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.albumgallery.R;
 import com.example.albumgallery.controller.MainController;
 import com.example.albumgallery.view.adapter.ImageAdapter;
-import com.example.albumgallery.view.adapter.ImageAdapterListener;
+import com.example.albumgallery.view.listeners.ImageAdapterListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.Tasks;
 
-import org.w3c.dom.Text;
-
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -37,8 +34,7 @@ public class SelectImageActivity extends AppCompatActivity implements ImageAdapt
     private TextView numberOfImagesSelected;
     List<String> selectedImageURLs;
     List<Task> selectedImageURLsTask;
-    List<String> ids;
-    List<String> selectedIds;
+    List<String> selectedImageURIs;
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -49,13 +45,12 @@ public class SelectImageActivity extends AppCompatActivity implements ImageAdapt
         imageURIs = new ArrayList<>();
         selectedImageURLs = new ArrayList<>();
         selectedImageURLsTask = new ArrayList<>();
-        ids = new ArrayList<>();
-        selectedIds = new ArrayList<>();
+
+        selectedImageURIs = new ArrayList<>();
         numberOfImagesSelected = (TextView) findViewById(R.id.numberOfSelectedImagesInSelectActivity);
 
         imageURIs.addAll(mainController.getImageController().getAllImageURLsSortByDate());
-        ids.addAll(mainController.getImageController().getAllImageIds());
-        imageAdapter = new ImageAdapter(this, imageURIs, ids);
+        imageAdapter = new ImageAdapter(this, imageURIs);
         recyclerMediaView = this.findViewById(R.id.recyclerViewForSelectImageActivity);
         recyclerMediaView.setLayoutManager(new GridLayoutManager(this, 3));
         recyclerMediaView.setAdapter(imageAdapter);
@@ -72,11 +67,10 @@ public class SelectImageActivity extends AppCompatActivity implements ImageAdapt
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(SelectImageActivity.this, CreateAlbumActivity.class);
-                // pass the number of images to CreateAlbumActivity
+                // send the number of images to CreateAlbumActivity
                 intent.putExtra("numOfImages", numberOfImagesSelected.getText().toString());
-                // pass the list of URLS and image ids to CreateAlbumActivity
-                intent.putStringArrayListExtra("selectedImageURLs", (ArrayList<String>) selectedImageURLs);
-                intent.putStringArrayListExtra("selectedIds", (ArrayList<String>) selectedIds);
+                // send the list of URLS to CreateAlbumActivity
+                intent.putStringArrayListExtra("selectedImageURIs", (ArrayList<String>) selectedImageURIs);
                 // set the afterSelectImage
                 intent.putExtra("isSelected", true);
 
@@ -116,11 +110,6 @@ public class SelectImageActivity extends AppCompatActivity implements ImageAdapt
             selectedImageURLs.add(imageURIs.get(i));
             Log.d("Deleted images", selectedImageURLs.get(i));
         }
-
-        for (int i = 0; i < count; i++) {
-            selectedIds.add(ids.get(i));
-            Log.d("ids", ids.get(i));
-        }
     }
 
     @Override
@@ -132,5 +121,15 @@ public class SelectImageActivity extends AppCompatActivity implements ImageAdapt
         intent.putExtra("position", position);
         Log.v("ImageAdapter", "Image selected: " + itemView);
         startActivity(intent, options.toBundle());
+    }
+
+    @Override
+    public void getInteractedURIs(String uri) {
+        if(!selectedImageURIs.contains(uri)) {
+            selectedImageURIs.add(uri);
+        }
+//        for(String u: selectedImageURIs) {
+//            Log.d("current uris", u);
+//        }
     }
 }

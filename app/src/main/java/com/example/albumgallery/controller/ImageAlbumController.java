@@ -1,6 +1,6 @@
 package com.example.albumgallery.controller;
 
-import com.example.albumgallery.DatabaseHelper;
+import com.example.albumgallery.helper.DatabaseHelper;
 import com.example.albumgallery.model.ImageAlbumModel;
 import com.example.albumgallery.model.Model;
 

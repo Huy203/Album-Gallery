@@ -29,9 +29,9 @@ import com.example.albumgallery.model.ImageModel;
 import com.example.albumgallery.view.adapter.AlbumAdapter;
 import com.example.albumgallery.view.adapter.AlbumInfoListener;
 import com.example.albumgallery.view.adapter.ImageAdapter;
-import com.example.albumgallery.view.adapter.ImageAdapterListener;
 import com.example.albumgallery.view.fragment.AlbumInfo;
 import com.example.albumgallery.view.fragment.ImageInfo;
+import com.example.albumgallery.view.listeners.ImageAdapterListener;
 import com.google.android.gms.tasks.Tasks;
 
 import java.util.ArrayList;
@@ -155,6 +155,12 @@ public class AlbumContentActivity extends AppCompatActivity implements ImageAdap
         Log.v("ImageAdapter", "Image selected: " + itemView);
         startActivity(intent, options.toBundle());
     }
+
+    @Override
+    public void getInteractedURIs(String uri) {
+
+    }
+
     private void showDeleteConfirmationDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Confirm Deletion");
@@ -213,5 +219,10 @@ public class AlbumContentActivity extends AppCompatActivity implements ImageAdap
     public void updateCapacity(){
         long capacity = mainController.getImageController().getTotalCapacityFromImageIDs(image_ids);
         mainController.getAlbumController().update("capacity", String.valueOf(capacity), String.valueOf(album_id));
+    }
+
+    @Override
+    public void onPointerCaptureChanged(boolean hasCapture) {
+        super.onPointerCaptureChanged(hasCapture);
     }
 }

@@ -13,8 +13,8 @@ import androidx.appcompat.app.AlertDialog;
 import com.bumptech.glide.Glide;
 import com.example.albumgallery.R;
 import com.example.albumgallery.controller.MainController;
-import com.example.albumgallery.controller.OnSwipeTouchListener;
 import com.example.albumgallery.view.fragment.ImageInfo;
+import com.example.albumgallery.view.listeners.OnSwipeTouchListener;
 
 public class DetailDeletedPicture extends DetailPicture {
     @Override
@@ -52,7 +52,7 @@ public class DetailDeletedPicture extends DetailPicture {
         ImageView backButton = findViewById(R.id.backButton);
         ImageView trashButton = findViewById(R.id.trashButton);
         Button ImageInfo = findViewById(R.id.ImageInfo);
-        view = findViewById(R.id.imageInfo);
+        imageInfoView = findViewById(R.id.imageInfo);
 
         backButton.setOnClickListener(v -> {
             //Intent intent = new Intent(DetailPicture.this, HomeScreen.class);
@@ -79,7 +79,7 @@ public class DetailDeletedPicture extends DetailPicture {
             toggleImageInfo();
         });
 
-        imageInfoFragment.setImageInfo(getImageModel());
+        imageInfoFragment.setImage(getImageModel());
 
         // Add ImageInfo fragment to activity
         getSupportFragmentManager().beginTransaction()

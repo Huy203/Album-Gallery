@@ -1,4 +1,4 @@
-package com.example.albumgallery.view.activity;
+package com.example.albumgallery.view.listeners;
 
 public interface BackgroundProcessingCallback {
 

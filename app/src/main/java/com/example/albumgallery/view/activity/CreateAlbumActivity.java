@@ -1,6 +1,7 @@
 package com.example.albumgallery.view.activity;
 
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -35,7 +36,7 @@ public class CreateAlbumActivity extends AppCompatActivity {
     private boolean isPrivate = false;
     private boolean isSelected = false;
     private List<String> selectedImageURLs;
-    private List<Task> selectedImageURLsTask;
+    private List<Uri> selectedImageURIs;
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -45,6 +46,7 @@ public class CreateAlbumActivity extends AppCompatActivity {
         handleInteractions();
         mainController = new MainController(this);
         selectedImageURLs = new ArrayList<>();
+        selectedImageURIs = new ArrayList<>();
 
         // display number of images selected
         String numOfImages = getIntent().getStringExtra("numOfImages");
@@ -107,7 +109,11 @@ public class CreateAlbumActivity extends AppCompatActivity {
                     String password = passwordInputText.getEditText().getText().toString();
                     String numOfImagesString = getIntent().getStringExtra("numOfImages");
                     Boolean isAlbumNameExists = mainController.getAlbumController().isAlbumNameExists(albumName);
-                    int numOfImages = Integer.parseInt(String.valueOf(numOfImagesString.charAt(0)));
+                    if(numOfImagesString == null) {
+                        makeNotification(findViewById(R.id.relativeLayoutCreateAlbum), "Please choose at least 1 image");
+                        return;
+                    }
+                    int numOfImages = numOfImagesString == null ? 0 : Integer.parseInt(String.valueOf(numOfImagesString.charAt(0)));
                     if(albumName.isEmpty()) {
                         makeNotification(findViewById(R.id.relativeLayoutCreateAlbum),"Album's name is empty");
                         return;
@@ -125,9 +131,12 @@ public class CreateAlbumActivity extends AppCompatActivity {
                     mainController.getAlbumController().addAlbum(albumName, password, numOfImages);
                     // get the album's id just added and add to album_image table
                     int id_album = (int) mainController.getAlbumController().getLastAlbumId();
-                    selectedImageURLs = getIntent().getStringArrayListExtra("selectedImageURLs");
+                    selectedImageURLs = getIntent().getStringArrayListExtra("selectedImageURIs");
                     List<String> ids = new ArrayList<>();
-                    ids = getIntent().getStringArrayListExtra("selectedIds");
+                    for(String uri: selectedImageURLs) {
+                        ids.add(Long.toString(mainController.getImageController().getIdByRef(uri)));
+                    }
+                    mainController.getAlbumController().updateThumbnailByAlbumName(albumName, selectedImageURLs.get(0));
                     for(String id: ids) {
                         int id_image = Integer.parseInt(id);
                         mainController.getImageAlbumController().addImageAlbum(id_image, id_album);

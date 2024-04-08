@@ -1,141 +1,56 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
-    <!-- Back Button -->
-    <ImageView
-        android:id="@+id/backButton"
-        android:layout_width="50dp"
-        android:layout_height="50dp"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="16dp"
-        android:src="@drawable/back_arrow"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
 
-    <!-- Date TextView -->
-    <TextView
-        android:id="@+id/dateTextView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:text="7th February, 2024"
-        android:textSize="20sp"
-        android:textStyle="bold"
-        app:layout_constraintStart_toEndOf="@id/backButton"
-        app:layout_constraintTop_toTopOf="@id/backButton" />
-
-    <!-- Time TextView -->
-    <TextView
-        android:id="@+id/timeTextView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="10:24"
-        android:textSize="16sp"
-        app:layout_constraintStart_toStartOf="@id/dateTextView"
-        app:layout_constraintTop_toBottomOf="@id/dateTextView" />
-
-    <!-- Meme ImageView -->
     <ImageView
         android:id="@+id/memeImageView"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:layout_marginTop="16dp"
+        android:layout_margin="20dp"
         android:transitionName="image"
-        app:layout_constraintDimensionRatio="H,1:1"
+        app:layout_constraintBottom_toTopOf="@+id/bottom_nav_detail"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/backButton" />
+        app:layout_constraintTop_toBottomOf="@+id/top_nav_detail"
+        tools:ignore="ContentDescription" />
 
-    <!-- Button Share -->
-    <ImageView
-        android:id="@+id/shareButton"
-        android:layout_width="30dp"
-        android:layout_height="30dp"
-        android:layout_marginStart="16dp"
-        android:layout_marginEnd="16dp"
-        android:layout_marginBottom="16dp"
-        android:src="@drawable/share_square"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/pencilButton"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/memeImageView" />
-
-    <!-- Button Pencil -->
-    <ImageView
-        android:id="@+id/pencilButton"
-        android:layout_width="30dp"
-        android:layout_height="30dp"
-        android:layout_marginEnd="16dp"
-        android:layout_marginBottom="16dp"
-        android:src="@drawable/pencil"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/heartButton"
-        app:layout_constraintStart_toEndOf="@+id/shareButton"
-        app:layout_constraintTop_toBottomOf="@id/memeImageView" />
-
-    <!-- Button Heart -->
-    <ImageView
-        android:id="@+id/heartButton"
-        android:layout_width="30dp"
-        android:layout_height="30dp"
-        android:layout_marginEnd="16dp"
-        android:layout_marginBottom="16dp"
-        android:src="@drawable/heart"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/trashButton"
-        app:layout_constraintStart_toEndOf="@+id/pencilButton"
-        app:layout_constraintTop_toBottomOf="@id/memeImageView" />
-
-    <!-- Button Trash -->
-    <ImageView
-        android:id="@+id/trashButton"
-        android:layout_width="30dp"
-        android:layout_height="30dp"
-        android:layout_marginEnd="16dp"
-        android:layout_marginBottom="16dp"
-        android:src="@drawable/trash"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/ellipsisButton"
-        app:layout_constraintStart_toEndOf="@+id/heartButton"
-        app:layout_constraintTop_toBottomOf="@id/memeImageView" />
-
-    <!-- Button Ellipsis -->
-    <ImageView
-        android:id="@+id/ellipsisButton"
-        android:layout_width="30dp"
-        android:layout_height="30dp"
-        android:layout_marginEnd="16dp"
-        android:layout_marginBottom="16dp"
-        android:src="@drawable/circle_ellipsis"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/trashButton"
-        app:layout_constraintTop_toBottomOf="@id/memeImageView" />
-
-    <Button
-        android:id="@+id/ImageInfo"
+    <TextView
+        android:id="@+id/qrLink"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Image Info"
-        app:layout_constraintBottom_toBottomOf="parent"
+        android:autoLink="web"
+        android:linksClickable="true"
+        app:layout_constraintBottom_toBottomOf="@+id/memeImageView"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.95"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.156" />
+        app:layout_constraintStart_toStartOf="parent" />
 
-    <RelativeLayout
+    <include
+        android:id="@+id/top_nav_detail"
+        layout="@layout/top_nav_detail"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <androidx.coordinatorlayout.widget.CoordinatorLayout
         android:id="@+id/imageInfo"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="160dp"
-        android:background="@color/white"
-        android:visibility="invisible"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        android:visibility="gone"
+        app:layout_constraintBottom_toTopOf="@+id/bottom_nav_detail"
+        app:layout_constraintEnd_toEndOf="parent">
+        <include
+            layout="@layout/image_info"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+    </androidx.coordinatorlayout.widget.CoordinatorLayout>
 
+    <include
+        android:id="@+id/bottom_nav_detail"
+        layout="@layout/bottom_nav_detail"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

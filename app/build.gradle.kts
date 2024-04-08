@@ -60,6 +60,7 @@ android {
 dependencies {
     implementation("androidx.appcompat:appcompat:1.6.1")
     implementation("com.google.android.material:material:1.11.0")
+    implementation("com.google.android.flexbox:flexbox:3.0.0")
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.7.0")
     implementation("androidx.activity:activity-compose:1.8.2")
     implementation(platform("androidx.compose:compose-bom:2023.08.00"))
@@ -94,5 +95,11 @@ dependencies {
     implementation("com.github.bumptech.glide:glide:4.16.0")
 
     implementation("com.google.android.gms:play-services-vision:20.1.3")
+    // Image Cropper
     implementation("com.theartofdev.edmodo:android-image-cropper:2.8.0")
+    // QR Code Scanner
+    implementation("com.google.zxing:core:3.4.1")
+
+
+
 }    

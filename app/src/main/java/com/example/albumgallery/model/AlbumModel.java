@@ -2,7 +2,7 @@ package com.example.albumgallery.model;
 
 import android.content.Context;
 
-import com.example.albumgallery.DatabaseHelper;
+import com.example.albumgallery.helper.DatabaseHelper;
 
 import java.util.Date;
 import java.util.Calendar;
@@ -20,6 +20,7 @@ public class AlbumModel implements Model{
     private String password;
     private int num_of_images;   // number of images
     private int is_deleted; // is album deleted
+    private String thumbnail;
 
     public DatabaseHelper getDbHelper() {
         return dbHelper;
@@ -112,6 +113,7 @@ public class AlbumModel implements Model{
         this.created_at = (Calendar.getInstance().getTime()).toString();
         this.notice = "";
         this.is_deleted = 0;
+        this.thumbnail = "";
     }
 
     public AlbumModel(int id, String name, int capacity, String notice, String ref, int num_of_images) {
@@ -123,6 +125,7 @@ public class AlbumModel implements Model{
         this.is_deleted = 0;
         this.notice = notice;
         this.num_of_images = num_of_images;
+        this.thumbnail = "";
     }
     public AlbumModel(String name, String password, int num_of_images){
         this.name = name;
@@ -133,6 +136,7 @@ public class AlbumModel implements Model{
         this.ref = "";
         this.is_deleted = 0;
         this.num_of_images = num_of_images;
+        this.thumbnail = "";
     }
 
     @Override

@@ -13,14 +13,18 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
 import android.widget.ImageButton;
 
 import com.example.albumgallery.R;
 import com.example.albumgallery.controller.MainController;
 import com.example.albumgallery.view.activity.AlbumContentActivity;
 import com.example.albumgallery.view.activity.CreateAlbumActivity;
+import com.example.albumgallery.view.activity.PasswordAlbumActivity;
 import com.example.albumgallery.view.adapter.AlbumAdapter;
 import com.example.albumgallery.view.adapter.AlbumAdapterListener;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
+import com.google.android.material.snackbar.Snackbar;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,6 +33,7 @@ public class AlbumsMainFragment extends Fragment implements AlbumAdapterListener
     private RecyclerView recyclerView;
     private AlbumAdapter albumAdapter;
     private List<String> albumNames;
+    private List<String> thumbnails;
     private MainController mainController;
     private AlbumAdapterListener listener;
 
@@ -58,7 +63,7 @@ public class AlbumsMainFragment extends Fragment implements AlbumAdapterListener
         recyclerView = (RecyclerView) view.findViewById(R.id.albumsRecyclerView);
         recyclerView.setLayoutManager(new GridLayoutManager(view.getContext(), 2, GridLayoutManager.HORIZONTAL, false));
 
-        albumAdapter = new AlbumAdapter(getActivity(), albumNames);
+        albumAdapter = new AlbumAdapter(getActivity(), albumNames, thumbnails);
         albumAdapter.setAlbumAdapterListener(this);
         recyclerView.setAdapter(albumAdapter);
     }
@@ -74,13 +79,22 @@ public class AlbumsMainFragment extends Fragment implements AlbumAdapterListener
 
     private void initializeData() {
         this.albumNames = new ArrayList<>();
+        this.thumbnails = new ArrayList<>();
         albumNames = mainController.getAlbumController().getAlbumNames();
+        thumbnails = mainController.getAlbumController().getAllThumbnails();
     }
 
     @Override
     public void onAlbumClicked(String albumName) {
         Intent intent = new Intent(getContext(), AlbumContentActivity.class);
         intent.putExtra("albumName", albumName);
-        startActivity(intent);
+        String password = mainController.getAlbumController().getPasswordByAlbumName(albumName);
+        if(!password.isEmpty()) {
+            Intent confirmPassword = new Intent(getContext(), PasswordAlbumActivity.class);
+            confirmPassword.putExtra("albumName", albumName);
+            startActivity(confirmPassword);
+        } else {
+            startActivity(intent);
+        }
     }
 }

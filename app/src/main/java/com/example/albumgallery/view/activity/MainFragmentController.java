@@ -17,12 +17,15 @@ import androidx.fragment.app.FragmentTransaction;
 import com.example.albumgallery.R;
 import com.example.albumgallery.controller.MainController;
 import com.example.albumgallery.databinding.ActivityFragmentControllerBinding;
-import com.example.albumgallery.view.adapter.ImageAdapterListener;
 import com.example.albumgallery.view.fragment.AlbumsMainFragment;
 import com.example.albumgallery.view.fragment.BinFragment;
+import com.example.albumgallery.view.fragment.FavoriteFragment;
 import com.example.albumgallery.view.fragment.HomeScreenFragment;
+import com.example.albumgallery.view.listeners.BackgroundProcessingCallback;
+import com.example.albumgallery.view.listeners.ImageAdapterListener;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 
@@ -30,12 +33,14 @@ public class MainFragmentController extends AppCompatActivity implements Backgro
     ActivityFragmentControllerBinding binding;
     private boolean isBackgroundTaskCompleted = true;
 
+    private ArrayList<Fragment> fragments = new ArrayList<>(Arrays.asList(new HomeScreenFragment(), new AlbumsMainFragment(), new FavoriteFragment(), new BinFragment()));
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         HomeScreenFragment fragment = new HomeScreenFragment();
         getSupportFragmentManager().beginTransaction()
-                .add(R.id.fragment_container, fragment)
+                .add(R.id.fragment_container, fragments.get(0))
                 .commit();
 
         binding = ActivityFragmentControllerBinding.inflate(getLayoutInflater());
@@ -45,22 +50,25 @@ public class MainFragmentController extends AppCompatActivity implements Backgro
         // fragment đầu tiên khi vừa vào app
 //        replaceFragment(new HomeScreenFragment());
         String fragmentToLoad = getIntent().getStringExtra("fragmentToLoad");
-        if(fragmentToLoad != null && fragmentToLoad.equals("AlbumMain")) {
-            replaceFragment(new AlbumsMainFragment());
+        if (fragmentToLoad != null && fragmentToLoad.equals("AlbumMain")) {
+            replaceFragment(fragments.get(1));
+        } else if (fragmentToLoad != null && fragmentToLoad.equals("HomeScreen")) {
+            replaceFragment(fragments.get(0));
         }
+
 
 
         binding.bottomNavigationView.setOnItemSelectedListener(item -> {
             int itemId = item.getItemId();
             if (itemId == R.id.photos) {
-                replaceFragment(new HomeScreenFragment());
+                replaceFragment(fragments.get(0));
             } else if (itemId == R.id.albums) {
-                replaceFragment(new AlbumsMainFragment());
+                replaceFragment(fragments.get(1));
             } else if (itemId == R.id.favorites) {
-                // xử lý cho màn hình favorites
+                replaceFragment(fragments.get(2));
             }
             else if (itemId == R.id.bin) {
-                replaceFragment(new BinFragment());
+                replaceFragment(fragments.get(3));
             }
             return true;
         });
@@ -131,7 +139,8 @@ public class MainFragmentController extends AppCompatActivity implements Backgro
         if (currentFragment instanceof HomeScreenFragment) {
             Log.d("home fragment", "ok");
             ((HomeScreenFragment) currentFragment).getSelectedItemsCount(count);
-        } else if (currentFragment instanceof BinFragment) {
+        }
+        else if (currentFragment instanceof BinFragment) {
             Log.d("bin fragment", "ok");
             ((BinFragment) currentFragment).getSelectedItemsCount(count);
         }
@@ -147,11 +156,27 @@ public class MainFragmentController extends AppCompatActivity implements Backgro
                 fragment.handleImagePick(itemView, uri, position);
             }
         }
+        else if (currentFragment instanceof FavoriteFragment) {
+            FavoriteFragment favoriteFragment = (FavoriteFragment) getSupportFragmentManager().findFragmentById(R.id.fragment_container);
+            if (favoriteFragment != null) {
+                favoriteFragment.handleImagePick(itemView, uri, position);
+            }
+        }
         else if (currentFragment instanceof BinFragment) {
             BinFragment binFragment = (BinFragment) getSupportFragmentManager().findFragmentById(R.id.fragment_container);
             if (binFragment != null) {
                 binFragment.handleDeletedImagePick(itemView, uri, position);
             }
         }
+    }
+
+    @Override
+    public void getInteractedURIs(String uri) {
+
+    }
+
+    @Override
+    public void onPointerCaptureChanged(boolean hasCapture) {
+        super.onPointerCaptureChanged(hasCapture);
     }
 }

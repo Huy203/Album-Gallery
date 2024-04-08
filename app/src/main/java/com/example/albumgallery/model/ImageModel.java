@@ -121,13 +121,14 @@ public class ImageModel implements Model {
         this.is_deleted = is_deleted;
     }
 
-    public boolean isIs_favourited() {
+    public boolean getIs_favourited() {
         return is_favourited;
     }
 
     public void setIs_favourited(boolean is_favourited) {
         this.is_favourited = is_favourited;
     }
+
 
     @Override
     public String toString() {
@@ -162,4 +163,5 @@ public class ImageModel implements Model {
     public void select() {
 
     }
+
 }

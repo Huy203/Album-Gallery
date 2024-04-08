@@ -84,7 +84,7 @@ public class BinFragment extends Fragment {
             if (imageAdapter.toggleMultipleChoiceImagesEnabled()) {
                 btnPickMultipleImages.setText("Cancel");
                 numberOfImagesSelected.setVisibility(TextView.VISIBLE);
-                numberOfImagesSelected.setText("0 images selected");
+                // numberOfImagesSelected.setText("0 images selected");
             } else {
                 btnPickMultipleImages.setText("Select");
                 numberOfImagesSelected.setVisibility(TextView.GONE);
@@ -124,6 +124,11 @@ public class BinFragment extends Fragment {
         startActivity(intent, options.toBundle());
     }
     private void showDeleteConfirmationDialog() {
+        Log.d("size of image urls before delete", String.valueOf(selectedImageURLsTask.size()));
+        for (Task taskImageURL : selectedImageURLsTask){
+            String imageURL = taskImageURL.getResult().toString();
+            Log.d("image url", imageURL);
+        }
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         builder.setTitle("Confirm Deletion");
         builder.setMessage("Are you sure you want to delete this image forever?");
@@ -140,12 +145,10 @@ public class BinFragment extends Fragment {
     @SuppressLint("SetTextI18n")
     public void getSelectedItemsCount(int count) {
         Log.v("SelectedItems", count + " items selected");
-        numberOfImagesSelected.setText(count + " images selected");
+        // numberOfImagesSelected.setText(count + " images selected");
 
-//        List<Task<Uri>> task =  new ArrayList<>();
-//        for (String uri : imageURIs) {
-//            task.add(Tasks.forResult(Uri.parse(uri)));
-//        }
+        selectedImageURLsTask.clear();
+        selectedImageURLs.clear();
 
         for (int i = 0; i < count; i++) {
             selectedImageURLsTask.add(Tasks.forResult(Uri.parse(imageURIs.get(i))));
@@ -154,14 +157,13 @@ public class BinFragment extends Fragment {
 
         for (int i = 0; i < count; i++) {
             selectedImageURLs.add(imageURIs.get(i));
-            Log.d("Deleted images", selectedImageURLs.get(i));
         }
     }
     public void updateUI() {
         imageURIs.clear();
 //        imageURIs.addAll(mainController.getImageController().getAllImageURLs());
         // lấy ảnh sort theo date (mới nhất xếp trước).
-        imageURIs.addAll(mainController.getImageController().getAllImageURLsSortByDate());
+        imageURIs.addAll(mainController.getImageController().getAllImageURLsSortByDateAtBin());
         imageAdapter = new ImageAdapter(getActivity(), imageURIs);
         recyclerView.setLayoutManager(new GridLayoutManager(getContext(), 3));
         recyclerView.setAdapter(imageAdapter);

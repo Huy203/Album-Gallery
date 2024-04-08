@@ -1,8 +1,13 @@
 package com.example.albumgallery.controller;
 
 import static android.app.Activity.RESULT_OK;
+import static com.example.albumgallery.utils.Constant.REQUEST_CODE_CAMERA;
+import static com.example.albumgallery.utils.Constant.REQUEST_CODE_EDIT_IMAGE;
 import static com.example.albumgallery.utils.Constant.REQUEST_CODE_PICK_MULTIPLE_IMAGES;
 import static com.example.albumgallery.utils.Constant.imageExtensions;
+import static com.example.albumgallery.utils.Utilities.byteArrayToBitmap;
+import static com.example.albumgallery.utils.Utilities.getImageAddedDate;
+import static java.text.DateFormat.getDateTimeInstance;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
@@ -11,7 +16,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
-import android.media.Image;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.provider.MediaStore;
 import android.util.Log;
@@ -19,37 +24,33 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 
-import com.example.albumgallery.R;
-import com.example.albumgallery.view.activity.BackgroundProcessingCallback;
-import com.example.albumgallery.DatabaseHelper;
+import com.example.albumgallery.helper.DatabaseHelper;
 import com.example.albumgallery.FirebaseManager;
 import com.example.albumgallery.model.ImageModel;
 import com.example.albumgallery.model.Model;
-import com.example.albumgallery.view.activity.HomeScreen;
+import com.example.albumgallery.utils.QRCodeRecognization;
 import com.example.albumgallery.view.activity.MainFragmentController;
-import com.example.albumgallery.view.fragment.BinFragment;
+import com.example.albumgallery.view.listeners.BackgroundProcessingCallback;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
-import com.google.firebase.Firebase;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageMetadata;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.file.Paths;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 
 public class ImageController implements Controller {
-    private static final int CAMERA_REQUEST_CODE = 1000;
-    final String[] PROJECTION = {MediaStore.Images.Media._ID, MediaStore.Images.Media.DISPLAY_NAME, MediaStore.Images.Media.WIDTH, MediaStore.Images.Media.HEIGHT, MediaStore.Images.Media.SIZE, MediaStore.Images.Media.DATE_ADDED,};
+    final String[] PROJECTION = {MediaStore.Images.Media._ID, MediaStore.Images.Media.DISPLAY_NAME, MediaStore.Images.Media.WIDTH, MediaStore.Images.Media.HEIGHT, MediaStore.Images.Media.SIZE, MediaStore.Images.Media.DATE_ADDED};
     private final Activity activity;
     private final DatabaseHelper dbHelper;
     private final FirebaseManager firebaseManager;
@@ -61,7 +62,7 @@ public class ImageController implements Controller {
         this.firebaseManager = FirebaseManager.getInstance(activity);
     }
 
-    private DatabaseHelper getDbHelper(){
+    private DatabaseHelper getDbHelper() {
         return dbHelper;
     }
 
@@ -74,8 +75,6 @@ public class ImageController implements Controller {
     public void insert(Model model) {
         idSelectedImages.add(dbHelper.insert("Image", model));
         dbHelper.close();
-        firebaseManager.getStorage();
-        // FirebaseStorage storage = FirebaseStorage.getInstance();
     }
 
     @Override
@@ -101,23 +100,37 @@ public class ImageController implements Controller {
     }
 
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == REQUEST_CODE_PICK_MULTIPLE_IMAGES && resultCode == RESULT_OK && data != null) {
-            handleImagePicked(data);
-        }
-        // xử lý ảnh chụp từ camera trong app
-        if (requestCode == CAMERA_REQUEST_CODE && resultCode == RESULT_OK && data != null) {
-            Bitmap bitmap = (Bitmap) data.getExtras().get("data");
-            if (bitmap != null) {
-                Uri imageUri = convertFromBitmapToURI(activity, bitmap);
-                handleImageFromCamera(imageUri);
-
-            } else {
-                Log.d("Camera in app", "Bitmap Image is null");
+        if (resultCode == RESULT_OK && data != null) {
+            Bitmap bitmap;
+            switch (requestCode) {
+                case REQUEST_CODE_PICK_MULTIPLE_IMAGES:
+                    handleImagePicked(data);
+                    break;
+                case REQUEST_CODE_CAMERA:
+                    bitmap = (Bitmap) Objects.requireNonNull(data.getExtras()).get("data");
+                    if (bitmap != null) {
+                        Uri imageUri = convertFromBitmapToURI(activity, bitmap);
+                        handleImage(imageUri, requestCode);
+                    } else {
+                        Log.d("Camera in app", "Bitmap Image is null");
+                    }
+                    break;
+                case REQUEST_CODE_EDIT_IMAGE:
+                    byte[] byteArray = data.getByteArrayExtra("imageByteArray");
+                    bitmap = byteArrayToBitmap(byteArray);
+                    if (bitmap != null) {
+                        Uri imageUri = convertFromBitmapToURI(activity, bitmap);
+                        handleImage(imageUri, requestCode);
+                    } else {
+                        Log.d("Edit image", "Bitmap Image is null");
+                    }
+                    break;
             }
         }
     }
 
-    private Uri convertFromBitmapToURI(Context inContext, Bitmap inImage) {
+
+    public Uri convertFromBitmapToURI(Context inContext, Bitmap inImage) {
         String imageName = "IMG_" + System.currentTimeMillis() + ".jpg";
         ByteArrayOutputStream bytes = new ByteArrayOutputStream();
         inImage.compress(Bitmap.CompressFormat.JPEG, 100, bytes);
@@ -151,7 +164,8 @@ public class ImageController implements Controller {
                 if (task1.isSuccessful()) {
                     try {
                         Uri uriImage = task1.getResult(); // The uri with the location of the file in firebase
-                        update("ref", uriImage.toString(), "id = " + idSelectedImages.get(uploadTasks.indexOf(task1))); // Update the reference of the image
+                        Log.v("Image", String.valueOf(idSelectedImages.get(uploadTasks.indexOf(task1))));
+                        this.update("ref", uriImage.toString(), "id = " + idSelectedImages.get(uploadTasks.indexOf(task1))); // Update the reference of the image
                         Log.v("Image", "Image uploaded" + " at " + idSelectedImages.get(uploadTasks.indexOf(task1)));
                         if (allTasksCompleted(uploadTasks)) {
                             activity.runOnUiThread(() -> {
@@ -168,11 +182,10 @@ public class ImageController implements Controller {
         }
     }
 
-    private void handleImageFromCamera(Uri imageUri) {
+    private void handleImage(Uri imageUri, int requestCode) {
         retrieveDataImageFromURL(imageUri);
-        Log.d("Camera in app", "here");
         try {
-            Long id = dbHelper.getLastId("Image");
+            long id = dbHelper.getLastId("Image");
             String id_string = Long.toString(id);
             Task<Uri> uploadTask = uploadImage(imageUri);
             uploadTask.addOnCompleteListener(task -> {
@@ -180,9 +193,12 @@ public class ImageController implements Controller {
                     Uri firebaseURI = task.getResult();
                     Log.d("test firebase uri", firebaseURI.toString());
                     update("ref", firebaseURI.toString(), "id = " + id_string);
-                    activity.runOnUiThread(() -> {
-                        ((MainFragmentController) activity).onBackgroundTaskCompleted();
-                    });
+                    if (requestCode == REQUEST_CODE_CAMERA) {
+                        activity.runOnUiThread(() -> {
+                            ((MainFragmentController) activity).onBackgroundTaskCompleted();
+                        });
+                    } else {
+                    }
                 }
             });
         } catch (Exception e) {
@@ -193,28 +209,31 @@ public class ImageController implements Controller {
 
     @SuppressLint("Range")
     private void retrieveDataImageFromURL(Uri uri) {
+        String name = null, dateAdded = null;
+        int width = 0, height = 0;
+        long capacity = 0;
+
+        // Get name, capacity and date added of the image
         try (Cursor cursor = activity.getContentResolver().query(uri, PROJECTION, null, null, null)) {
-            long id;
-            String name;
-            int width, height;
-            long capacity, dateAdded;
-
             if (cursor != null && cursor.moveToFirst()) {
-                // Get the column index of the image
-                id = cursor.getLong(cursor.getColumnIndex(MediaStore.Images.Media._ID));
                 name = cursor.getString(cursor.getColumnIndex(MediaStore.Images.Media.DISPLAY_NAME));
-                width = cursor.getInt(cursor.getColumnIndex(MediaStore.Images.Media.WIDTH));
-                height = cursor.getInt(cursor.getColumnIndex(MediaStore.Images.Media.HEIGHT));
                 capacity = cursor.getLong(cursor.getColumnIndex(MediaStore.Images.Media.SIZE));
-                dateAdded = cursor.getLong(cursor.getColumnIndex(MediaStore.Images.Media.DATE_ADDED));
+                long temp = cursor.getLong(cursor.getColumnIndex(MediaStore.Images.Media.DATE_ADDED));
                 // Convert milliseconds to a more readable format (optional)
-                @SuppressLint("SimpleDateFormat") String formattedDate = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date(dateAdded * 1000));
-
-                this.create(name, width, height, capacity, formattedDate); // Create an image
-
-                Log.v("Image", "Image added" + " " + id + " " + name + " " + capacity + " " + dateAdded + formattedDate);
+                dateAdded = getImageAddedDate();
             }
         }
+        // Get width and height of the image
+        try {
+            InputStream in = activity.getContentResolver().openInputStream(uri);
+            BitmapFactory.Options options = new BitmapFactory.Options();
+            Bitmap bitmap = BitmapFactory.decodeStream(in, null, options);
+            width = options.outWidth;
+            height = options.outHeight;
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        this.create(name, width, height, capacity, dateAdded); // Create an image
     }
 
     private Task<Uri> uploadImage(Uri uri) {
@@ -260,6 +279,7 @@ public class ImageController implements Controller {
         }
         return true;
     }
+
     private boolean allTasksCompletedGeneric(List<Task> tasks) {
         for (Task<Uri> task : tasks) {
             if (!task.isSuccessful()) {
@@ -268,29 +288,20 @@ public class ImageController implements Controller {
         }
         return true;
     }
-
     public String getExtensionName(Uri uri) {
         String fileName = uri.getPathSegments().get(uri.getPathSegments().size() - 1);
         return fileName.split("\\.")[fileName.split("\\.").length - 1];
     }
-
-    public List<ImageModel> getAllImages() {
-        List<String> data = dbHelper.getAll("Image");
-        List<ImageModel> imageModels = new ArrayList<>();
-        for (String s : data) {
-            String[] temp = s.split(",");
-            imageModels.add(new ImageModel(Integer.parseInt(temp[0]), temp[1], Integer.parseInt(temp[2]), Integer.parseInt(temp[3]), Long.parseLong(temp[4]), temp[5], temp[6], temp[7], temp[8], Boolean.parseBoolean(temp[9]), Boolean.parseBoolean(temp[10])));
-        }
-        return imageModels;
-    }
-
     public List<String> getAllImageURLs() {
         return dbHelper.getAllRef("Image");
     }
+
     public ImageModel getImageById(long id) {
         String data = dbHelper.getById("Image", id);
         String[] temp = data.split(",");
-        return new ImageModel(Integer.parseInt(temp[0]),temp[1], Integer.parseInt(temp[2]), Integer.parseInt(temp[3]), Long.parseLong(temp[4]), temp[5], temp[6], temp[7], temp[8], Boolean.parseBoolean(temp[9]), Boolean.parseBoolean(temp[10]));
+        boolean isFavourited = temp[10].equals("1");
+        boolean isDeleted = temp[9].equals("1");
+        return new ImageModel(Integer.parseInt(temp[0]), temp[1], Integer.parseInt(temp[2]), Integer.parseInt(temp[3]), Long.parseLong(temp[4]), temp[5], temp[6], temp[7], temp[8], isDeleted, isFavourited);
     }
 
     public long getIdByRef(String ref) {
@@ -300,12 +311,27 @@ public class ImageController implements Controller {
     public List<String> getAllImageURLsSortByDate() {
         return dbHelper.selectImagesSortByDate("Image", "ref", "descending");
     }
+    public List<String> getAllImageURLsSortByDateAtBin() {
+        return dbHelper.selectImagesSortByDateAtBin("Image", "ref", "descending");
+    }
     public List<String> getAllImageIds() {
         return dbHelper.getFromImage("id");
     }
 
     public String getImageRefById(long imageId) {
         return dbHelper.getImageRefById(imageId);
+    }
+
+    public boolean toggleFavoriteImage(long imageId) {
+        boolean isFavourited = getImageById(imageId).getIs_favourited();
+        dbHelper.update("image", "is_favourited", isFavourited ? "0" : "1", "id = " + imageId);
+        return !isFavourited;
+    }
+    public boolean isFavoriteImage(long imageId) {
+        return dbHelper.isFavoriteImage(imageId);
+    }
+    public List<String> getAllFavoriteImageRef() {
+        return dbHelper.getAllFavoriteImageRef();
     }
     public List<String> getSelectedImageURLs() {
         final String replace = idSelectedImages.toString().replace("[", "").replace("]", "");
@@ -328,7 +354,7 @@ public class ImageController implements Controller {
         return filename;
     }
 
-    public void deleteSelectedImage(String imageURL){
+    public void deleteSelectedImage(String imageURL) {
         String URL = parseURL(imageURL);
         Log.d("URL", URL);
 
@@ -381,9 +407,11 @@ public class ImageController implements Controller {
         }
         return null;
     }
+
     public List<String> getImagePaths() {
         return getAllImageURLs();
     }
+
     public void deleteSelectedImageAtBin(List<Task> imageURLs){
         FirebaseStorage storage = FirebaseStorage.getInstance();
         // Create a storage reference from our app
@@ -424,6 +452,7 @@ public class ImageController implements Controller {
     }
 
     public void deleteSelectedImageAtHomeScreeen(List<Task> imageURLs){
+        Log.d("get into delete at homescreen function", String.valueOf(imageURLs.size()));
         for (Task taskImageURL : imageURLs) {
             if (taskImageURL.isSuccessful()) {
                 String imageURL = taskImageURL.getResult().toString();
@@ -469,4 +498,14 @@ public class ImageController implements Controller {
     public List<String> getAllDeleteImageRef() {
         return dbHelper.getAllDeleteImageRef();
     }
+    public String recognizeQRCode(String uri) {
+        QRCodeRecognization qrCodeRecognization = new QRCodeRecognization();
+        try {
+            return qrCodeRecognization.execute(uri).get();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
 }

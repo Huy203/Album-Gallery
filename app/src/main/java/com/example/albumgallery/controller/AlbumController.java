@@ -1,6 +1,6 @@
 package com.example.albumgallery.controller;
 
-import com.example.albumgallery.DatabaseHelper;
+import com.example.albumgallery.helper.DatabaseHelper;
 import com.example.albumgallery.model.AlbumModel;
 import com.example.albumgallery.model.ImageModel;
 import com.example.albumgallery.model.Model;
@@ -75,6 +75,18 @@ public class AlbumController implements Controller {
     public long getLastAlbumId() {
         long res = dbHelper.getLastId("Album");
         return res;
+    }
+
+    public String getPasswordByAlbumName(String albumName) {
+        return dbHelper.getPasswordByAlbumName(albumName);
+    }
+
+    public void updateThumbnailByAlbumName(String albumName, String thumbnail) {
+        dbHelper.updateThumbnailByAlbumName(albumName, thumbnail);
+    }
+
+    public List<String> getAllThumbnails() {
+        return dbHelper.getAllThumbnails();
     }
 
     public void deleteAlbum(String name) {
