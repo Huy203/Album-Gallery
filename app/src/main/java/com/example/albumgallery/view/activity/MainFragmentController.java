@@ -15,47 +15,49 @@ import androidx.fragment.app.FragmentTransaction;
 
 import com.example.albumgallery.R;
 import com.example.albumgallery.databinding.ActivityFragmentControllerBinding;
-import com.example.albumgallery.view.listeners.BackgroundProcessingCallback;
-import com.example.albumgallery.view.listeners.ImageAdapterListener;
 import com.example.albumgallery.view.fragment.AlbumsMainFragment;
 import com.example.albumgallery.view.fragment.FavoriteFragment;
 import com.example.albumgallery.view.fragment.HomeScreenFragment;
+import com.example.albumgallery.view.listeners.BackgroundProcessingCallback;
+import com.example.albumgallery.view.listeners.ImageAdapterListener;
+
+import java.util.ArrayList;
+import java.util.Arrays;
 
 
 public class MainFragmentController extends AppCompatActivity implements BackgroundProcessingCallback, ImageAdapterListener {
     ActivityFragmentControllerBinding binding;
     private boolean isBackgroundTaskCompleted = true;
 
+    private ArrayList<Fragment> fragments = new ArrayList<>(Arrays.asList(new HomeScreenFragment(), new AlbumsMainFragment(), new FavoriteFragment()));
+
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        HomeScreenFragment fragment = new HomeScreenFragment();
         getSupportFragmentManager().beginTransaction()
-                .add(R.id.fragment_container, fragment)
+                .add(R.id.fragment_container, fragments.get(0))
                 .commit();
 
         binding = ActivityFragmentControllerBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
-
-        // fragment đầu tiên khi vừa vào app
-//        replaceFragment(new HomeScreenFragment());
         String fragmentToLoad = getIntent().getStringExtra("fragmentToLoad");
-        if(fragmentToLoad != null && fragmentToLoad.equals("AlbumMain")) {
-            replaceFragment(new AlbumsMainFragment());
+        if (fragmentToLoad != null && fragmentToLoad.equals("AlbumMain")) {
+            replaceFragment(fragments.get(1));
         } else if (fragmentToLoad != null && fragmentToLoad.equals("HomeScreen")) {
-            replaceFragment(new HomeScreenFragment());
+            replaceFragment(fragments.get(0));
         }
 
 
         binding.bottomNavigationView.setOnItemSelectedListener(item -> {
             int itemId = item.getItemId();
             if (itemId == R.id.photos) {
-                replaceFragment(new HomeScreenFragment());
+                replaceFragment(fragments.get(0));
             } else if (itemId == R.id.albums) {
-                replaceFragment(new AlbumsMainFragment());
+                replaceFragment(fragments.get(1));
             } else if (itemId == R.id.favorites) {
-                replaceFragment(new FavoriteFragment());
+                replaceFragment(fragments.get(2));
             }
             return true;
         });
@@ -64,25 +66,23 @@ public class MainFragmentController extends AppCompatActivity implements Backgro
     @SuppressLint("NotifyDataSetChanged")
     @Override
     public void onResume() {
-        Toast.makeText(this, "onResume", Toast.LENGTH_SHORT).show();
         super.onResume();
+        Toast.makeText(this, "onResume", Toast.LENGTH_SHORT).show();
+
         Fragment currentFragment = getSupportFragmentManager().findFragmentById(R.id.fragment_container);
-        HomeScreenFragment fragment = null;
-        if(currentFragment instanceof HomeScreenFragment) {
-            fragment = (HomeScreenFragment) getSupportFragmentManager().findFragmentById(R.id.fragment_container);
-        }
-        if (fragment != null) {
-            if (isBackgroundTaskCompleted)
-                fragment.updateUI();
+
+        if (currentFragment instanceof HomeScreenFragment && isBackgroundTaskCompleted) {
+            HomeScreenFragment fragment = (HomeScreenFragment) currentFragment;
+            fragment.updateUI();
         } else {
-            Log.v("MainFragmentController", "fragment is null");
+            Log.v("MainFragmentController", "Fragment is null or background task is not completed");
         }
     }
+
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        Log.v("MainFragmentController", "onActivityResult: " + requestCode + " " + resultCode);
         if (data != null) {
             if (data.getData() == null) {
                 Log.d("Check data", "is null");
@@ -101,17 +101,16 @@ public class MainFragmentController extends AppCompatActivity implements Backgro
         FragmentManager fragmentManager = getSupportFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
         fragmentTransaction.replace(R.id.fragment_container, fragment);
+        fragmentTransaction.addToBackStack(null);
         fragmentTransaction.commit();
     }
 
     @Override
     public void onBackgroundTaskCompleted() {
-        isBackgroundTaskCompleted = true;
         HomeScreenFragment fragment = (HomeScreenFragment) getSupportFragmentManager().findFragmentById(R.id.fragment_container);
         if (fragment != null) {
             fragment.updateUI();
         }
-        isBackgroundTaskCompleted = false;
     }
 
     @Override
@@ -125,7 +124,7 @@ public class MainFragmentController extends AppCompatActivity implements Backgro
     @Override
     public void handleImagePick(View itemView, String uri, int position) {
         Fragment currentFragment = getSupportFragmentManager().findFragmentById(R.id.fragment_container);
-        if(currentFragment instanceof HomeScreenFragment) {
+        if (currentFragment instanceof HomeScreenFragment) {
             HomeScreenFragment fragment = (HomeScreenFragment) getSupportFragmentManager().findFragmentById(R.id.fragment_container);
             if (fragment != null) {
                 fragment.handleImagePick(itemView, uri, position);

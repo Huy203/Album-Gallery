@@ -2,8 +2,6 @@ package com.example.albumgallery.controller;
 
 import android.app.Activity;
 
-import java.util.List;
-
 public class MainController {
     private final AlbumController albumController;
     private final ImageController imageController;
@@ -14,17 +12,16 @@ public class MainController {
         imageController = new ImageController(activity);
         imageAlbumController = new ImageAlbumController(activity);
     }
+
     public AlbumController getAlbumController() {
         return albumController;
     }
+
     public ImageController getImageController() {
         return imageController;
     }
+
     public ImageAlbumController getImageAlbumController() {
         return imageAlbumController;
     }
-    public List<String> getImagePaths() {
-        return imageController.getImagePaths();
-    }
-
 }

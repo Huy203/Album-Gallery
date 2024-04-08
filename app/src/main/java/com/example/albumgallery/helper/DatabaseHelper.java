@@ -167,6 +167,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         Log.v("DatabaseHelper", "Updating data");
         SQLiteDatabase db = getWritableDatabase();
         db.execSQL("UPDATE " + table + " SET " + column + " = " + "'" + value + "'" + " WHERE " + where);
+        Log.v("DatabaseHelper", "Query: "+ "UPDATE " + table + " SET " + column + " = " + "'" + value + "'" + " WHERE " + where);
         return getId(table, where);
     }
 
