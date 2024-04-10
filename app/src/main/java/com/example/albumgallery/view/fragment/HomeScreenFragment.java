@@ -6,6 +6,7 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.util.Log;
@@ -32,6 +33,7 @@ import com.example.albumgallery.view.adapter.ImageAdapter;
 import com.example.albumgallery.view.listeners.BackgroundProcessingCallback;
 import com.example.albumgallery.view.listeners.ImageAdapterListener;
 import com.google.android.gms.tasks.Task;
+import com.google.android.gms.tasks.Tasks;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -92,11 +94,18 @@ public class HomeScreenFragment extends Fragment {
         numberOfImagesSelected = view.findViewById(R.id.numberOfSelectedImages);
     }
 
+//    private void setupButtons() {
+//        view.findViewById(R.id.btnCamera).setOnClickListener(v -> openCamera());
+//        view.findViewById(R.id.btnPickImageFromDevice).setOnClickListener(v -> pickImagesFromDevice());
+//        view.findViewById(R.id.btnPickMultipleImages).setOnClickListener(v -> showDeleteConfirmationDialog());
+//        view.findViewById(R.id.btnDeleteMultipleImages).setOnClickListener(v -> toggleMultipleChoiceImages(view.findViewById(R.id.btnDeleteMultipleImages)));
+//    }
+
     private void setupButtons() {
         view.findViewById(R.id.btnCamera).setOnClickListener(v -> openCamera());
         view.findViewById(R.id.btnPickImageFromDevice).setOnClickListener(v -> pickImagesFromDevice());
-        view.findViewById(R.id.btnPickMultipleImages).setOnClickListener(v -> showDeleteConfirmationDialog());
-        view.findViewById(R.id.btnDeleteMultipleImages).setOnClickListener(v -> toggleMultipleChoiceImages(view.findViewById(R.id.btnDeleteMultipleImages)));
+        view.findViewById(R.id.btnDeleteMultipleImages).setOnClickListener(v -> showDeleteConfirmationDialog());
+        view.findViewById(R.id.btnPickMultipleImages).setOnClickListener(v -> toggleMultipleChoiceImages(view.findViewById(R.id.btnPickMultipleImages)));
     }
 
     private void pickImagesFromDevice() {
@@ -143,7 +152,7 @@ public class HomeScreenFragment extends Fragment {
         imageURIs.clear();
         // lấy ảnh sort theo date (mới nhất xếp trước).
 //       imageURIs.addAll(mainController.getImageController().getAllImageURLsSortByDate());
-        imageURIs.addAll(mainController.getImageController().getAllImageURLs());
+        imageURIs.addAll(mainController.getImageController().getAllImageURLsSortByDate());
         imageAdapter = new ImageAdapter(getActivity(), imageURIs);
         recyclerMediaView.setLayoutManager(new GridLayoutManager(getContext(), 3));
         recyclerMediaView.setAdapter(imageAdapter);
@@ -153,9 +162,20 @@ public class HomeScreenFragment extends Fragment {
     @SuppressLint("SetTextI18n")
     public void getSelectedItemsCount(int count) {
         numberOfImagesSelected.setText(count + " images selected");
+
+        for (int i = 0; i < count; i++) {
+            selectedImageURLsTask.add(Tasks.forResult(Uri.parse(imageURIs.get(i))));
+            Log.d("Deleted images task", selectedImageURLsTask.get(i).getResult().toString());
+        }
+
+        for (int i = 0; i < count; i++) {
+            selectedImageURLs.add(imageURIs.get(i));
+            Log.d("Deleted images", selectedImageURLs.get(i));
+        }
     }
 
     private void showDeleteConfirmationDialog() {
+        Log.d("size of image urls task before delete", String.valueOf(selectedImageURLsTask.size()));
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         builder.setTitle("Confirm Deletion");
         builder.setMessage("Are you sure you want to delete this image?");
