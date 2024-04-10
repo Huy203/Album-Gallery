@@ -132,4 +132,9 @@ public class SelectImageActivity extends AppCompatActivity implements ImageAdapt
 //            Log.d("current uris", u);
 //        }
     }
+
+    @Override
+    public void toggleMultipleChoice(int length) {
+
+    }
 }

@@ -5,36 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <LinearLayout
-        android:id="@+id/searchLayout"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        app:layout_constraintTop_toTopOf="parent">
-
-        <androidx.appcompat.widget.SearchView
-            android:id="@+id/searchView"
-            android:layout_width="301dp"
-            android:layout_height="wrap_content"
-            android:layout_margin="8dp"
-            android:background="@drawable/search_view_bg"
-            app:iconifiedByDefault="false"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:queryHint="Enter image's name..." />
-
-        <ImageButton
-            android:id="@+id/btnCamera"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:background="?attr/selectableItemBackgroundBorderless"
-            android:contentDescription="camera"
-            android:padding="8dp"
-            android:scaleType="fitCenter"
-            android:src="@drawable/camera_icon" />
-    </LinearLayout>
-
+    <include layout="@layout/top_nav_main" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerMediaView"
@@ -47,8 +18,7 @@
         app:layout_constraintBottom_toTopOf="@+id/dividerView"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/searchLayout" />
-
+        app:layout_constraintTop_toBottomOf="@+id/top_nav_main"/>
 
     <View
         android:id="@+id/dividerView"
@@ -72,12 +42,6 @@
             android:layout_centerHorizontal="true"
             android:orientation="vertical">
 
-            <Button
-                android:id="@+id/btnPickImageFromDevice"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:padding="8dp"
-                android:text="Choose" />
 
             <Button
                 android:id="@+id/btnPickMultipleImages"

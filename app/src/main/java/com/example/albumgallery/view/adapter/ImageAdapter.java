@@ -30,15 +30,13 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> implements View.OnClickListener {
+public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> {
     private final Context context;
     private final List<String> imageURLs;
     private final List<String> ids;
     private final SparseBooleanArray selectedItems;
     private boolean isMultipleChoice = false;
     private ImageAdapterListener listener;
-
-    private List<String> selectedURIs;
 
 
     public ImageAdapter(Activity activity, List<String> imageURLs) {
@@ -47,7 +45,6 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> 
         this.selectedItems = new SparseBooleanArray();
         this.listener = (ImageAdapterListener) activity;
         this.ids = new ArrayList<>();
-        this.selectedURIs = new ArrayList<>();
     }
 
     public ImageAdapter(Activity activity, List<String> imageURLs, List<String> ids) {
@@ -56,7 +53,6 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> 
         this.selectedItems = new SparseBooleanArray();
         this.listener = (ImageAdapterListener) activity;
         this.ids = ids;
-        this.selectedURIs = new ArrayList<>();
     }
 
     @NonNull
@@ -69,7 +65,8 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         String imageURL = imageURLs.get(position);
-        holder.bind(imageURL, position);
+        holder.bind(imageURL);
+        holder.checkbox.setVisibility(isMultipleChoice ? View.VISIBLE : View.GONE); // Update visibility based on isMultipleChoice
     }
 
     public void setMultipleChoiceEnabled(boolean isMultipleChoice) {
@@ -87,27 +84,16 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> 
     public boolean toggleMultipleChoiceImagesEnabled() {
         if (listener != null) {
             setMultipleChoiceEnabled(!isMultipleChoice);
-        }
-        else{
+            notifyDataSetChanged(); // Notify adapter to update views
+        } else {
             Log.v("ImageAdapter", "toggleMultipleChoiceImagesEnabled: listener is null");
         }
-        if (getMultipleChoiceImagesEnabled()) {
-            View view = LayoutInflater.from(context).inflate(R.layout.item_image, null);
-            CheckBox checkBox = view.findViewById(R.id.checkbox);
-            checkBox.setVisibility(View.INVISIBLE);
-        }
+        Log.v("ImageAdapter", "isMultipleChoice: " + isMultipleChoice);
         return isMultipleChoice;
     }
 
     public void clearSelectedItems() {
         selectedItems.clear();
-        selectedURIs.clear();
-        notifyDataSetChanged();
-    }
-
-    @Override
-    public void onClick(View view) {
-
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {
@@ -120,12 +106,12 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> 
             super(itemView);
             imageView = itemView.findViewById(R.id.imageView);
             checkbox = itemView.findViewById(R.id.checkbox);
-            progressIndicator = (CircularProgressIndicator) itemView.findViewById(R.id.circularProgressIndicator);
+            progressIndicator = itemView.findViewById(R.id.circularProgressIndicator);
             progressIndicator.setVisibility(View.VISIBLE);
         }
 
-        public void bind(String imageURL, int position) {
-            checkbox.setChecked(selectedItems.get(position, false));
+        public void bind(String imageURL) {
+            ;
             Glide.with(context)
                     .load(Uri.parse(imageURL))
                     .listener(new RequestListener<Drawable>() {
@@ -144,28 +130,38 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> 
                     .into(imageView);
 
             itemView.setOnClickListener(view -> {
+                Log.v("ImageAdapter", "Image selected: " + getAdapterPosition());
                 if (!isMultipleChoice) {
-                    listener.handleImagePick(imageView, imageURL, position);
+                    listener.handleImagePick(imageView, imageURL, getAdapterPosition());
                 } else {
-                    toggleSelection(position, imageURL);
-                    listener.getInteractedURIs(imageURL);
-                    listener.getSelectedItemsCount(selectedItems.size());
+                    toggleSelection();
                 }
             });
 
-            checkbox.setVisibility(isMultipleChoice ? View.VISIBLE : View.INVISIBLE);
+            itemView.setOnLongClickListener(view -> {
+                Log.v("ImageAdapter", "Image selected: " + getAdapterPosition());
+                isMultipleChoice = true;
+                toggleSelection();
+                return true;
+            });
+            listener.getInteractedURIs(imageURL);
+            listener.getSelectedItemsCount(selectedItems.size());
+        }
+
+        private void toggleSelection() {
+            int position = getAdapterPosition();
+            if (selectedItems.get(position, false)) {
+                checkbox.setChecked(false);
+                checkbox.setVisibility(View.GONE);
+                selectedItems.delete(position);
+            } else {
+                checkbox.setChecked(true);
+                checkbox.setVisibility(View.VISIBLE);
+                selectedItems.put(position, true);
+            }
+            listener.toggleMultipleChoice(selectedItems.size());
         }
     }
-
-    private void toggleSelection(int position, String uri) {
-        if (selectedItems.get(position, false)) {
-            selectedItems.delete(position);
-        } else {
-            selectedItems.put(position, true);
-        }
-        notifyItemChanged(position);
-    }
-
 
     // Xử lý sắp xếp hình ảnh theo date
     public void sortImageByDate() {

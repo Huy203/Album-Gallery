@@ -4,8 +4,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:layout_marginLeft="20dp"
-    android:layout_marginRight="20dp"
     android:layout_marginTop="10dp"
+    android:layout_marginRight="20dp"
     android:layout_marginBottom="10dp"
     android:orientation="vertical">
 
@@ -13,26 +13,28 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical">
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center_vertical">
+
             <TextView
                 android:id="@+id/textViewAlbum"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:text="Albums"
+                android:layout_marginBottom="5dp"
                 android:layout_weight="1"
-                android:textStyle="bold"
+                android:text="@string/albums"
                 android:textSize="40sp"
-                android:layout_marginBottom="5dp"/>
+                android:textStyle="bold" />
         </LinearLayout>
 
         <View
             android:layout_width="match_parent"
             android:layout_height="3dp"
-            android:background="#61677A"
-            android:layout_marginBottom="20dp" />
+            android:layout_marginBottom="20dp"
+            android:background="#61677A" />
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/albumsRecyclerView"
@@ -42,26 +44,16 @@
     </LinearLayout>
 
 
-
-
-
-
-
-
-
-
-
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/btnCreateAlbum"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|right"
         android:layout_margin="16dp"
+        android:background="?attr/selectableItemBackgroundBorderless"
         android:contentDescription="@string/fab_content_desc"
         android:scaleType="fitCenter"
-        android:background="?attr/selectableItemBackgroundBorderless"
-        app:srcCompat="@drawable/baseline_add_50"
-        />
+        app:srcCompat="@drawable/baseline_add_50" />
 
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

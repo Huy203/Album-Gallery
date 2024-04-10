@@ -115,4 +115,9 @@ public class AlbumContentActivity extends AppCompatActivity implements ImageAdap
     public void getInteractedURIs(String uri) {
 
     }
+
+    @Override
+    public void toggleMultipleChoice(int count) {
+
+    }
 }

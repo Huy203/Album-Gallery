@@ -19,11 +19,7 @@
         android:theme="@style/Theme.AlbumGallery"
         android:usesCleartextTraffic="true"
         tools:targetApi="31">
-        <activity
-            android:name=".view.activity.MainFragmentController"
-            android:exported="true"
-            android:windowSoftInputMode="adjustResize" />
-        <activity android:name=".view.activity.AlbumMain" />
+
         <activity
             android:name=".MainActivity"
             android:exported="true"
@@ -35,6 +31,10 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity
+            android:name=".view.activity.MainFragmentController"
+            android:exported="true"
+            android:windowSoftInputMode="adjustResize" />
         <activity android:name=".view.activity.EditImageActivity" />
         <activity android:name=".view.activity.DetailPicture" />
         <activity android:name=".view.activity.AlbumActivity" />

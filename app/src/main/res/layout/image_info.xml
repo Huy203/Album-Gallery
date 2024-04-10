@@ -13,8 +13,9 @@
         android:layout_margin="8dp"
         android:layout_marginTop="8dp"
         android:layout_marginBottom="8dp"
-        android:gravity="left"
-        android:hint="Thêm chú thích"
+        android:gravity="start"
+        android:hint="@string/add_notice"
+        android:importantForAutofill="no"
         android:inputType="text"
         android:maxLength="20"
         android:padding="8dp"
@@ -38,9 +39,9 @@
                 android:layout_marginStart="8dp"
                 android:layout_marginTop="8dp"
                 android:layout_weight="1"
-                android:gravity="left"
+                android:gravity=""
                 android:padding="8dp"
-                android:text="Lúc 3giờ, ngày 20 tháng 2 năm 2021"
+                android:text="@string/image_created_at"
                 android:textColor="@color/black"
                 android:textSize="16sp" />
 
@@ -51,7 +52,7 @@
                 android:layout_marginTop="8dp"
                 android:gravity="start"
                 android:padding="8dp"
-                android:text="Chỉnh sửa"
+                android:text="@string/edit_time"
                 android:textColor="@color/black"
                 android:textSize="16sp" />
         </LinearLayout>
@@ -61,7 +62,6 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
-
             android:gravity="start"
             android:padding="8dp"
             android:text="Tên ảnh"
@@ -81,21 +81,21 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
             android:layout_marginTop="8dp"
-            android:gravity="left"
+            android:gravity="start"
             android:padding="8dp"
-            android:text="X MP"
+            android:text="@string/capacity"
             android:textColor="@color/black"
             android:textSize="16sp" />
 
         <TextView
-            android:id="@+id/pointDevider"
+            android:id="@+id/pointDivider"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="8dp"
             android:layout_marginTop="8dp"
-            android:gravity="left"
+            android:gravity="start"
             android:padding="8dp"
-            android:text="•"
+            android:text="@string/point_divider"
             android:textColor="@color/black"
             android:textSize="16sp" />
 
@@ -106,7 +106,7 @@
             android:layout_marginTop="8dp"
             android:gravity="start"
             android:padding="8dp"
-            android:text="width x height"
+            android:text="@string/image_size"
             android:textColor="@color/black"
             android:textSize="16sp" />
 
@@ -120,7 +120,7 @@
         android:gravity="center"
         android:onClick="addLocation"
         android:padding="8dp"
-        android:text="Thêm vị trí"
+        android:text="@string/add_location"
         android:textColor="@color/black"
         android:textSize="20sp" />
 

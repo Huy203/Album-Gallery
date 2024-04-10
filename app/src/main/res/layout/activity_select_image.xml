@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical">
@@ -14,74 +13,75 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:gravity="center_vertical"
             android:layout_marginLeft="8dp"
-            android:layout_marginRight="8dp">
+            android:layout_marginRight="8dp"
+            android:gravity="center_vertical">
+
             <ImageButton
                 android:id="@+id/backButtonSelectImageActivity"
                 android:layout_width="48dp"
                 android:layout_height="48dp"
-                android:src="@drawable/previous_button"
-                android:scaleType="fitCenter"
                 android:background="?attr/selectableItemBackgroundBorderless"
-                android:contentDescription="@string/create_album" />
+                android:contentDescription="@string/create_album"
+                android:scaleType="fitCenter"
+                android:src="@drawable/previous_button" />
+
             <TextView
                 android:id="@+id/textViewAlbum"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:text="@string/select_image"
-                android:layout_weight="1"
-                android:textStyle="bold"
-                android:textSize="40sp"
-                android:layout_marginLeft="16dp"
+                android:layout_marginStart="16dp"
                 android:layout_marginTop="8dp"
-                android:layout_marginBottom="8dp"/>
+                android:layout_marginBottom="8dp"
+                android:layout_weight="1"
+                android:text="@string/select_image"
+                android:textSize="40sp"
+                android:textStyle="bold" />
 
 
         </LinearLayout>
+
         <View
             android:layout_width="match_parent"
             android:layout_height="3dp"
-            android:background="#61677A"
             android:layout_marginLeft="20dp"
-            android:layout_marginRight="20dp"/>
+            android:layout_marginRight="20dp"
+            android:background="#61677A" />
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:orientation="vertical"
-            android:layout_margin="16dp">
+            android:layout_margin="16dp"
+            android:orientation="vertical">
+
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/recyclerViewForSelectImageActivity"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
-                android:layout_weight="1"
                 android:layout_marginBottom="16dp"
-                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"/>
+                android:layout_weight="1"
+                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
+
             <TextView
                 android:id="@+id/numberOfSelectedImagesInSelectActivity"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
-                android:text="0 images selected"
+                android:text="@string/number_of_selected_images"
                 android:textColor="@android:color/black"
-                android:textSize="18sp"/>
-
-
+                android:textSize="18sp" />
         </LinearLayout>
-
-
     </LinearLayout>
 
     <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
         android:id="@+id/btnCreateAlbum"
         android:layout_width="wrap_content"
         android:layout_height="75dp"
-        android:layout_margin="16dp"
         android:layout_gravity="bottom|end"
+        android:layout_margin="16dp"
         android:contentDescription="@string/confirm_create_album"
         android:text="@string/confirm_create_album"
-        android:textSize="17dp"
-        app:icon="@drawable/baseline_add_24"/>
+        android:textSize="17sp"
+        app:icon="@drawable/baseline_add_24" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

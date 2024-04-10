@@ -38,7 +38,7 @@
                         android:id="@+id/nameTextView"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="7th February, 2024"
+                        android:text="@string/image_name"
                         android:textSize="20sp"
                         android:textStyle="bold"
                         app:layout_constraintStart_toEndOf="@id/backButton"
@@ -49,7 +49,7 @@
                         android:id="@+id/timeTextView"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="10:24"
+                        android:text="@string/image_created_at"
                         android:textSize="16sp"
                         app:layout_constraintStart_toStartOf="@id/nameTextView"
                         app:layout_constraintTop_toBottomOf="@id/nameTextView" />
@@ -78,10 +78,7 @@
                     app:iconTint="@color/black" />
             </LinearLayout>
 
-
         </com.google.android.flexbox.FlexboxLayout>
-
     </com.google.android.material.appbar.AppBarLayout>
-
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

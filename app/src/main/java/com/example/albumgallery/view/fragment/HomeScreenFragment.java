@@ -94,22 +94,20 @@ public class HomeScreenFragment extends Fragment {
 
     private void setupButtons() {
         view.findViewById(R.id.btnCamera).setOnClickListener(v -> openCamera());
-        view.findViewById(R.id.btnPickImageFromDevice).setOnClickListener(v -> pickImagesFromDevice());
-        view.findViewById(R.id.btnPickMultipleImages).setOnClickListener(v -> showDeleteConfirmationDialog());
-        view.findViewById(R.id.btnDeleteMultipleImages).setOnClickListener(v -> toggleMultipleChoiceImages(view.findViewById(R.id.btnDeleteMultipleImages)));
+        view.findViewById(R.id.action_add).setOnClickListener(v -> pickImagesFromDevice());
+        view.findViewById(R.id.btnDeleteMultipleImages).setOnClickListener(v -> showDeleteConfirmationDialog());
     }
 
     private void pickImagesFromDevice() {
         mainController.getImageController().pickMultipleImages(bgListener);
     }
 
-    private void toggleMultipleChoiceImages(Button btnPickMultipleImages) {
-        if (imageAdapter.toggleMultipleChoiceImagesEnabled()) {
-            btnPickMultipleImages.setText("Cancel");
+    public void toggleMultipleChoice(int length) {
+        if (imageAdapter.getMultipleChoiceImagesEnabled()) {
             numberOfImagesSelected.setVisibility(TextView.VISIBLE);
             numberOfImagesSelected.setText("0 images selected");
-        } else {
-            btnPickMultipleImages.setText("Select");
+        }
+        if(length == 0) {
             numberOfImagesSelected.setVisibility(TextView.GONE);
             imageAdapter.clearSelectedItems();
         }
@@ -142,7 +140,7 @@ public class HomeScreenFragment extends Fragment {
     public void updateUI() {
         imageURIs.clear();
         // lấy ảnh sort theo date (mới nhất xếp trước).
-//       imageURIs.addAll(mainController.getImageController().getAllImageURLsSortByDate());
+//        imageURIs.addAll(mainController.getImageController().getAllImageURLsSortByDate());
         imageURIs.addAll(mainController.getImageController().getAllImageURLs());
         imageAdapter = new ImageAdapter(getActivity(), imageURIs);
         recyclerMediaView.setLayoutManager(new GridLayoutManager(getContext(), 3));

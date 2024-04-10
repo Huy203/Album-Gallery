@@ -2,14 +2,19 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item
         android:id="@+id/photos"
-        android:title="Photos"
+        android:title="@string/photos"
         android:icon="@drawable/photo"/>
     <item
-        android:title="Albums"
+        android:title="@string/albums"
         android:id="@+id/albums"
         android:icon="@drawable/album"/>
     <item
         android:id="@+id/favorites"
-        android:title="Favorites"
+        android:title="@string/favorites"
         android:icon="@drawable/favourite"/>
+    <item
+        android:id="@+id/searchbar"
+        android:title="@string/search"
+        android:icon="@drawable/search_black"/>
+
 </menu>

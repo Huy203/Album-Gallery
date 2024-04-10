@@ -28,6 +28,7 @@ import java.util.Arrays;
 public class MainFragmentController extends AppCompatActivity implements BackgroundProcessingCallback, ImageAdapterListener {
     ActivityFragmentControllerBinding binding;
     private boolean isBackgroundTaskCompleted = true;
+    private boolean isMultipleChoiceEnabled = false;
 
     private ArrayList<Fragment> fragments = new ArrayList<>(Arrays.asList(new HomeScreenFragment(), new AlbumsMainFragment(), new FavoriteFragment()));
 
@@ -35,9 +36,7 @@ public class MainFragmentController extends AppCompatActivity implements Backgro
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        getSupportFragmentManager().beginTransaction()
-                .add(R.id.fragment_container, fragments.get(0))
-                .commit();
+        getSupportFragmentManager().beginTransaction().add(R.id.fragment_container, fragments.get(0)).commit();
 
         binding = ActivityFragmentControllerBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
@@ -140,5 +139,13 @@ public class MainFragmentController extends AppCompatActivity implements Backgro
     @Override
     public void getInteractedURIs(String uri) {
 
+    }
+
+    @Override
+    public void toggleMultipleChoice(int length) {
+        HomeScreenFragment fragment = (HomeScreenFragment) getSupportFragmentManager().findFragmentById(R.id.fragment_container);
+        if (fragment != null) {
+            fragment.toggleMultipleChoice(length);
+        }
     }
 }

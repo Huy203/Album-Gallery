@@ -8,13 +8,13 @@ import android.widget.Button;
 import androidx.activity.ComponentActivity;
 import androidx.annotation.Nullable;
 
-import com.example.albumgallery.view.activity.MainFragmentController;
 import com.example.albumgallery.view.activity.LoginScreen;
-import com.example.albumgallery.view.activity.CropImageActivity;
+import com.example.albumgallery.view.activity.MainFragmentController;
 
 public class MainActivity extends ComponentActivity {
 
     DatabaseManager db;
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -23,7 +23,6 @@ public class MainActivity extends ComponentActivity {
         final Button button = findViewById(R.id.testBtn);
         final Button editButton = findViewById(R.id.editImageButton);
         button.setOnClickListener(v -> {
-//            Intent intent = new Intent(this, HomeScreen.class);
             Intent intent = new Intent(this, MainFragmentController.class);
             startActivity(intent);
         });
