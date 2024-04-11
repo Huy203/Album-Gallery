@@ -1,10 +1,11 @@
 package com.example.albumgallery.view.activity;
 
 import static com.example.albumgallery.utils.Constant.REQUEST_CODE_EDIT_IMAGE;
-import static com.example.albumgallery.utils.Utilities.convertFromBitmapToURI;
+import static com.example.albumgallery.utils.Utilities.convertFromBitmapToUri;
 
 import android.annotation.SuppressLint;
 import android.app.WallpaperManager;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.ColorStateList;
@@ -191,7 +192,7 @@ public class DetailPicture extends AppCompatActivity implements ImageInfoListene
     }
 
     private void shareImageAndText(Bitmap bitmap) {
-        Uri uri = convertFromBitmapToURI(this, bitmap);
+        Uri uri = convertFromBitmapToUri(this, bitmap);
         Intent intent = new Intent(Intent.ACTION_SEND);
 
         // putting uri of image to be shared
@@ -219,6 +220,7 @@ public class DetailPicture extends AppCompatActivity implements ImageInfoListene
             public void onClick(DialogInterface dialog, int which) {
                 // Call deleteSelectedImage() method from ImageController
                 // mainController.getImageController().deleteSelectedImage(uri);
+                finish();
 
                 Log.d("update delete successfully 1", "ok");
 
@@ -274,7 +276,7 @@ public class DetailPicture extends AppCompatActivity implements ImageInfoListene
 
     public void backAction(View view) {
         Intent intent = new Intent();
-        intent.putExtra("updateUI", false);
+        intent.putExtra("update", false);
         setResult(RESULT_OK, intent);
         supportFinishAfterTransition();
     }

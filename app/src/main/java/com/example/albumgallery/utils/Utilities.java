@@ -38,7 +38,7 @@ public class Utilities {
         return null;
     }
 
-    public static Bitmap imageToBitmap(String uri) {
+    public static Bitmap convertFromUriToBitmap(String uri) {
         try {
             URL url = new URL(uri);
             return BitmapFactory.decodeStream(url.openConnection().getInputStream());
@@ -48,7 +48,7 @@ public class Utilities {
         return null;
     }
 
-    public static Uri convertFromBitmapToURI(Context inContext, Bitmap inImage) {
+    public static Uri convertFromBitmapToUri(Context inContext, Bitmap inImage) {
         String imageName = "IMG_" + System.currentTimeMillis() + ".jpg";
         ByteArrayOutputStream bytes = new ByteArrayOutputStream();
         inImage.compress(Bitmap.CompressFormat.JPEG, 100, bytes);

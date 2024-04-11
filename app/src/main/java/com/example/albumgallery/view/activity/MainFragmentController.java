@@ -1,7 +1,7 @@
 package com.example.albumgallery.view.activity;
 
 import static com.example.albumgallery.utils.Constant.REQUEST_CODE_PICK_MULTIPLE_IMAGES;
-import static com.example.albumgallery.utils.Utilities.convertFromBitmapToURI;
+import static com.example.albumgallery.utils.Utilities.convertFromBitmapToUri;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
@@ -17,13 +17,11 @@ import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityOptionsCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
 import com.example.albumgallery.R;
-import com.example.albumgallery.controller.MainController;
 import com.example.albumgallery.databinding.ActivityFragmentControllerBinding;
 import com.example.albumgallery.view.fragment.AlbumsMainFragment;
 import com.example.albumgallery.view.fragment.BinFragment;
@@ -42,7 +40,7 @@ public class MainFragmentController extends AppCompatActivity implements Backgro
     private static final int CAMERA_REQUEST_CODE = 1000;
     ActivityFragmentControllerBinding binding;
     private boolean isBackgroundTaskCompleted = true;
-    private ArrayList<Fragment> fragments = new ArrayList<>(Arrays.asList(new HomeScreenFragment(), new AlbumsMainFragment(), new FavoriteFragment()));
+    private ArrayList<Fragment> fragments = new ArrayList<>(Arrays.asList(new HomeScreenFragment(), new AlbumsMainFragment(), new FavoriteFragment(), new BinFragment()));
     private Fragment currentFragment;
 
     @Override
@@ -65,7 +63,6 @@ public class MainFragmentController extends AppCompatActivity implements Backgro
         }
 
 
-
         binding.bottomNavigationView.setOnItemSelectedListener(item -> {
             int itemId = item.getItemId();
             if (itemId == R.id.photos) {
@@ -74,8 +71,7 @@ public class MainFragmentController extends AppCompatActivity implements Backgro
                 replaceFragment(fragments.get(1));
             } else if (itemId == R.id.favorites) {
                 replaceFragment(fragments.get(2));
-            }
-            else if (itemId == R.id.bin) {
+            } else if (itemId == R.id.bin) {
                 replaceFragment(fragments.get(3));
             }
             return true;
@@ -88,15 +84,18 @@ public class MainFragmentController extends AppCompatActivity implements Backgro
         Toast.makeText(this, "onResume", Toast.LENGTH_SHORT).show();
         super.onResume();
         Fragment currentFragment = getSupportFragmentManager().findFragmentById(R.id.fragment_container);
-        HomeScreenFragment fragment = null;
-        if(currentFragment instanceof HomeScreenFragment) {
-            fragment = (HomeScreenFragment) getSupportFragmentManager().findFragmentById(R.id.fragment_container);
-        }
-        if (fragment != null) {
+
+        if (currentFragment instanceof HomeScreenFragment) {
             if (isBackgroundTaskCompleted)
-                fragment.updateUI();
-        } else {
-            Log.v("MainFragmentController", "fragment is null");
+                ((HomeScreenFragment)currentFragment).updateUI();
+        }
+        else if (currentFragment instanceof FavoriteFragment) {
+//            if (isBackgroundTaskCompleted)
+//                ((FavoriteFragment)currentFragment).updateUI();
+        }
+        else if (currentFragment instanceof BinFragment) {
+            if (isBackgroundTaskCompleted)
+                ((BinFragment)currentFragment).updateUI();
         }
     }
 
@@ -129,50 +128,54 @@ public class MainFragmentController extends AppCompatActivity implements Backgro
     @Override
     public void onBackgroundTaskCompleted() {
         isBackgroundTaskCompleted = true;
-        Fragment currentFragment = getSupportFragmentManager().findFragmentById(R.id.fragment_container);
-        if (currentFragment instanceof HomeScreenFragment) {
-            HomeScreenFragment fragment = (HomeScreenFragment) currentFragment;
+        Log.v("MainFragmentController", "Background task completed");
+        HomeScreenFragment fragment = (HomeScreenFragment) getSupportFragmentManager().findFragmentById(R.id.fragment_container);
+        if (fragment != null && fragment.isAdded()) {
+            Log.v("MainFragmentController", "Fragment: " + fragment);
             fragment.updateUI();
         }
-        else if (currentFragment instanceof BinFragment) {
-            BinFragment fragment = (BinFragment) currentFragment;
-            fragment.updateUI();
-        }
+//        else if (currentFragment instanceof BinFragment) {
+//            BinFragment fragment = (BinFragment) currentFragment;
+//            fragment.updateUI();
+//        }
         isBackgroundTaskCompleted = false;
     }
 
 
+//    @Override
+//    public void getSelectedItemsCount(int count) {
+//        ((TextView)findViewById(R.id.numberOfSelectedImages)).setText(count + " items selected");
+//        Fragment currentFragment = getSupportFragmentManager().findFragmentById(R.id.fragment_container);
+//
+//        if (currentFragment instanceof HomeScreenFragment) {
+//            Log.d("home fragment", "ok");
+//            ((HomeScreenFragment) currentFragment).getSelectedItemsCount(count);
+//        }
+//        else if (currentFragment instanceof BinFragment) {
+//            Log.d("bin fragment", "ok");
+//            ((BinFragment) currentFragment).getSelectedItemsCount(count);
+//        }
+//    }
+
     @Override
-    public void getSelectedItemsCount(int count) {
-        Fragment currentFragment = getSupportFragmentManager().findFragmentById(R.id.fragment_container);
+    public void getSelectedItemsCount() {
 
-        if (currentFragment instanceof HomeScreenFragment) {
-            Log.d("home fragment", "ok");
-            ((HomeScreenFragment) currentFragment).getSelectedItemsCount(count);
-        }
-        else if (currentFragment instanceof BinFragment) {
-            Log.d("bin fragment", "ok");
-            ((BinFragment) currentFragment).getSelectedItemsCount(count);
-        }
     }
-
 
     @Override
     public void handleImagePick(View itemView, String uri, int position) {
         Fragment currentFragment = getSupportFragmentManager().findFragmentById(R.id.fragment_container);
-        if(currentFragment instanceof HomeScreenFragment) {
+        if (currentFragment instanceof HomeScreenFragment) {
             HomeScreenFragment fragment = (HomeScreenFragment) getSupportFragmentManager().findFragmentById(R.id.fragment_container);
             if (fragment != null) {
                 fragment.handleImagePick(itemView, uri, position);
             }
-        }
-        else if (currentFragment instanceof FavoriteFragment) {
+        } else if (currentFragment instanceof FavoriteFragment) {
             FavoriteFragment favoriteFragment = (FavoriteFragment) getSupportFragmentManager().findFragmentById(R.id.fragment_container);
             if (favoriteFragment != null) {
                 favoriteFragment.handleImagePick(itemView, uri, position);
             }
-        }
-        else if (currentFragment instanceof BinFragment) {
+        } else if (currentFragment instanceof BinFragment) {
             BinFragment binFragment = (BinFragment) getSupportFragmentManager().findFragmentById(R.id.fragment_container);
             if (binFragment != null) {
                 binFragment.handleDeletedImagePick(itemView, uri, position);
@@ -184,13 +187,15 @@ public class MainFragmentController extends AppCompatActivity implements Backgro
     public void getInteractedURIs(String uri) {
 
     }
-
+    /**
+     * This method is used to toggle multiple choice mode in the fragment
+     */
     @Override
-    public void toggleMultipleChoice(int length) {
-        getSelectedItemsCount(length);
+    public void toggleMultipleChoice() {
+//        getSelectedItemsCount(length);
         HomeScreenFragment fragment = (HomeScreenFragment) getSupportFragmentManager().findFragmentById(R.id.fragment_container);
         if (fragment != null) {
-            changeBottomMenu(fragment.toggleMultipleChoice(length));
+            changeBottomMenu(fragment.toggleMultipleChoice());
         }
     }
 
@@ -240,7 +245,6 @@ public class MainFragmentController extends AppCompatActivity implements Backgro
     }
 
     public void deleteAction(View view) {
-        Log.v("MainFragmentController", "Delete action");
         HomeScreenFragment fragment = (HomeScreenFragment) getSupportFragmentManager().findFragmentById(R.id.fragment_container);
         if (fragment != null && fragment.isAdded()) {
             fragment.ActivityToFragListener("Delete");
@@ -249,7 +253,7 @@ public class MainFragmentController extends AppCompatActivity implements Backgro
         }
     }
 
-    public void cameraAction(View view){
+    public void cameraAction(View view) {
         Log.v("MainFragmentController", "Camera action");
         HomeScreenFragment fragment = (HomeScreenFragment) getSupportFragmentManager().findFragmentById(R.id.fragment_container);
         if (fragment != null && fragment.isAdded()) {
@@ -259,7 +263,7 @@ public class MainFragmentController extends AppCompatActivity implements Backgro
         }
     }
 
-    public void selectAction(View view){
+    public void selectAction(View view) {
         Intent intent = new Intent(Intent.ACTION_GET_CONTENT, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
         intent.setAction(Intent.ACTION_PICK);
         intent.setType("image/*");
@@ -267,13 +271,35 @@ public class MainFragmentController extends AppCompatActivity implements Backgro
         this.startActivityForResult(intent, REQUEST_CODE_PICK_MULTIPLE_IMAGES);
     }
 
+    @SuppressLint("SetTextI18n")
     @Override
     public void onFragmentAction(String action, Object data) {
+        Log.v("MainFragmentController", "Action: " + action);
+        switch (action) {
+            case "Share":
+                shareImages((ArrayList<Uri>) data);
+                break;
+            case "DeleteImage":
+                HomeScreenFragment fragment = (HomeScreenFragment) getSupportFragmentManager().findFragmentById(R.id.fragment_container);
+                if (fragment != null) {
+                    fragment.ActivityToFragListener("Delete");
+                }
+                break;
+            case "ShowMultipleChoice":
+                int count = (int) data;
+                ((TextView) findViewById(R.id.numberOfSelectedImages)).setText(count + " items selected");
+        }
+    }
 
+    private void shareImages(ArrayList<Uri> imageUris) {
+        Intent intent = new Intent(Intent.ACTION_SEND_MULTIPLE);
+        intent.putParcelableArrayListExtra(Intent.EXTRA_STREAM, imageUris);
+        intent.setType("image/*");
+        startActivity(Intent.createChooser(intent, "Share images"));
     }
 
     private void shareImageAndText(Bitmap bitmap, Context context) {
-        Uri uri = convertFromBitmapToURI(this, bitmap);
+        Uri uri = convertFromBitmapToUri(this, bitmap);
         Intent intent = new Intent(Intent.ACTION_SEND);
 
         // putting uri of image to be shared
@@ -291,6 +317,7 @@ public class MainFragmentController extends AppCompatActivity implements Backgro
         // calling startactivity() to share
         startActivity(Intent.createChooser(intent, "Share Via"));
     }
+
     public void onPointerCaptureChanged(boolean hasCapture) {
         super.onPointerCaptureChanged(hasCapture);
     }

@@ -352,16 +352,22 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return data;
     }
 
-    public List<String> getAllRef(String table){
+    public List<String> getAllRef(String table, String where) {
         List<String> data = new ArrayList<>();
         SQLiteDatabase db = getWritableDatabase();
-        Cursor cursor = db.rawQuery("SELECT ref FROM " + table, null);
-        if(cursor.moveToFirst()){
-            while(!cursor.isAfterLast()){
+        Cursor cursor ;
+        if(where == null) {
+            cursor = db.rawQuery("SELECT ref FROM " + table, null);
+        } else {
+            cursor = db.rawQuery("SELECT ref FROM " + table + " WHERE " + where, null);
+        }
+        if (cursor.moveToFirst()) {
+            while (!cursor.isAfterLast()) {
                 data.add(cursor.getString(0));
                 cursor.moveToNext();
             }
         }
+        cursor.close();
         return data;
     }
     public boolean checkExist(String table, String s) {

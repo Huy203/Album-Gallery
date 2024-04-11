@@ -6,8 +6,8 @@ import java.util.List;
 
 public interface ImageAdapterListener {
 
-    void getSelectedItemsCount(int count);
+    void getSelectedItemsCount();
     void handleImagePick(View itemView, String uri, int position);
     void getInteractedURIs(String uri);
-    void toggleMultipleChoice(int length);
+    void toggleMultipleChoice();
 }

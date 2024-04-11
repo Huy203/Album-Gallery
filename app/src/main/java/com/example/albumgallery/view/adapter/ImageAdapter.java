@@ -25,18 +25,15 @@ import com.example.albumgallery.R;
 import com.example.albumgallery.view.listeners.ImageAdapterListener;
 import com.google.android.material.progressindicator.CircularProgressIndicator;
 
-import java.io.File;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> {
     private final Context context;
-    private final List<String> imageURLs;
-    private final List<String> ids;
-    private final SparseBooleanArray selectedItems;
-    private boolean isMultipleChoice = false;
-    private ImageAdapterListener listener;
+    private final List<String> imageURLs;  // List of image URLs
+    private final SparseBooleanArray selectedItems; // SparseBooleanArray to store selected items
+    private boolean isMultipleChoice = false; // Flag to determine if multiple choice is enabled
+    private ImageAdapterListener listener; // Listener to handle image selection
 
 
     public ImageAdapter(Activity activity, List<String> imageURLs) {
@@ -44,15 +41,6 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> 
         this.imageURLs = imageURLs;
         this.selectedItems = new SparseBooleanArray();
         this.listener = (ImageAdapterListener) activity;
-        this.ids = new ArrayList<>();
-    }
-
-    public ImageAdapter(Activity activity, List<String> imageURLs, List<String> ids) {
-        this.context = activity;
-        this.imageURLs = imageURLs;
-        this.selectedItems = new SparseBooleanArray();
-        this.listener = (ImageAdapterListener) activity;
-        this.ids = ids;
     }
 
     @NonNull
@@ -64,9 +52,14 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> 
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        String imageURL = imageURLs.get(position);
+        String imageURL = getImageURLs().get(position);
         holder.bind(imageURL);
         holder.checkbox.setVisibility(isMultipleChoice ? View.VISIBLE : View.GONE); // Update visibility based on isMultipleChoice
+    }
+
+    @Override
+    public int getItemCount() {
+        return getImageURLs().size();
     }
 
     public void setMultipleChoiceEnabled(boolean isMultipleChoice) {
@@ -77,8 +70,23 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> 
         return isMultipleChoice;
     }
 
-    public int getItemCount() {
-        return imageURLs.size();
+    public List<String> getImageURLs() {
+        return imageURLs;
+    }
+
+    public SparseBooleanArray getSelectedItems() {
+        return selectedItems;
+    }
+
+    public List<String> getSelectedImageURLs() {
+        List<String> selectedImageURLs = new ArrayList<>();
+        for (int i = 0; i < getSelectedItems().size(); i++) {
+            int key = getSelectedItems().keyAt(i);
+            if (getSelectedItems().get(key)) {
+                selectedImageURLs.add(getImageURLs().get(key));
+            }
+        }
+        return selectedImageURLs;
     }
 
     public boolean toggleMultipleChoiceImagesEnabled() {
@@ -93,7 +101,7 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> 
     }
 
     public void clearSelectedItems() {
-        selectedItems.clear();
+        getSelectedItems().clear();
         isMultipleChoice = false;
     }
 
@@ -129,8 +137,9 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> 
                     })
                     .into(imageView);
 
+            checkbox.setOnClickListener(view -> toggleSelection());
+
             itemView.setOnClickListener(view -> {
-                Log.v("ImageAdapter", "Image selected: " + getAdapterPosition());
                 if (!isMultipleChoice) {
                     listener.handleImagePick(imageView, imageURL, getAdapterPosition());
                 } else {
@@ -138,13 +147,7 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> 
                 }
             });
 
-            checkbox.setOnClickListener(view -> {
-                Log.v("ImageAdapter", "Checkbox selected: " + getAdapterPosition());
-                toggleSelection();
-            });
-
             itemView.setOnLongClickListener(view -> {
-                Log.v("ImageAdapter", "Image selected: " + getAdapterPosition());
                 isMultipleChoice = true;
                 toggleSelection();
                 return true;
@@ -154,28 +157,27 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> 
 
         private void toggleSelection() {
             int position = getAdapterPosition();
-            if (selectedItems.get(position, false)) {
+            if (getSelectedItems().get(position, false)) {
                 checkbox.setChecked(false);
                 checkbox.setVisibility(View.GONE);
-                selectedItems.delete(position);
+                getSelectedItems().delete(position);
             } else {
                 checkbox.setChecked(true);
                 checkbox.setVisibility(View.VISIBLE);
-                selectedItems.put(position, true);
+                getSelectedItems().put(position, true);
             }
-            listener.toggleMultipleChoice(selectedItems.size());
+            listener.toggleMultipleChoice();
         }
     }
-
-    // Xử lý sắp xếp hình ảnh theo date
-    public void sortImageByDate() {
-        Collections.sort(imageURLs, (path_1, path_2) -> Long.compare(getImageDate(path_1), getImageDate(path_2)));
-        notifyDataSetChanged();
-    }
-
-    private long getImageDate(String imageURL) {
-        File imageFile = new File(imageURL);
-        return imageFile.exists() ? imageFile.lastModified() : 0;
-    }
-
+//
+//    // Xử lý sắp xếp hình ảnh theo date
+//    public void sortImageByDate() {
+//        Collections.sort(getImageURLs(), (path_1, path_2) -> Long.compare(getImageDate(path_1), getImageDate(path_2)));
+//        notifyDataSetChanged();
+//    }
+//
+//    private long getImageDate(String imageURL) {
+//        File imageFile = new File(imageURL);
+//        return imageFile.exists() ? imageFile.lastModified() : 0;
+//    }
 }

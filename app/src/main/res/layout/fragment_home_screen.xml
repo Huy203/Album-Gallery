@@ -37,24 +37,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerHorizontal="true"
-            android:orientation="vertical">
-
-
-            <Button
-                android:id="@+id/btnPickMultipleImages"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:padding="8dp"
-                android:text="Select" />
-
-            <Button
-                android:id="@+id/btnDeleteMultipleImages"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:padding="8dp"
-                android:text="Delete" />
-
-        </LinearLayout>
+            android:orientation="vertical"/>
     </RelativeLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

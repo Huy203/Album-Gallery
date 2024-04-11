@@ -27,7 +27,6 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.albumgallery.R;
 import com.example.albumgallery.controller.MainController;
 import com.example.albumgallery.view.activity.DetailPicture;
-import com.example.albumgallery.view.activity.MainFragmentController;
 import com.example.albumgallery.view.adapter.ImageAdapter;
 import com.example.albumgallery.view.listeners.BackgroundProcessingCallback;
 import com.example.albumgallery.view.listeners.FragToActivityListener;
@@ -79,7 +78,6 @@ public class HomeScreenFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        Log.v("HomeScreenFragment", "onViewCreated");
         initializeVariables(view);
         setupButtons();
         updateUI();
@@ -88,7 +86,6 @@ public class HomeScreenFragment extends Fragment {
     private void initializeVariables(View view) {
         this.view = view;
         mainController = new MainController(getActivity());
-        Log.v("HomeScreenFragment", "initializeVariables" + mainController);
         imageURIs = new ArrayList<>();
         selectedImageURLs = new ArrayList<>();
         selectedImageURLsTask = new ArrayList<>();
@@ -113,7 +110,11 @@ public class HomeScreenFragment extends Fragment {
 ////        mainController.getImageController().pickMultipleImages(bgListener);
 //    }
 
-    public boolean toggleMultipleChoice(int length) {
+    public boolean toggleMultipleChoice() {
+        int length = imageAdapter.getSelectedItems().size(); // get the number of selected items
+        fragToActivityListener.onFragmentAction("ShowMultipleChoice", length);
+
+        // if no items are selected, clear the selected items and return false
         if (length == 0) {
             imageAdapter.clearSelectedItems();
             return false;
@@ -123,7 +124,6 @@ public class HomeScreenFragment extends Fragment {
 
     @SuppressLint("SetTextI18n")
     public void getSelectedItemsCount(int count) {
-
         for (int i = 0; i < count; i++) {
             selectedImageURLsTask.add(Tasks.forResult(Uri.parse(imageURIs.get(i))));
             Log.d("Deleted images task", selectedImageURLsTask.get(i).getResult().toString());
@@ -160,10 +160,11 @@ public class HomeScreenFragment extends Fragment {
     }
 
     public void updateUI() {
+        Log.v("HomeScreenFragment", "updateUI");
         imageURIs.clear();
         // lấy ảnh sort theo date (mới nhất xếp trước).
 //        imageURIs.addAll(mainController.getImageController().getAllImageURLsSortByDate());
-        imageURIs.addAll(mainController.getImageController().getAllImageURLs());
+        imageURIs.addAll(mainController.getImageController().getAllImageURLsUndeleted());
         imageAdapter = new ImageAdapter(getActivity(), imageURIs);
         recyclerMediaView.setLayoutManager(new GridLayoutManager(getContext(), 3));
         recyclerMediaView.setAdapter(imageAdapter);
@@ -174,14 +175,20 @@ public class HomeScreenFragment extends Fragment {
         if (isAdded() && getActivity() != null) {
             if (!getActivity().isFinishing()) {
                 getActivity().runOnUiThread(() -> {
+
                     AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
                     Log.v("HomeScreenFragment", "showDeleteConfirmationDialog" + getActivity());
 
                     builder.setTitle("Confirm Deletion");
                     builder.setMessage("Are you sure you want to delete this image?");
+
                     builder.setPositiveButton("Delete", (dialog, which) -> {
-                        this.mainController.getImageController().deleteSelectedImageAtHomeScreeen(selectedImageURLsTask);
+                        for (String uri : imageAdapter.getSelectedImageURLs()) {
+                            mainController.getImageController().deleteSelectedImage(uri);
+                        }
+//                        this.mainController.getImageController().deleteSelectedImageAtHomeScreeen(selectedImageURLsTask);
                     });
+
                     builder.setNegativeButton("Cancel", null);
                     builder.show();
                 });
@@ -230,20 +237,30 @@ public class HomeScreenFragment extends Fragment {
         return selectedImageURLsTask;
     }
 
+
     public void ActivityToFragListener(String action) {
         switch (action) {
             case "Delete":
+                imageAdapter.getSelectedImageURLs();
                 showDeleteConfirmationDialog();
                 break;
-            case "Share":
-//                Intent intent = new Intent(getActivity(), MainFragmentController.class);
-//                intent.putExtra("key", data); // Replace "key" with your desired key
-//                getActivity().startActivity(intent);
+//            case "Share":
+////                Intent intent = new Intent(getActivity(), MainFragmentController.class);
+////                intent.putExtra("key", data); // Replace "key" with your desired key
+////                getActivity().startActivity(intent);
             case "Camera":
                 openCamera();
                 break;
             case "Select":
 //                pickImagesFromDevice();
+                break;
+            case "Share":
+                List<Uri> tempUri = new ArrayList<>();
+                for (String url : imageAdapter.getSelectedImageURLs()) {
+                    tempUri.add(Uri.parse(url));
+                }
+                // Frag to activity listener
+                fragToActivityListener.onFragmentAction("Share", tempUri);
                 break;
         }
     }
