@@ -6,10 +6,13 @@ import android.content.Intent;
 import android.media.Image;
 import android.net.Uri;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.Nullable;
@@ -33,6 +36,9 @@ import com.example.albumgallery.view.fragment.AlbumInfo;
 import com.example.albumgallery.view.fragment.ImageInfo;
 import com.example.albumgallery.view.listeners.ImageAdapterListener;
 import com.google.android.gms.tasks.Tasks;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
+import com.google.android.material.snackbar.Snackbar;
+import com.google.android.material.textfield.TextInputEditText;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -199,6 +205,60 @@ public class AlbumContentActivity extends AppCompatActivity implements ImageAdap
         isAlbumInfoVisible = !isAlbumInfoVisible;
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
         Log.v("AlbumContent", "toggleAlbumInfo: " + getSupportFragmentManager().findFragmentById(R.id.albumInfo).getView().getVisibility());
+        Button btnRemovePassword = (Button) view.findViewById(R.id.btnRemovePassword);
+        LinearLayout setPasswordField = (LinearLayout) view.findViewById(R.id.setPasswordField);
+        String album_pw = mainController.getAlbumController().getPasswordByAlbumName(albumName);
+        btnRemovePassword.setVisibility(album_pw.isEmpty() ? View.GONE : View.VISIBLE);
+        setPasswordField.setVisibility(album_pw.isEmpty() ? View.VISIBLE : View.GONE);
+        btnRemovePassword.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(AlbumContentActivity.this);
+                builder.setTitle("Are you sure to remove password ?")
+                        .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {}
+                        })
+                        .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                mainController.getAlbumController().removeAlbumPasswordByName(albumName);
+                                btnRemovePassword.setVisibility(View.GONE);
+                                setPasswordField.setVisibility(View.VISIBLE);
+                                Snackbar.make(view, "Password has been removed", Snackbar.LENGTH_SHORT).show();
+                            }
+                        });
+                builder.show();
+            }
+        });
+
+        TextInputEditText passwordInputAlbumInfo = (TextInputEditText) findViewById(R.id.passwordInputAlbumInfo);
+        Button applyPassword = (Button) findViewById(R.id.applyPasswordAlbumInfo);
+        passwordInputAlbumInfo.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {}
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {}
+            @Override
+            public void afterTextChanged(Editable editable) {
+                if(editable.toString().trim().length() > 0) {
+                    applyPassword.setEnabled(true);
+                } else {
+                    applyPassword.setEnabled(false);
+                }
+            }
+        });
+        applyPassword.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                String password = passwordInputAlbumInfo.getText().toString().trim();
+                mainController.getAlbumController().update("password", password, "name = " + "'" + albumName + "'");
+                setPasswordField.setVisibility(View.GONE);
+                btnRemovePassword.setVisibility(View.VISIBLE);
+            }
+        });
+
+
         if (isAlbumInfoVisible) {
             view.setVisibility(View.VISIBLE);
             transaction.setCustomAnimations(R.anim.slide_up, R.anim.slide_down);
