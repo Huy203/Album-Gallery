@@ -13,8 +13,7 @@
         android:title="@string/favorites"
         android:icon="@drawable/favourite"/>
     <item
-        android:id="@+id/searchbar"
-        android:title="@string/search"
-        android:icon="@drawable/search_black"/>
-
+        android:id="@+id/bin"
+        android:title="Bin"
+        android:icon="@drawable/trash_bin"/>
 </menu>

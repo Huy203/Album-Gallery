@@ -37,6 +37,7 @@
             android:windowSoftInputMode="adjustResize" />
         <activity android:name=".view.activity.EditImageActivity" />
         <activity android:name=".view.activity.DetailPicture" />
+        <activity android:name=".view.activity.DetailDeletedPicture" />
         <activity android:name=".view.activity.AlbumActivity" />
         <activity android:name=".view.activity.LoginScreen" />
         <activity android:name=".view.activity.RegisterScreen" />

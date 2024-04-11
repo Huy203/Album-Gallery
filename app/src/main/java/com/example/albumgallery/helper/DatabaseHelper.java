@@ -29,6 +29,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public static final String VIDEO_TABLE = "Video";
     public static final String VIDEO_ALBUM_TABLE = "Video_Album";
     public static final String VIDEO_TAG_TABLE = "Video_Tag";
+    public static final String TRASH_TABLE = "Trash";
+    public static final String IMAGE_TRASH_TABLE = "Image_Trash";
+    public static final String VIDEO_TRASH_TABLE = "Video_Trash";
 
     public DatabaseHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -117,6 +120,18 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                     "    video_id INTEGER REFERENCES " + VIDEO_TABLE + "(id),\n" +
                     "    tag_id INTEGER REFERENCES " + TAG_TABLE + "(id)\n" +
                     ");");
+            db.execSQL("CREATE TABLE " + TRASH_TABLE + "(\n" +
+                    "    id INTEGER PRIMARY KEY AUTOINCREMENT,\n" +
+                    "    capacity INTEGER\n" +
+                    ");");
+            db.execSQL("CREATE TABLE " + IMAGE_TRASH_TABLE + "(\n" +
+                    "    image_id INTEGER REFERENCES " + IMAGE_TABLE + "(id),\n" +
+                    "    trash_id INTEGER REFERENCES " + TRASH_TABLE + "(id)\n" +
+                    ");");
+            db.execSQL("CREATE TABLE " + VIDEO_TRASH_TABLE + "(\n" +
+                    "    video_id INTEGER REFERENCES " + VIDEO_TABLE + "(id),\n" +
+                    "    trash_id INTEGER REFERENCES " + TRASH_TABLE + "(id)\n" +
+                    ");");
         } catch (SQLiteException e) {
             e.printStackTrace();
         }
@@ -135,6 +150,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             db.execSQL("DROP TABLE IF EXISTS " + VIDEO_TABLE);
             db.execSQL("DROP TABLE IF EXISTS " + VIDEO_ALBUM_TABLE);
             db.execSQL("DROP TABLE IF EXISTS " + VIDEO_TAG_TABLE);
+            db.execSQL("DROP TABLE IF EXISTS " + TRASH_TABLE);
+            db.execSQL("DROP TABLE IF EXISTS " + IMAGE_TRASH_TABLE);
+            db.execSQL("DROP TABLE IF EXISTS " + VIDEO_TRASH_TABLE);
         } catch (SQLiteException e) {
             e.printStackTrace();
         }
@@ -163,12 +181,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.execSQL("DELETE FROM " + table + " WHERE " + where);
     }
 
-    public long update(String table, String column, String value, String where) {
+    public void update(String table, String column, String value, String where) {
         Log.v("DatabaseHelper", "Updating data");
         SQLiteDatabase db = getWritableDatabase();
         db.execSQL("UPDATE " + table + " SET " + column + " = " + "'" + value + "'" + " WHERE " + where);
-        Log.v("DatabaseHelper", "Query: "+ "UPDATE " + table + " SET " + column + " = " + "'" + value + "'" + " WHERE " + where);
-        return getId(table, where);
     }
 
     public List<String> select(String table, String column, String where) {
@@ -199,7 +215,29 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public List<String> selectImagesSortByDate(String table, String column, String order) {
         List<String> data = new ArrayList<>();
         SQLiteDatabase db = getWritableDatabase();
-        String query = "SELECT " + column + " FROM " + table + " ORDER BY created_at";
+        String query = "SELECT " + column + " FROM " + table + " WHERE is_deleted = 0 ORDER BY created_at";
+        if(Objects.equals(order, "ascending")) {
+            query += " ASC;";
+        } else if ( (Objects.equals(order,"descending"))) {
+            query += " DESC;";
+        }
+        Cursor cursor = db.rawQuery(query, null);
+        if(cursor.moveToFirst()) {
+            while(!cursor.isAfterLast()) {
+                data.add(cursor.getString(0));
+                cursor.moveToNext();
+            }
+            cursor.close();
+        } else {
+            Log.v("DatabaseHelper", "no data found");
+        }
+        return data;
+    }
+
+    public List<String> selectImagesSortByDateAtBin(String table, String column, String order) {
+        List<String> data = new ArrayList<>();
+        SQLiteDatabase db = getWritableDatabase();
+        String query = "SELECT " + column + " FROM " + table + " WHERE is_deleted = 1 ORDER BY created_at";
         if(Objects.equals(order, "ascending")) {
             query += " ASC;";
         } else if ( (Objects.equals(order,"descending"))) {
@@ -246,11 +284,27 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return -1;
     }
 
+//    public String getById(String table, long id) {
+//        SQLiteDatabase db = getWritableDatabase();
+//        Cursor cursor = db.rawQuery("SELECT * FROM " + table + " WHERE id = " + id, null);
+//        if (cursor.moveToFirst()) {
+//            return cursor.getString(0) + "," + cursor.getString(1) + "," + cursor.getString(2)+ "," + cursor.getString(3)+ "," + cursor.getString(4)+ "," + cursor.getString(5)+ "," + cursor.getString(6)+ "," + cursor.getString(7)+ "," + cursor.getString(8)+ "," + cursor.getString(9)+ "," + cursor.getString(10);
+//        }
+//        return null;
+//    }
+
     public String getById(String table, long id) {
         SQLiteDatabase db = getWritableDatabase();
         Cursor cursor = db.rawQuery("SELECT * FROM " + table + " WHERE id = " + id, null);
         if (cursor.moveToFirst()) {
-            return cursor.getString(0) + "," + cursor.getString(1) + "," + cursor.getString(2)+ "," + cursor.getString(3)+ "," + cursor.getString(4)+ "," + cursor.getString(5)+ "," + cursor.getString(6)+ "," + cursor.getString(7)+ "," + cursor.getString(8)+ "," + cursor.getString(9)+ "," + cursor.getString(10);
+            StringBuilder stringBuilder = new StringBuilder();
+            for (int i = 0; i < cursor.getColumnCount(); i++) {
+                stringBuilder.append(cursor.getString(i));
+                if (i < cursor.getColumnCount() - 1) {
+                    stringBuilder.append(",");
+                }
+            }
+            return stringBuilder.toString();
         }
         return null;
     }
@@ -264,19 +318,40 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return -1;
     }
 
+    //    public List<String> getAll(String table) {
+//        List<String> data = new ArrayList<>();
+//        SQLiteDatabase db = getWritableDatabase();
+//        Cursor cursor = db.rawQuery("SELECT * FROM " + table, null);
+//        if (cursor.moveToFirst()) {
+//            while (!cursor.isAfterLast()) {
+//                String temp = cursor.getString(0) + "," + cursor.getString(1) + "," + cursor.getString(2)+ "," + cursor.getString(3)+ "," + cursor.getString(4)+ "," + cursor.getString(5)+ "," + cursor.getString(6)+ "," + cursor.getString(7)+ "," + cursor.getString(8)+ "," + cursor.getString(9)+ "," + cursor.getString(10);
+//                data.add(temp);
+//                cursor.moveToNext();
+//            }
+//        }
+//        return data;
+//    }
     public List<String> getAll(String table) {
         List<String> data = new ArrayList<>();
         SQLiteDatabase db = getWritableDatabase();
         Cursor cursor = db.rawQuery("SELECT * FROM " + table, null);
         if (cursor.moveToFirst()) {
-            while (!cursor.isAfterLast()) {
-                String temp = cursor.getString(0) + "," + cursor.getString(1) + "," + cursor.getString(2)+ "," + cursor.getString(3)+ "," + cursor.getString(4)+ "," + cursor.getString(5)+ "," + cursor.getString(6)+ "," + cursor.getString(7)+ "," + cursor.getString(8)+ "," + cursor.getString(9)+ "," + cursor.getString(10);
-                data.add(temp);
-                cursor.moveToNext();
-            }
+            int numColumns = cursor.getColumnCount();
+            do {
+                StringBuilder temp = new StringBuilder();
+                for (int i = 0; i < numColumns; i++) {
+                    temp.append(cursor.getString(i));
+                    if (i < numColumns - 1) {
+                        temp.append(",");
+                    }
+                }
+                data.add(temp.toString());
+            } while (cursor.moveToNext());
         }
+        cursor.close();
         return data;
     }
+
     public List<String> getAllRef(String table){
         List<String> data = new ArrayList<>();
         SQLiteDatabase db = getWritableDatabase();
@@ -289,7 +364,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         }
         return data;
     }
-
     public boolean checkExist(String table, String s) {
         SQLiteDatabase db = getWritableDatabase();
         Cursor cursor = db.rawQuery("SELECT * FROM " + table + " WHERE " + s, null);
@@ -344,8 +418,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         Cursor cursor = db.rawQuery("SELECT id FROM " + ALBUM_TABLE + " WHERE name = ?", new String[]{albumName});
         long albumId = -1;
         if (cursor != null) {
+            Log.d("cursor", cursor.toString());
             if (cursor.moveToFirst()) {
                 albumId = cursor.getLong(0);
+                Log.d("album id", String.valueOf(albumId));
             }
             cursor.close();
         }
@@ -381,6 +457,88 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return ref;
     }
 
+    @SuppressLint("Range")
+    public long getTotalCapacityFromImageIDs(List<Long> imageIDs){
+        long totalCapacity = 0;
+        SQLiteDatabase db = getReadableDatabase();
+
+        for (Long imageId : imageIDs) {
+            Cursor cursor = db.rawQuery("SELECT capacity FROM " + IMAGE_TABLE + " WHERE id = ?", new String[]{String.valueOf(imageId)});
+            if (cursor != null && cursor.moveToFirst()) {
+                // Get the capacity from the cursor and add it to the total capacity
+                long capacity = cursor.getLong(cursor.getColumnIndex("capacity"));
+                totalCapacity += capacity;
+                cursor.close();
+            }
+        }
+        return totalCapacity;
+    }
+    public boolean isDeleteImage(long imageId) {
+        SQLiteDatabase db = getReadableDatabase();
+        Cursor cursor = db.rawQuery("SELECT is_favourited FROM " + IMAGE_TABLE + " WHERE id = ?", new String[]{String.valueOf(imageId)});
+        boolean isDeleted = false;
+
+        if (cursor != null) {
+            if (cursor.moveToFirst()) {
+                int delValue = cursor.getInt(0);
+                isDeleted = delValue == 1;
+            }
+            cursor.close();
+        }
+        return isDeleted;
+    }
+    public void toggleDeleteImage(long imageId) {
+        SQLiteDatabase db = getWritableDatabase();
+        boolean isDelete = isDeleteImage(imageId);
+
+        int newDelete;
+        if(isDelete) {
+            newDelete = 0;
+        } else {
+            newDelete = 1;
+        }
+
+        ContentValues values = new ContentValues();
+        values.put("is_deleted", newDelete);
+        db.update(IMAGE_TABLE, values, "id = ?", new String[]{String.valueOf(imageId)});
+    }
+    public List<String> getAllDeleteImageRef() {
+        List<String> deleteRefs = new ArrayList<>();
+        SQLiteDatabase db = getReadableDatabase();
+        Cursor cursor = db.rawQuery("SELECT ref FROM " + IMAGE_TABLE + " WHERE is_deleted = 1", null);
+
+        if (cursor != null) {
+            if (cursor.moveToFirst()) {
+                do {
+                    String ref = cursor.getString(0);
+                    deleteRefs.add(ref);
+                } while (cursor.moveToNext());
+            }
+            cursor.close();
+        }
+        return deleteRefs;
+    }
+    public void setDelete(long imageId, boolean isDelete) {
+        SQLiteDatabase db = getWritableDatabase();
+        int delete = isDelete ? 1 : 0;
+        ContentValues values = new ContentValues();
+        values.put("is_deleted", delete);
+        db.update(IMAGE_TABLE, values, "id = ?", new String[]{String.valueOf(imageId)});
+    }
+    public long getImageIdByURL(String URL){
+        SQLiteDatabase db = getReadableDatabase();
+        Cursor cursor = db.rawQuery("SELECT id FROM " + IMAGE_TABLE + " WHERE ref = ?", new String[]{URL});
+        long imageId = -1;
+        if (cursor != null) {
+            Log.d("cursor", cursor.toString());
+            if (cursor.moveToFirst()) {
+                imageId = cursor.getLong(0);
+                Log.d("album id", String.valueOf(imageId));
+            }
+            cursor.close();
+        }
+        return imageId;
+    }
     public void toggleFavoriteImage(long imageId) {
         SQLiteDatabase db = getWritableDatabase();
         boolean isFavorite = isFavoriteImage(imageId);

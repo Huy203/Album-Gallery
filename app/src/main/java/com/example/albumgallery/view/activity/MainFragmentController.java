@@ -17,13 +17,16 @@ import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityOptionsCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
 import com.example.albumgallery.R;
+import com.example.albumgallery.controller.MainController;
 import com.example.albumgallery.databinding.ActivityFragmentControllerBinding;
 import com.example.albumgallery.view.fragment.AlbumsMainFragment;
+import com.example.albumgallery.view.fragment.BinFragment;
 import com.example.albumgallery.view.fragment.FavoriteFragment;
 import com.example.albumgallery.view.fragment.HomeScreenFragment;
 import com.example.albumgallery.view.listeners.BackgroundProcessingCallback;
@@ -32,6 +35,7 @@ import com.example.albumgallery.view.listeners.ImageAdapterListener;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 
 public class MainFragmentController extends AppCompatActivity implements BackgroundProcessingCallback, ImageAdapterListener, FragToActivityListener {
@@ -44,19 +48,22 @@ public class MainFragmentController extends AppCompatActivity implements Backgro
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        getSupportFragmentManager().beginTransaction().add(R.id.fragment_container, fragments.get(0)).commit();
+        HomeScreenFragment fragment = new HomeScreenFragment();
+        getSupportFragmentManager().beginTransaction()
+                .add(R.id.fragment_container, fragments.get(0))
+                .commit();
 
         binding = ActivityFragmentControllerBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
         currentFragment = getSupportFragmentManager().findFragmentById(R.id.fragment_container);
-
         String fragmentToLoad = getIntent().getStringExtra("fragmentToLoad");
         if (fragmentToLoad != null && fragmentToLoad.equals("AlbumMain")) {
             replaceFragment(fragments.get(1));
         } else if (fragmentToLoad != null && fragmentToLoad.equals("HomeScreen")) {
             replaceFragment(fragments.get(0));
         }
+
 
 
         binding.bottomNavigationView.setOnItemSelectedListener(item -> {
@@ -68,6 +75,9 @@ public class MainFragmentController extends AppCompatActivity implements Backgro
             } else if (itemId == R.id.favorites) {
                 replaceFragment(fragments.get(2));
             }
+            else if (itemId == R.id.bin) {
+                replaceFragment(fragments.get(3));
+            }
             return true;
         });
     }
@@ -75,19 +85,20 @@ public class MainFragmentController extends AppCompatActivity implements Backgro
     @SuppressLint("NotifyDataSetChanged")
     @Override
     public void onResume() {
-        super.onResume();
         Toast.makeText(this, "onResume", Toast.LENGTH_SHORT).show();
-
+        super.onResume();
         Fragment currentFragment = getSupportFragmentManager().findFragmentById(R.id.fragment_container);
-
-        if (currentFragment instanceof HomeScreenFragment && isBackgroundTaskCompleted) {
-            HomeScreenFragment fragment = (HomeScreenFragment) currentFragment;
-            fragment.updateUI();
+        HomeScreenFragment fragment = null;
+        if(currentFragment instanceof HomeScreenFragment) {
+            fragment = (HomeScreenFragment) getSupportFragmentManager().findFragmentById(R.id.fragment_container);
+        }
+        if (fragment != null) {
+            if (isBackgroundTaskCompleted)
+                fragment.updateUI();
         } else {
-            Log.v("MainFragmentController", "Fragment is null or background task is not completed");
+            Log.v("MainFragmentController", "fragment is null");
         }
     }
-
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -110,7 +121,6 @@ public class MainFragmentController extends AppCompatActivity implements Backgro
         FragmentManager fragmentManager = getSupportFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
         fragmentTransaction.replace(R.id.fragment_container, fragment);
-        fragmentTransaction.addToBackStack(null);
         fragmentTransaction.commit();
 
         currentFragment = fragment;
@@ -118,35 +128,54 @@ public class MainFragmentController extends AppCompatActivity implements Backgro
 
     @Override
     public void onBackgroundTaskCompleted() {
-        HomeScreenFragment fragment = (HomeScreenFragment) getSupportFragmentManager().findFragmentById(R.id.fragment_container);
-        if (fragment != null) {
+        isBackgroundTaskCompleted = true;
+        Fragment currentFragment = getSupportFragmentManager().findFragmentById(R.id.fragment_container);
+        if (currentFragment instanceof HomeScreenFragment) {
+            HomeScreenFragment fragment = (HomeScreenFragment) currentFragment;
             fragment.updateUI();
+        }
+        else if (currentFragment instanceof BinFragment) {
+            BinFragment fragment = (BinFragment) currentFragment;
+            fragment.updateUI();
+        }
+        isBackgroundTaskCompleted = false;
+    }
+
+
+    @Override
+    public void getSelectedItemsCount(int count) {
+        Fragment currentFragment = getSupportFragmentManager().findFragmentById(R.id.fragment_container);
+
+        if (currentFragment instanceof HomeScreenFragment) {
+            Log.d("home fragment", "ok");
+            ((HomeScreenFragment) currentFragment).getSelectedItemsCount(count);
+        }
+        else if (currentFragment instanceof BinFragment) {
+            Log.d("bin fragment", "ok");
+            ((BinFragment) currentFragment).getSelectedItemsCount(count);
         }
     }
 
-    public void getSelectedItemsCount(int count) {
-        ((TextView) findViewById(R.id.numberOfSelectedImages)).setText(count + " images selected");
-        Fragment currentFragment = getSupportFragmentManager().findFragmentById(R.id.fragment_container);
-        if (currentFragment instanceof HomeScreenFragment) {
-            HomeScreenFragment fragment = (HomeScreenFragment) getSupportFragmentManager().findFragmentById(R.id.fragment_container);
-            if (fragment != null) {
-                fragment.getSelectedItemsCount(count);
-            }
-        }
-    }
 
     @Override
     public void handleImagePick(View itemView, String uri, int position) {
         Fragment currentFragment = getSupportFragmentManager().findFragmentById(R.id.fragment_container);
-        if (currentFragment instanceof HomeScreenFragment) {
+        if(currentFragment instanceof HomeScreenFragment) {
             HomeScreenFragment fragment = (HomeScreenFragment) getSupportFragmentManager().findFragmentById(R.id.fragment_container);
             if (fragment != null) {
                 fragment.handleImagePick(itemView, uri, position);
             }
-        } else if (currentFragment instanceof FavoriteFragment) {
+        }
+        else if (currentFragment instanceof FavoriteFragment) {
             FavoriteFragment favoriteFragment = (FavoriteFragment) getSupportFragmentManager().findFragmentById(R.id.fragment_container);
             if (favoriteFragment != null) {
                 favoriteFragment.handleImagePick(itemView, uri, position);
+            }
+        }
+        else if (currentFragment instanceof BinFragment) {
+            BinFragment binFragment = (BinFragment) getSupportFragmentManager().findFragmentById(R.id.fragment_container);
+            if (binFragment != null) {
+                binFragment.handleDeletedImagePick(itemView, uri, position);
             }
         }
     }
@@ -261,5 +290,8 @@ public class MainFragmentController extends AppCompatActivity implements Backgro
 
         // calling startactivity() to share
         startActivity(Intent.createChooser(intent, "Share Via"));
+    }
+    public void onPointerCaptureChanged(boolean hasCapture) {
+        super.onPointerCaptureChanged(hasCapture);
     }
 }

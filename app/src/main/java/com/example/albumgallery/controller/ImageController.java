@@ -25,8 +25,8 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 
-import com.example.albumgallery.FirebaseManager;
 import com.example.albumgallery.helper.DatabaseHelper;
+import com.example.albumgallery.FirebaseManager;
 import com.example.albumgallery.model.ImageModel;
 import com.example.albumgallery.model.Model;
 import com.example.albumgallery.utils.QRCodeRecognization;
@@ -286,7 +286,7 @@ public class ImageController implements Controller {
         boolean isFavourited = temp[10].equals("1");
         boolean isDeleted = temp[9].equals("1");
         return new ImageModel(Integer.parseInt(temp[0]), temp[1], Integer.parseInt(temp[2]), Integer.parseInt(temp[3]), Long.parseLong(temp[4]), temp[5], temp[6], temp[7], temp[8], isDeleted, isFavourited);
-     }
+    }
 
     public long getIdByRef(String ref) {
         return dbHelper.getId("Image", "ref = '" + ref + "'");
@@ -294,6 +294,9 @@ public class ImageController implements Controller {
 
     public List<String> getAllImageURLsSortByDate() {
         return dbHelper.selectImagesSortByDate("Image", "ref", "descending");
+    }
+    public List<String> getAllImageURLsSortByDateAtBin() {
+        return dbHelper.selectImagesSortByDateAtBin("Image", "ref", "descending");
     }
     public List<String> getAllImageIds() {
         return dbHelper.getFromImage("id");
@@ -393,7 +396,7 @@ public class ImageController implements Controller {
         return getAllImageURLs();
     }
 
-    public void deleteSelectedImageAtHomeScreeen(List<Task> imageURLs) {
+    public void deleteSelectedImageAtBin(List<Task> imageURLs){
         FirebaseStorage storage = FirebaseStorage.getInstance();
         // Create a storage reference from our app
         StorageReference storageRef = storage.getReference();
@@ -434,6 +437,53 @@ public class ImageController implements Controller {
         }
     }
 
+    public void deleteSelectedImageAtHomeScreeen(List<Task> imageURLs){
+        Log.d("get into delete at homescreen function", String.valueOf(imageURLs.size()));
+        for (Task taskImageURL : imageURLs) {
+            if (taskImageURL.isSuccessful()) {
+                String imageURL = taskImageURL.getResult().toString();
+                Log.d("Image task", imageURL);
+                String URL = parseURL(imageURL);
+
+                long imageID = dbHelper.getImageIdByURL(imageURL);
+
+                setDeleteAtHomeScreen(imageID, true);
+
+                Log.d("delete image url", imageURL);
+                Log.d("delete id", String.valueOf(imageID));
+
+                // Delete the file
+                if (allTasksCompletedGeneric(imageURLs)) {
+                    activity.runOnUiThread(() -> {
+                        ((MainFragmentController) activity).onBackgroundTaskCompleted();
+                    });
+                }
+            }
+        }
+    }
+    public long getTotalCapacityFromImageIDs(List<Long> imageIDs){
+        return dbHelper.getTotalCapacityFromImageIDs(imageIDs);
+    }
+    public void toggleDeleteImage(long imageId) {
+        dbHelper.toggleDeleteImage(imageId);
+    }
+    public void setDelete(long imageId, boolean isDelete) {
+        dbHelper.setDelete(imageId, isDelete);
+
+        Intent intent = new Intent(activity, MainFragmentController.class);
+        activity.startActivity(intent);
+        activity.finish();
+    }
+
+    public void setDeleteAtHomeScreen(long imageId, boolean isDelete) {
+        dbHelper.setDelete(imageId, isDelete);
+    }
+    public boolean isDeleteImage(long imageId) {
+        return dbHelper.isDeleteImage(imageId);
+    }
+    public List<String> getAllDeleteImageRef() {
+        return dbHelper.getAllDeleteImageRef();
+    }
     public String recognizeQRCode(String uri) {
         QRCodeRecognization qrCodeRecognization = new QRCodeRecognization();
         try {

@@ -96,6 +96,13 @@ public class HomeScreenFragment extends Fragment {
         recyclerMediaView = view.findViewById(R.id.recyclerMediaView);
     }
 
+//    private void setupButtons() {
+//        view.findViewById(R.id.btnCamera).setOnClickListener(v -> openCamera());
+//        view.findViewById(R.id.btnPickImageFromDevice).setOnClickListener(v -> pickImagesFromDevice());
+//        view.findViewById(R.id.btnPickMultipleImages).setOnClickListener(v -> showDeleteConfirmationDialog());
+//        view.findViewById(R.id.btnDeleteMultipleImages).setOnClickListener(v -> toggleMultipleChoiceImages(view.findViewById(R.id.btnDeleteMultipleImages)));
+//    }
+
     private void setupButtons() {
 //        view.findViewById(R.id.btnCamera).setOnClickListener(v -> openCamera());
 //        view.findViewById(R.id.action_add).setOnClickListener(v -> pickImagesFromDevice());

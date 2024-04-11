@@ -41,15 +41,16 @@ import java.util.List;
 
 public class DetailPicture extends AppCompatActivity implements ImageInfoListener {
 
-    private MainController mainController;
-    private ImageView imageView;
-    private List<String> imagePaths;
-    private TextView qrLink;
-    private int currentPosition;
-    private View imageInfoView;
-    private ImageInfo imageInfoFragment;
-    private boolean isImageInfoVisible = false;
-    private AlertDialog optionsDialog;
+    protected MainController mainController;
+    protected ImageView imageView;
+    protected List<String> imagePaths;
+    protected TextView qrLink;
+    protected int currentPosition;
+    protected View imageInfoView;
+    protected ImageInfo imageInfoFragment;
+    protected boolean isImageInfoVisible = false;
+    protected boolean isDeleted;
+    protected AlertDialog optionsDialog;
     ImageModel imageModel;
 
     @Override
@@ -144,7 +145,7 @@ public class DetailPicture extends AppCompatActivity implements ImageInfoListene
 
     }
 
-    private void loadImage(int position) {
+    protected void loadImage(int position) {
         Glide.with(this).load(Uri.parse(imagePaths.get(position))).into(imageView);
     }
 
@@ -178,8 +179,15 @@ public class DetailPicture extends AppCompatActivity implements ImageInfoListene
     private void deleteImage() {
     }
 
-    private void toggleImageInfo() {
-
+    protected void toggleImageInfo() {
+        isImageInfoVisible = !isImageInfoVisible;
+        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+        if (isImageInfoVisible) {
+            imageInfoView.setVisibility(View.VISIBLE);
+        } else {
+            imageInfoView.setVisibility(View.GONE);
+        }
+        transaction.commit();
     }
 
     private void shareImageAndText(Bitmap bitmap) {
@@ -202,11 +210,23 @@ public class DetailPicture extends AppCompatActivity implements ImageInfoListene
         startActivity(Intent.createChooser(intent, "Share Via"));
     }
 
-    private void showDeleteConfirmationDialog(String uri) {
+    protected void showDeleteConfirmationDialog(String uri) {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Confirm Deletion");
         builder.setMessage("Are you sure you want to delete this image?");
-        builder.setPositiveButton("Delete", (dialog, which) -> mainController.getImageController().deleteSelectedImage(uri));
+        builder.setPositiveButton("Delete", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                // Call deleteSelectedImage() method from ImageController
+                // mainController.getImageController().deleteSelectedImage(uri);
+
+                Log.d("update delete successfully 1", "ok");
+
+                long id = mainController.getImageController().getIdByRef(uri);
+                isDeleted = mainController.getImageController().isDeleteImage(id);
+                toggleDeleteImage(id);
+            }
+        });
         builder.setNegativeButton("Cancel", null);
         builder.show();
     }
@@ -343,5 +363,16 @@ public class DetailPicture extends AppCompatActivity implements ImageInfoListene
             Toast.makeText(this, "No image to delete", Toast.LENGTH_SHORT).show();
         }
     }
-}
 
+    private void toggleDeleteImage(long id) {
+        Log.d("update delete successfully 2", "ok");
+        isDeleted = !isDeleted;
+        mainController.getImageController().setDelete(id, isDeleted);
+    }
+
+    protected ImageModel getImageModel() {
+        long id = getIntent().getLongExtra("id", 0);
+        Log.d("image content id", String.valueOf(id));
+        return mainController.getImageController().getImageById(id);
+    }
+}

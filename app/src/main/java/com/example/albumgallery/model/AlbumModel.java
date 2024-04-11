@@ -4,9 +4,11 @@ import android.content.Context;
 
 import com.example.albumgallery.helper.DatabaseHelper;
 
+import java.util.Date;
 import java.util.Calendar;
+import java.util.List;
 
-public class AlbumModel implements Model {
+public class AlbumModel implements Model{
     // AlbumModel class is used to store the data of the album.
     private DatabaseHelper dbHelper;
     private int id; // id of the album
@@ -114,21 +116,18 @@ public class AlbumModel implements Model {
         this.thumbnail = "";
     }
 
-    public AlbumModel(int id, String name, int capacity, String ref, String password, int num_of_images) {
+    public AlbumModel(int id, String name, int capacity, String notice, String ref, int num_of_images) {
         this.id = id;
         this.name = name;
         this.capacity = capacity;
         this.ref = ref;
-        this.password = password;
         this.created_at = (Calendar.getInstance().getTime()).toString();
         this.is_deleted = 0;
-        this.password = "";
-        this.notice = "";
+        this.notice = notice;
         this.num_of_images = num_of_images;
         this.thumbnail = "";
     }
-
-    public AlbumModel(String name, String password, int num_of_images) {
+    public AlbumModel(String name, String password, int num_of_images){
         this.name = name;
         this.capacity = 0;
         this.password = password;
