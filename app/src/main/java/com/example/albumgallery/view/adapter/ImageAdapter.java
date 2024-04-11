@@ -77,6 +77,9 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> 
     public SparseBooleanArray getSelectedItems() {
         return selectedItems;
     }
+    public void emptySelectedItems() {
+        selectedItems.clear();
+    }
 
     public List<String> getSelectedImageURLs() {
         List<String> selectedImageURLs = new ArrayList<>();

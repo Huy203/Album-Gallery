@@ -116,6 +116,7 @@ public class HomeScreenFragment extends Fragment {
 
         // if no items are selected, clear the selected items and return false
         if (length == 0) {
+            Log.v("HomeScreenFragment", "No items selected");
             imageAdapter.clearSelectedItems();
             return false;
         }
@@ -141,6 +142,13 @@ public class HomeScreenFragment extends Fragment {
         Toast.makeText(requireContext(), "onResume of Homesscreen", Toast.LENGTH_SHORT).show();
         super.onResume();
     }
+
+    @Override
+    public void onPause() {
+        Toast.makeText(requireContext(), "onPause of Homesscreen", Toast.LENGTH_SHORT).show();
+        super.onPause();
+    }
+
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -184,8 +192,13 @@ public class HomeScreenFragment extends Fragment {
 
                     builder.setPositiveButton("Delete", (dialog, which) -> {
                         for (String uri : imageAdapter.getSelectedImageURLs()) {
-                            mainController.getImageController().deleteSelectedImage(uri);
+                            long id = mainController.getImageController().getIdByRef(uri);
+                            mainController.getImageController().setDelete(id, true);
                         }
+                        imageAdapter.clearSelectedItems();
+                        onResume();
+                        fragToActivityListener.onFragmentAction("Delete", true);
+                        updateUI();
 //                        this.mainController.getImageController().deleteSelectedImageAtHomeScreeen(selectedImageURLsTask);
                     });
 
@@ -241,8 +254,8 @@ public class HomeScreenFragment extends Fragment {
     public void ActivityToFragListener(String action) {
         switch (action) {
             case "Delete":
-                imageAdapter.getSelectedImageURLs();
                 showDeleteConfirmationDialog();
+                onPause();
                 break;
 //            case "Share":
 ////                Intent intent = new Intent(getActivity(), MainFragmentController.class);

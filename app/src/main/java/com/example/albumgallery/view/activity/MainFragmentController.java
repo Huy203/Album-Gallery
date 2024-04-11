@@ -192,9 +192,9 @@ public class MainFragmentController extends AppCompatActivity implements Backgro
      */
     @Override
     public void toggleMultipleChoice() {
-//        getSelectedItemsCount(length);
         HomeScreenFragment fragment = (HomeScreenFragment) getSupportFragmentManager().findFragmentById(R.id.fragment_container);
         if (fragment != null) {
+            Log.v("MainFragmentController", "Toggle multiple choice");
             changeBottomMenu(fragment.toggleMultipleChoice());
         }
     }
@@ -279,10 +279,13 @@ public class MainFragmentController extends AppCompatActivity implements Backgro
             case "Share":
                 shareImages((ArrayList<Uri>) data);
                 break;
-            case "DeleteImage":
-                HomeScreenFragment fragment = (HomeScreenFragment) getSupportFragmentManager().findFragmentById(R.id.fragment_container);
-                if (fragment != null) {
-                    fragment.ActivityToFragListener("Delete");
+            case "Delete":
+                boolean isDeleted = (boolean) data;
+                Log.v("MainFragmentController", "Is deleted: " + isDeleted);
+                if(isDeleted) {
+                    toggleMultipleChoice();
+                } else {
+                    Toast.makeText(this, "Failed to delete image", Toast.LENGTH_SHORT).show();
                 }
                 break;
             case "ShowMultipleChoice":

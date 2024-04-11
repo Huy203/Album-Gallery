@@ -484,9 +484,9 @@ public class ImageController implements Controller {
     public void setDelete(long imageId, boolean isDelete) {
         dbHelper.setDelete(imageId, isDelete);
 
-        Intent intent = new Intent(activity, MainFragmentController.class);
-        activity.startActivity(intent);
-        activity.finish();
+//        Intent intent = new Intent(activity, MainFragmentController.class);
+//        activity.startActivity(intent);
+//        activity.finish();
     }
 
     public void setDeleteAtHomeScreen(long imageId, boolean isDelete) {
