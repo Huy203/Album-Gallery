@@ -26,6 +26,7 @@
                     style="?attr/materialIconButtonStyle"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:onClick="backAction"
                     app:icon="@drawable/back_black"
                     app:iconTint="@color/black" />
 
@@ -66,6 +67,7 @@
                     style="?attr/materialIconButtonStyle"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:onClick="editAction"
                     app:icon="@drawable/pencil_black"
                     app:iconTint="@color/black" />
 
@@ -74,6 +76,7 @@
                     style="?attr/materialIconButtonStyle"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:onClick="menuAction"
                     app:icon="@drawable/menu_black"
                     app:iconTint="@color/black" />
             </LinearLayout>

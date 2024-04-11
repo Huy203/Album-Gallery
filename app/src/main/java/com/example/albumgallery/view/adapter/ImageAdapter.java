@@ -94,6 +94,7 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> 
 
     public void clearSelectedItems() {
         selectedItems.clear();
+        isMultipleChoice = false;
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {
@@ -111,7 +112,6 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> 
         }
 
         public void bind(String imageURL) {
-            ;
             Glide.with(context)
                     .load(Uri.parse(imageURL))
                     .listener(new RequestListener<Drawable>() {
@@ -138,6 +138,11 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> 
                 }
             });
 
+            checkbox.setOnClickListener(view -> {
+                Log.v("ImageAdapter", "Checkbox selected: " + getAdapterPosition());
+                toggleSelection();
+            });
+
             itemView.setOnLongClickListener(view -> {
                 Log.v("ImageAdapter", "Image selected: " + getAdapterPosition());
                 isMultipleChoice = true;
@@ -145,7 +150,6 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> 
                 return true;
             });
             listener.getInteractedURIs(imageURL);
-            listener.getSelectedItemsCount(selectedItems.size());
         }
 
         private void toggleSelection() {

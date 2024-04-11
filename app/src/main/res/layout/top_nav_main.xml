@@ -37,10 +37,11 @@
                 android:orientation="horizontal">
 
                 <com.google.android.material.button.MaterialButton
-                    android:id="@+id/action_add"
+                    android:id="@+id/action_select"
                     style="?attr/materialIconButtonStyle"
                     android:layout_width="50dp"
                     android:layout_height="50dp"
+                    android:onClick="selectAction"
                     app:icon="@drawable/baseline_add_50"
                     app:iconTint="@color/black" />
 
@@ -50,6 +51,7 @@
                     android:layout_height="50dp"
                     android:background="?attr/selectableItemBackgroundBorderless"
                     android:contentDescription="camera"
+                    android:onClick="cameraAction"
                     android:padding="8dp"
                     android:scaleType="fitCenter"
                     android:src="@drawable/camera_icon" />

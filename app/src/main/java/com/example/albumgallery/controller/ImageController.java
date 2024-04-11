@@ -7,6 +7,7 @@ import static com.example.albumgallery.utils.Constant.REQUEST_CODE_PICK_MULTIPLE
 import static com.example.albumgallery.utils.Constant.imageExtensions;
 import static com.example.albumgallery.utils.Utilities.byteArrayToBitmap;
 import static com.example.albumgallery.utils.Utilities.getImageAddedDate;
+import static com.example.albumgallery.utils.Utilities.convertFromBitmapToURI;
 import static java.text.DateFormat.getDateTimeInstance;
 
 import android.annotation.SuppressLint;
@@ -91,13 +92,6 @@ public class ImageController implements Controller {
         dbHelper.close();
     }
 
-    public void pickMultipleImages(BackgroundProcessingCallback callback) {
-        idSelectedImages.clear(); // Clear the list of image previously selected
-        Intent intent = new Intent(Intent.ACTION_GET_CONTENT, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-        intent.setAction(Intent.ACTION_PICK);
-        intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
-        activity.startActivityForResult(intent, REQUEST_CODE_PICK_MULTIPLE_IMAGES);
-    }
 
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (resultCode == RESULT_OK && data != null) {
@@ -129,14 +123,6 @@ public class ImageController implements Controller {
         }
     }
 
-
-    public Uri convertFromBitmapToURI(Context inContext, Bitmap inImage) {
-        String imageName = "IMG_" + System.currentTimeMillis() + ".jpg";
-        ByteArrayOutputStream bytes = new ByteArrayOutputStream();
-        inImage.compress(Bitmap.CompressFormat.JPEG, 100, bytes);
-        String path = MediaStore.Images.Media.insertImage(inContext.getContentResolver(), inImage, imageName, null);
-        return Uri.parse(path);
-    }
 
     private void handleImagePicked(Intent data) {
         Log.v("Image", "Image picked" + " " + data.getData());
@@ -191,7 +177,6 @@ public class ImageController implements Controller {
             uploadTask.addOnCompleteListener(task -> {
                 if (task.isSuccessful()) {
                     Uri firebaseURI = task.getResult();
-                    Log.d("test firebase uri", firebaseURI.toString());
                     update("ref", firebaseURI.toString(), "id = " + id_string);
                     if (requestCode == REQUEST_CODE_CAMERA) {
                         activity.runOnUiThread(() -> {
@@ -218,7 +203,6 @@ public class ImageController implements Controller {
             if (cursor != null && cursor.moveToFirst()) {
                 name = cursor.getString(cursor.getColumnIndex(MediaStore.Images.Media.DISPLAY_NAME));
                 capacity = cursor.getLong(cursor.getColumnIndex(MediaStore.Images.Media.SIZE));
-                long temp = cursor.getLong(cursor.getColumnIndex(MediaStore.Images.Media.DATE_ADDED));
                 // Convert milliseconds to a more readable format (optional)
                 dateAdded = getImageAddedDate();
             }
@@ -413,36 +397,40 @@ public class ImageController implements Controller {
         FirebaseStorage storage = FirebaseStorage.getInstance();
         // Create a storage reference from our app
         StorageReference storageRef = storage.getReference();
+        try {
+            for (Task taskImageURL : imageURLs) {
+                if (taskImageURL.isSuccessful()) {
+                    String imageURL = taskImageURL.getResult().toString();
+                    Log.d("Image task", imageURL);
+                    String URL = parseURL(imageURL);
 
-        for (Task taskImageURL : imageURLs) {
-            if (taskImageURL.isSuccessful()) {
-                String imageURL = taskImageURL.getResult().toString();
-                Log.d("Image task", imageURL);
-                String URL = parseURL(imageURL);
+                    // Create a reference to the file to delete
+                    StorageReference desertRef = storageRef.child(URL);
 
-                // Create a reference to the file to delete
-                StorageReference desertRef = storageRef.child(URL);
-
-                // Delete the file
-                desertRef.delete().addOnSuccessListener(new OnSuccessListener<Void>() {
-                    @Override
-                    public void onSuccess(Void aVoid) {
-                        // File deleted successfully
-                        delete("ref = '" + imageURL + "'");
-                        if (allTasksCompletedGeneric(imageURLs)) {
-                            activity.runOnUiThread(() -> {
-                                ((MainFragmentController) activity).onBackgroundTaskCompleted();
-                            });
+                    // Delete the file
+                    desertRef.delete().addOnSuccessListener(new OnSuccessListener<Void>() {
+                        @Override
+                        public void onSuccess(Void aVoid) {
+                            // File deleted successfully
+                            delete("ref = '" + imageURL + "'");
+                            if (allTasksCompletedGeneric(imageURLs)) {
+                                Log.v("Image", "All images deleted" + activity);
+                                activity.runOnUiThread(() -> {
+                                    ((MainFragmentController) activity).onBackgroundTaskCompleted();
+                                });
+                            }
                         }
-                    }
-                }).addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception exception) {
-                        // Uh-oh, an error occurred!
-                        Toast.makeText(activity, "Image deleted failed", Toast.LENGTH_SHORT).show();
-                    }
-                });
+                    }).addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception exception) {
+                            // Uh-oh, an error occurred!
+                            Toast.makeText(activity, "Image deleted failed", Toast.LENGTH_SHORT).show();
+                        }
+                    });
+                }
             }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 

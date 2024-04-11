@@ -6,14 +6,13 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -28,10 +27,13 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.albumgallery.R;
 import com.example.albumgallery.controller.MainController;
 import com.example.albumgallery.view.activity.DetailPicture;
+import com.example.albumgallery.view.activity.MainFragmentController;
 import com.example.albumgallery.view.adapter.ImageAdapter;
 import com.example.albumgallery.view.listeners.BackgroundProcessingCallback;
+import com.example.albumgallery.view.listeners.FragToActivityListener;
 import com.example.albumgallery.view.listeners.ImageAdapterListener;
 import com.google.android.gms.tasks.Task;
+import com.google.android.gms.tasks.Tasks;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -42,12 +44,13 @@ public class HomeScreenFragment extends Fragment {
     private List<String> imageURIs; //contains the list of image encoded.
     private ImageAdapter imageAdapter; //adapter for the recycler view
     private MainController mainController; //controller contains other controllers
-    private TextView numberOfImagesSelected;
     private ImageAdapterListener iListener;
     private BackgroundProcessingCallback bgListener;
     List<String> selectedImageURLs;
     List<Task> selectedImageURLsTask;
     private View view;
+
+    private FragToActivityListener fragToActivityListener;
 
     public HomeScreenFragment() {
         // Required empty public constructor
@@ -56,9 +59,10 @@ public class HomeScreenFragment extends Fragment {
     @Override
     public void onAttach(@NonNull Context context) {
         super.onAttach(context);
-        if (context instanceof ImageAdapterListener && context instanceof BackgroundProcessingCallback) {
+        if (context instanceof ImageAdapterListener && context instanceof BackgroundProcessingCallback && context instanceof FragToActivityListener) {
             iListener = (ImageAdapterListener) context;
             bgListener = (BackgroundProcessingCallback) context;
+            fragToActivityListener = (FragToActivityListener) context;
         } else {
             throw new RuntimeException(context
                     + " must implement Interface");
@@ -84,39 +88,50 @@ public class HomeScreenFragment extends Fragment {
     private void initializeVariables(View view) {
         this.view = view;
         mainController = new MainController(getActivity());
+        Log.v("HomeScreenFragment", "initializeVariables" + mainController);
         imageURIs = new ArrayList<>();
         selectedImageURLs = new ArrayList<>();
         selectedImageURLsTask = new ArrayList<>();
         imageAdapter = new ImageAdapter(getActivity(), imageURIs);
         recyclerMediaView = view.findViewById(R.id.recyclerMediaView);
-        numberOfImagesSelected = view.findViewById(R.id.numberOfSelectedImages);
     }
 
     private void setupButtons() {
-        view.findViewById(R.id.btnCamera).setOnClickListener(v -> openCamera());
-        view.findViewById(R.id.action_add).setOnClickListener(v -> pickImagesFromDevice());
-        view.findViewById(R.id.btnDeleteMultipleImages).setOnClickListener(v -> showDeleteConfirmationDialog());
+//        view.findViewById(R.id.btnCamera).setOnClickListener(v -> openCamera());
+//        view.findViewById(R.id.action_add).setOnClickListener(v -> pickImagesFromDevice());
+//        view.findViewById(R.id.action_delete).setOnClickListener(v -> showDeleteConfirmationDialog());
     }
 
-    private void pickImagesFromDevice() {
-        mainController.getImageController().pickMultipleImages(bgListener);
-    }
+//    private void pickImagesFromDevice() {
+////        mainController.getImageController().pickMultipleImages(bgListener);
+//    }
 
-    public void toggleMultipleChoice(int length) {
-        if (imageAdapter.getMultipleChoiceImagesEnabled()) {
-            numberOfImagesSelected.setVisibility(TextView.VISIBLE);
-            numberOfImagesSelected.setText("0 images selected");
-        }
-        if(length == 0) {
-            numberOfImagesSelected.setVisibility(TextView.GONE);
+    public boolean toggleMultipleChoice(int length) {
+        if (length == 0) {
             imageAdapter.clearSelectedItems();
+            return false;
+        }
+        return true;
+    }
+
+    @SuppressLint("SetTextI18n")
+    public void getSelectedItemsCount(int count) {
+
+        for (int i = 0; i < count; i++) {
+            selectedImageURLsTask.add(Tasks.forResult(Uri.parse(imageURIs.get(i))));
+            Log.d("Deleted images task", selectedImageURLsTask.get(i).getResult().toString());
+        }
+
+        for (int i = 0; i < count; i++) {
+            selectedImageURLs.add(imageURIs.get(i));
+            Log.d("Deleted images", selectedImageURLs.get(i));
         }
     }
 
     @SuppressLint("NotifyDataSetChanged")
     @Override
     public void onResume() {
-        Toast.makeText(requireContext(), "onResume", Toast.LENGTH_SHORT).show();
+        Toast.makeText(requireContext(), "onResume of Homesscreen", Toast.LENGTH_SHORT).show();
         super.onResume();
     }
 
@@ -148,20 +163,23 @@ public class HomeScreenFragment extends Fragment {
         imageAdapter.notifyDataSetChanged();
     }
 
-    @SuppressLint("SetTextI18n")
-    public void getSelectedItemsCount(int count) {
-        numberOfImagesSelected.setText(count + " images selected");
-    }
+    public void showDeleteConfirmationDialog() {
+        if (isAdded() && getActivity() != null) {
+            if (!getActivity().isFinishing()) {
+                getActivity().runOnUiThread(() -> {
+                    AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+                    Log.v("HomeScreenFragment", "showDeleteConfirmationDialog" + getActivity());
 
-    private void showDeleteConfirmationDialog() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-        builder.setTitle("Confirm Deletion");
-        builder.setMessage("Are you sure you want to delete this image?");
-        builder.setPositiveButton("Delete", (dialog, which) -> {
-            mainController.getImageController().deleteSelectedImageAtHomeScreeen(selectedImageURLsTask);
-        });
-        builder.setNegativeButton("Cancel", null);
-        builder.show();
+                    builder.setTitle("Confirm Deletion");
+                    builder.setMessage("Are you sure you want to delete this image?");
+                    builder.setPositiveButton("Delete", (dialog, which) -> {
+                        this.mainController.getImageController().deleteSelectedImageAtHomeScreeen(selectedImageURLsTask);
+                    });
+                    builder.setNegativeButton("Cancel", null);
+                    builder.show();
+                });
+            }
+        }
     }
 
 
@@ -199,5 +217,27 @@ public class HomeScreenFragment extends Fragment {
         super.onDestroy();
         mainController = null;
         Log.v("HomeScreenFragment", "onDestroy");
+    }
+
+    public List<Task> getSelectedImageURLsTask() {
+        return selectedImageURLsTask;
+    }
+
+    public void ActivityToFragListener(String action) {
+        switch (action) {
+            case "Delete":
+                showDeleteConfirmationDialog();
+                break;
+            case "Share":
+//                Intent intent = new Intent(getActivity(), MainFragmentController.class);
+//                intent.putExtra("key", data); // Replace "key" with your desired key
+//                getActivity().startActivity(intent);
+            case "Camera":
+                openCamera();
+                break;
+            case "Select":
+//                pickImagesFromDevice();
+                break;
+        }
     }
 }
