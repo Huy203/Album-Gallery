@@ -256,6 +256,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return data;
     }
 
+
     public void getConnection() {
         SQLiteDatabase db = getWritableDatabase();
     }

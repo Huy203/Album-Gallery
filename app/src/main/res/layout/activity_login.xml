@@ -250,30 +250,6 @@
                         />
                 </com.google.android.material.textfield.TextInputLayout>
                 <com.google.android.material.textfield.TextInputLayout
-                    android:hint="Address"
-                    android:layout_marginLeft="5dp"
-                    android:layout_marginRight="5dp"
-                    android:layout_marginTop="5dp"
-                    app:shapeAppearanceOverlay="@style/Button4"
-                    app:hintTextColor="#4E4A4A"
-                    app:boxStrokeColor="#4E4A4A"
-                    app:boxStrokeWidth="1dp"
-                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
-
-                    <com.google.android.material.textfield.TextInputEditText
-                        android:inputType="textPostalAddress"
-                        android:id="@+id/address"
-                        android:ems="10"
-                        android:textSize="13sp"
-                        android:textColor="@color/black"
-                        android:textStyle="normal"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        />
-                </com.google.android.material.textfield.TextInputLayout>
-                <com.google.android.material.textfield.TextInputLayout
                     android:hint="Password"
                     android:layout_marginLeft="5dp"
                     android:layout_marginRight="5dp"
@@ -330,7 +306,7 @@
                     android:textAllCaps="false"
                     android:elevation="15dp"
                     android:gravity="center"
-                    android:layout_marginTop="15dp"
+                    android:layout_marginTop="40dp"
                     android:layout_marginStart="24dp"
                     android:layout_marginEnd="24dp"
                     android:textColor="@color/textColor"

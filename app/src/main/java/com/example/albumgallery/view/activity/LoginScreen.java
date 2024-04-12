@@ -75,15 +75,15 @@ public class LoginScreen extends AppCompatActivity {
                 String email = ((TextInputEditText) findViewById(R.id.eMails)).getText().toString();
                 String username = ((TextInputEditText) findViewById(R.id.userName)).getText().toString();
                 String phone = ((TextInputEditText) findViewById(R.id.phoneNumber)).getText().toString();
-                String address = ((TextInputEditText) findViewById(R.id.address)).getText().toString();
+                //String address = ((TextInputEditText) findViewById(R.id.address)).getText().toString();
                 String password = ((TextInputEditText) findViewById(R.id.passwordss)).getText().toString();
 
-                if (email.isEmpty() || username.isEmpty() || phone.isEmpty() || address.isEmpty() || password.isEmpty()) {
+                if (email.isEmpty() || username.isEmpty() || phone.isEmpty()  || password.isEmpty()) {
                     Toast.makeText(LoginScreen.this, "Please fill in all fields", Toast.LENGTH_SHORT).show();
                     return;
                 }
 
-                UserModel userModel = new UserModel(username, password, email, phone, address);
+                UserModel userModel = new UserModel(username, password, email, phone, "");
 
                 // Gọi phương thức register của AuthenticationManager để lưu thông tin người dùng vào Firebase
                 authManager.register(userModel, new AuthenticationManager.OnRegisterListener() {
@@ -107,10 +107,10 @@ public class LoginScreen extends AppCompatActivity {
                 String email = ((TextInputEditText) findViewById(R.id.eMails)).getText().toString();
                 String username = ((TextInputEditText) findViewById(R.id.userName)).getText().toString();
                 String phone = ((TextInputEditText) findViewById(R.id.phoneNumber)).getText().toString();
-                String address = ((TextInputEditText) findViewById(R.id.address)).getText().toString();
+                //String address = ((TextInputEditText) findViewById(R.id.address)).getText().toString();
                 String password = ((TextInputEditText) findViewById(R.id.passwordss)).getText().toString();
 
-                if (email.isEmpty() || username.isEmpty() || phone.isEmpty() || address.isEmpty() || password.isEmpty()) {
+                if (email.isEmpty() || username.isEmpty() || phone.isEmpty()  || password.isEmpty()) {
                     Toast.makeText(LoginScreen.this, "Please fill in all fields", Toast.LENGTH_SHORT).show();
                     return;
                 }
@@ -130,7 +130,7 @@ public class LoginScreen extends AppCompatActivity {
                             }
                         } else {
                             // Email và username chưa tồn tại, tiến hành đăng ký
-                            UserModel userModel = new UserModel(username, password, email, phone, address);
+                            UserModel userModel = new UserModel(username, password, email, phone, "");
 
                             authManager.register(userModel, new AuthenticationManager.OnRegisterListener() {
                                 @Override
@@ -151,7 +151,7 @@ public class LoginScreen extends AppCompatActivity {
                                     ((TextInputEditText) findViewById(R.id.eMails)).setText("");
                                     ((TextInputEditText) findViewById(R.id.userName)).setText("");
                                     ((TextInputEditText) findViewById(R.id.phoneNumber)).setText("");
-                                    ((TextInputEditText) findViewById(R.id.address)).setText("");
+                                    //((TextInputEditText) findViewById(R.id.address)).setText("");
                                     ((TextInputEditText) findViewById(R.id.passwordss)).setText("");
                                 }
 
