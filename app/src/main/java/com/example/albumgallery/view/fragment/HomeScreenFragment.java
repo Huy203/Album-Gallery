@@ -27,7 +27,10 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.albumgallery.R;
 import com.example.albumgallery.controller.MainController;
+import com.example.albumgallery.model.auth.AuthenticationManager;
+import com.example.albumgallery.model.auth.AuthenticationManagerSingleton;
 import com.example.albumgallery.view.activity.DetailPicture;
+import com.example.albumgallery.view.activity.LoginScreen;
 import com.example.albumgallery.view.adapter.ImageAdapter;
 import com.example.albumgallery.view.listeners.BackgroundProcessingCallback;
 import com.example.albumgallery.view.listeners.ImageAdapterListener;
@@ -36,7 +39,7 @@ import com.google.android.gms.tasks.Task;
 import java.util.ArrayList;
 import java.util.List;
 
-public class HomeScreenFragment extends Fragment {
+public class HomeScreenFragment extends Fragment  {
     private static final int CAMERA_REQUEST_CODE = 1000;
     private RecyclerView recyclerMediaView;
     private List<String> imageURIs; //contains the list of image encoded.
@@ -48,6 +51,12 @@ public class HomeScreenFragment extends Fragment {
     List<String> selectedImageURLs;
     List<Task> selectedImageURLsTask;
     private View view;
+
+    private AuthenticationManager authManager = AuthenticationManagerSingleton.getInstance();
+
+    public interface HomeScreenFragmentListener extends ImageAdapterListener, BackgroundProcessingCallback {
+        // Các phương thức khác nếu cần
+    }
 
     public HomeScreenFragment() {
         // Required empty public constructor
@@ -97,6 +106,7 @@ public class HomeScreenFragment extends Fragment {
         view.findViewById(R.id.btnPickImageFromDevice).setOnClickListener(v -> pickImagesFromDevice());
         view.findViewById(R.id.btnPickMultipleImages).setOnClickListener(v -> showDeleteConfirmationDialog());
         view.findViewById(R.id.btnDeleteMultipleImages).setOnClickListener(v -> toggleMultipleChoiceImages(view.findViewById(R.id.btnDeleteMultipleImages)));
+        view.findViewById(R.id.btnLogOut).setOnClickListener(v -> logOut());
     }
 
     private void pickImagesFromDevice() {
@@ -114,6 +124,28 @@ public class HomeScreenFragment extends Fragment {
             imageAdapter.clearSelectedItems();
         }
     }
+
+    private void logOut() {
+        // Thực hiện đăng xuất
+        if(authManager!=null){
+            authManager.signOut(new AuthenticationManager.OnLogoutListener() {
+                @Override
+                public void onSuccess() {
+                    // Đăng xuất thành công, thực hiện các hành động cần thiết (ví dụ: chuyển hướng đến màn hình đăng nhập)
+                    Intent intent = new Intent(getActivity(), LoginScreen.class);
+                    startActivity(intent);
+                    getActivity().finish(); // Đóng màn hình hiện tại (HomeScreenFragment)
+                }
+
+                @Override
+                public void onFailure(String errorMessage) {
+                    // Xử lý khi đăng xuất thất bại (nếu cần)
+                    Toast.makeText(getActivity(), "Logout failed: " + errorMessage, Toast.LENGTH_SHORT).show();
+                }
+            });
+        }
+    }
+
 
     @SuppressLint("NotifyDataSetChanged")
     @Override
@@ -142,8 +174,8 @@ public class HomeScreenFragment extends Fragment {
     public void updateUI() {
         imageURIs.clear();
         // lấy ảnh sort theo date (mới nhất xếp trước).
-//       imageURIs.addAll(mainController.getImageController().getAllImageURLsSortByDate());
-        imageURIs.addAll(mainController.getImageController().getAllImageURLs());
+        imageURIs.addAll(mainController.getImageController().getAllImageURLsSortByDate());
+        //imageURIs.addAll(mainController.getImageController().getAllImageURLs());
         imageAdapter = new ImageAdapter(getActivity(), imageURIs);
         recyclerMediaView.setLayoutManager(new GridLayoutManager(getContext(), 3));
         recyclerMediaView.setAdapter(imageAdapter);

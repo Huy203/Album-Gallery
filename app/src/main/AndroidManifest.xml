@@ -29,16 +29,23 @@
             android:exported="true"
             android:label="AlbumGallery"
             android:windowSoftInputMode="adjustResize">
+<!--            <intent-filter>-->
+<!--                <action android:name="android.intent.action.MAIN" />-->
+
+<!--                <category android:name="android.intent.category.LAUNCHER" />-->
+<!--            </intent-filter>-->
+        </activity>
+        <activity android:name=".view.activity.EditImageActivity"/>
+        <activity android:name=".view.activity.DetailPicture" />
+        <activity android:name=".view.activity.AlbumActivity" />
+        <activity
+            android:name=".view.activity.LoginScreen"
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".view.activity.EditImageActivity" />
-        <activity android:name=".view.activity.DetailPicture" />
-        <activity android:name=".view.activity.AlbumActivity" />
-        <activity android:name=".view.activity.LoginScreen" />
         <activity android:name=".view.activity.RegisterScreen" />
         <activity android:name=".view.activity.CreateAlbumActivity" />
         <activity android:name=".view.activity.SelectImageActivity" />

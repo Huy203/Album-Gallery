@@ -3,6 +3,7 @@ package com.example.albumgallery.view.activity;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
 import android.text.InputType;
@@ -19,19 +20,24 @@ import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.example.albumgallery.MainActivity;
 import com.example.albumgallery.R;
 import com.example.albumgallery.model.auth.AuthenticationManager;
+import com.example.albumgallery.model.auth.AuthenticationManagerSingleton;
 import com.example.albumgallery.model.auth.UserModel;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.textfield.TextInputEditText;
 
+import com.example.albumgallery.view.fragment.HomeScreenFragment;
+
 import java.util.Objects;
 
 public class LoginScreen extends AppCompatActivity {
     private AuthenticationManager authManager;
     ProgressDialog loadingBar;
+
     @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,7 +45,15 @@ public class LoginScreen extends AppCompatActivity {
 //        Objects.requireNonNull(getSupportActionBar()).hide();
         setContentView(R.layout.activity_login);
 
-        authManager = new AuthenticationManager(null);
+        clearLoginStatus();
+
+        authManager = AuthenticationManagerSingleton.getInstance();
+
+        if (isLoggedIn()) {
+            // Nếu đã đăng nhập, chuyển họ đến màn hình chính
+            startActivity(new Intent(LoginScreen.this, MainFragmentController.class));
+            finish();
+        }
 
         findViewById(R.id.forgetPass).setOnClickListener(new View.OnClickListener() {
             @Override
@@ -179,8 +193,9 @@ public class LoginScreen extends AppCompatActivity {
                     @Override
                     public void onSuccess(String userId) {
                         // Đăng nhập thành công, chuyển sang màn hình chính hoặc màn hình khác
+                        saveLoginStatus();
                         Toast.makeText(LoginScreen.this, "Login successfully!", Toast.LENGTH_SHORT).show();
-                        Intent intent = new Intent(LoginScreen.this, RegisterScreen.class);
+                        Intent intent = new Intent(LoginScreen.this, MainFragmentController.class);
                         startActivity(intent);
                         finish();
                     }
@@ -191,6 +206,7 @@ public class LoginScreen extends AppCompatActivity {
                         Toast.makeText(LoginScreen.this, "Login failed: " + errorMessage, Toast.LENGTH_SHORT).show();
                     }
                 });
+
             }
         });
 
@@ -269,6 +285,27 @@ public class LoginScreen extends AppCompatActivity {
                 }
             }
         });
+    }
+
+    private boolean isLoggedIn() {
+        // Kiểm tra xem thông tin đăng nhập đã được lưu trữ hay không
+        SharedPreferences sharedPreferences = getSharedPreferences("login", MODE_PRIVATE);
+        return sharedPreferences.getBoolean("isLoggedIn", false);
+    }
+
+    // Khi đăng nhập thành công, lưu trạng thái đăng nhập
+    private void saveLoginStatus() {
+        SharedPreferences sharedPreferences = getSharedPreferences("login", MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putBoolean("isLoggedIn", true);
+        editor.apply();
+    }
+
+    private void clearLoginStatus() {
+        SharedPreferences sharedPreferences = getSharedPreferences("login", MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putBoolean("isLoggedIn", false);
+        editor.apply();
     }
 
 }
