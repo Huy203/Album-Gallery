@@ -97,19 +97,19 @@ public class SelectImageActivity extends AppCompatActivity implements ImageAdapt
 
     @SuppressLint("SetTextI18n")
     @Override
-    public void getSelectedItemsCount(int count) {
-        Log.v("SelectedItems", count + " items selected");
-        numberOfImagesSelected.setText(count + " images selected");
-
-        for (int i = 0; i < count; i++) {
-            selectedImageURLsTask.add(Tasks.forResult(Uri.parse(imageURIs.get(i))));
-            Log.d("Deleted images task", selectedImageURLsTask.get(i).getResult().toString());
-        }
-
-        for (int i = 0; i < count; i++) {
-            selectedImageURLs.add(imageURIs.get(i));
-            Log.d("Deleted images", selectedImageURLs.get(i));
-        }
+    public void getSelectedItemsCount() {
+//        Log.v("SelectedItems", count + " items selected");
+//        numberOfImagesSelected.setText(count + " images selected");
+//
+//        for (int i = 0; i < count; i++) {
+//            selectedImageURLsTask.add(Tasks.forResult(Uri.parse(imageURIs.get(i))));
+//            Log.d("Deleted images task", selectedImageURLsTask.get(i).getResult().toString());
+//        }
+//
+//        for (int i = 0; i < count; i++) {
+//            selectedImageURLs.add(imageURIs.get(i));
+//            Log.d("Deleted images", selectedImageURLs.get(i));
+//        }
     }
 
     @Override
@@ -131,5 +131,10 @@ public class SelectImageActivity extends AppCompatActivity implements ImageAdapt
 //        for(String u: selectedImageURIs) {
 //            Log.d("current uris", u);
 //        }
+    }
+
+    @Override
+    public void toggleMultipleChoice() {
+
     }
 }

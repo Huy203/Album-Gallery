@@ -1,10 +1,11 @@
 package com.example.albumgallery.controller;
 
 import com.example.albumgallery.helper.DatabaseHelper;
+import com.example.albumgallery.model.ImageAlbumModel;
 import com.example.albumgallery.model.Model;
-import com.example.albumgallery.model.auth.ImageAlbumModel;
 
 import android.content.Context;
+import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,7 +23,8 @@ public class ImageAlbumController implements Controller {
     }
     public List<ImageAlbumModel> getAllImageAlbums() {
         // Get all ImageAlbums
-        List<String> data = dbHelper.getAll("ImageAlbum");
+        List<String> data = dbHelper.getAll("Image_Album");
+        Log.d("check delete data", String.valueOf(data));
         List<ImageAlbumModel> ImageAlbumModels = new ArrayList<>();
         for (String s : data) {
             String[] temp = s.split(",");
@@ -32,20 +34,20 @@ public class ImageAlbumController implements Controller {
     }
     @Override
     public void insert(Model model) {
-//        dbHelper.insert("ImageAlbum", model);
+//        dbHelper.insert("Image_Album", model);
         dbHelper.insertByCustomId("Image_Album", model);
         dbHelper.close();
     }
 
     @Override
     public void update(String column, String value, String where) {
-        dbHelper.update("ImageAlbum", column, value, where);
+        dbHelper.update("Image_Album", column, value, where);
         dbHelper.close();
     }
 
     @Override
     public void delete(String where) {
-        dbHelper.delete("ImageAlbum", where);
+        dbHelper.delete("Image_Album", where);
         dbHelper.close();
     }
 
@@ -59,8 +61,9 @@ public class ImageAlbumController implements Controller {
         return dbHelper.getImageIdsByAlbumId(albumId);
     }
 
-    public void deleteImageAlbum() {
+    public void deleteImageAlbum(long id_album) {
         // Delete an ImageAlbum
+        this.delete("album_id = " + id_album);
     }
 
     public void editImageAlbum() {

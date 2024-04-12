@@ -38,7 +38,7 @@ public class Utilities {
         return null;
     }
 
-    public static Bitmap imageToBitmap(String uri) {
+    public static Bitmap convertFromUriToBitmap(String uri) {
         try {
             URL url = new URL(uri);
             return BitmapFactory.decodeStream(url.openConnection().getInputStream());
@@ -48,39 +48,19 @@ public class Utilities {
         return null;
     }
 
-    public static Uri bitmapToUri(Bitmap bitmap, Context context) {
-        try {
-            ByteArrayOutputStream bytes = new ByteArrayOutputStream();
-            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, bytes);
-            String path = MediaStore.Images.Media.insertImage(context.getContentResolver(), bitmap, "Title", null);
-            return Uri.parse(path);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return null;
+    public static Uri convertFromBitmapToUri(Context inContext, Bitmap inImage) {
+        String imageName = "IMG_" + System.currentTimeMillis() + ".jpg";
+        ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+        inImage.compress(Bitmap.CompressFormat.JPEG, 100, bytes);
+        String path = MediaStore.Images.Media.insertImage(inContext.getContentResolver(), inImage, imageName, null);
+        return Uri.parse(path);
     }
+
 
     public static String getImageAddedDate() {
         long currentTime = new Date().getTime();
         return new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(currentTime);
     }
 
-    public static boolean showAlertDialog(Context context, String title, String message, String btnYes, String btnNo) {
-        final boolean[] result = {false};
-        new AlertDialog.Builder(context)
-                .setTitle(title)
-                .setMessage(message)
-                .setPositiveButton(btnYes, new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int which) {
-                        result[0] = true;
-                    }
-                })
-                .setNegativeButton(btnNo, new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int which) {
-                        result[0] = false;
-                    }
-                })
-                .show();
-        return result[0];
-    }
+
 }

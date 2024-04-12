@@ -25,6 +25,16 @@
                 app:iconTint="@color/black" />
 
             <com.google.android.material.button.MaterialButton
+                android:id="@+id/action_add"
+                style="?attr/materialIconButtonStyle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:onClick="addAction"
+                app:icon="@drawable/baseline_add_50"
+                app:iconTint="@color/black" />
+
+
+            <com.google.android.material.button.MaterialButton
                 android:id="@+id/action_like"
                 style="?attr/materialIconButtonStyle"
                 android:layout_width="wrap_content"
@@ -50,7 +60,6 @@
                 android:onClick="deleteAction"
                 app:icon="@drawable/delete_black"
                 app:iconTint="@color/black" />
-
 
         </com.google.android.flexbox.FlexboxLayout>
 

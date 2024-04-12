@@ -2,11 +2,14 @@ package com.example.albumgallery.controller;
 
 import com.example.albumgallery.helper.DatabaseHelper;
 import com.example.albumgallery.model.AlbumModel;
+import com.example.albumgallery.model.ImageModel;
 import com.example.albumgallery.model.Model;
 
 import android.content.Context;
+import android.util.Log;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class AlbumController implements Controller {
@@ -23,10 +26,11 @@ public class AlbumController implements Controller {
     public List<AlbumModel> getAllAlbums() {
         // Get all albums
         List<String> data = dbHelper.getAll("Album");
+        Log.d("check delete data", String.valueOf(data));
         List<AlbumModel> albumModels = new ArrayList<>();
         for (String s : data) {
             String[] temp = s.split(",");
-            albumModels.add(new AlbumModel(Integer.parseInt(temp[0]), temp[1], Integer.parseInt(temp[2]), temp[3], temp[4], Integer.parseInt(temp[5])));
+            albumModels.add(new AlbumModel(Integer.parseInt(temp[0]), temp[1], Integer.parseInt(temp[2]), temp[4], temp[5], Integer.parseInt(temp[7])));
         }
         return albumModels;
     }
@@ -85,8 +89,10 @@ public class AlbumController implements Controller {
         return dbHelper.getAllThumbnails();
     }
 
-    public void deleteAlbum() {
+    public void deleteAlbum(String name) {
         // Delete an album
+        dbHelper.delete("Album", "name='" + name + "'");
+        dbHelper.close();
     }
 
     public void editAlbum() {
@@ -108,4 +114,12 @@ public class AlbumController implements Controller {
     public void unfavouriteAlbum() {
         // Unfavourite an album
     }
+
+    public AlbumModel getAlbumById(long id) {
+        String data = dbHelper.getById("Album", id);
+        String[] temp = data.split(",");
+        Log.d("temp data", Arrays.toString(temp));
+        return new AlbumModel(Integer.parseInt(temp[0]), temp[1], Integer.parseInt(temp[2]), temp[4], temp[5], Integer.parseInt(temp[7]));
+    }
+
 }

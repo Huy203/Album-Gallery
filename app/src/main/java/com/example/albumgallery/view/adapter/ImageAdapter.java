@@ -25,20 +25,15 @@ import com.example.albumgallery.R;
 import com.example.albumgallery.view.listeners.ImageAdapterListener;
 import com.google.android.material.progressindicator.CircularProgressIndicator;
 
-import java.io.File;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
-public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> implements View.OnClickListener {
+public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> {
     private final Context context;
-    private final List<String> imageURLs;
-    private final List<String> ids;
-    private final SparseBooleanArray selectedItems;
-    private boolean isMultipleChoice = false;
-    private ImageAdapterListener listener;
-
-    private List<String> selectedURIs;
+    private final List<String> imageURLs;  // List of image URLs
+    private final SparseBooleanArray selectedItems; // SparseBooleanArray to store selected items
+    private boolean isMultipleChoice = false; // Flag to determine if multiple choice is enabled
+    private ImageAdapterListener listener; // Listener to handle image selection
 
 
     public ImageAdapter(Activity activity, List<String> imageURLs) {
@@ -46,17 +41,6 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> 
         this.imageURLs = imageURLs;
         this.selectedItems = new SparseBooleanArray();
         this.listener = (ImageAdapterListener) activity;
-        this.ids = new ArrayList<>();
-        this.selectedURIs = new ArrayList<>();
-    }
-
-    public ImageAdapter(Activity activity, List<String> imageURLs, List<String> ids) {
-        this.context = activity;
-        this.imageURLs = imageURLs;
-        this.selectedItems = new SparseBooleanArray();
-        this.listener = (ImageAdapterListener) activity;
-        this.ids = ids;
-        this.selectedURIs = new ArrayList<>();
     }
 
     @NonNull
@@ -68,8 +52,14 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> 
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        String imageURL = imageURLs.get(position);
-        holder.bind(imageURL, position);
+        String imageURL = getImageURLs().get(position);
+        holder.bind(imageURL);
+        holder.checkbox.setVisibility(isMultipleChoice ? View.VISIBLE : View.GONE); // Update visibility based on isMultipleChoice
+    }
+
+    @Override
+    public int getItemCount() {
+        return getImageURLs().size();
     }
 
     public void setMultipleChoiceEnabled(boolean isMultipleChoice) {
@@ -80,34 +70,42 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> 
         return isMultipleChoice;
     }
 
-    public int getItemCount() {
-        return imageURLs.size();
+    public List<String> getImageURLs() {
+        return imageURLs;
+    }
+
+    public SparseBooleanArray getSelectedItems() {
+        return selectedItems;
+    }
+    public void emptySelectedItems() {
+        selectedItems.clear();
+    }
+
+    public List<String> getSelectedImageURLs() {
+        List<String> selectedImageURLs = new ArrayList<>();
+        for (int i = 0; i < getSelectedItems().size(); i++) {
+            int key = getSelectedItems().keyAt(i);
+            if (getSelectedItems().get(key)) {
+                selectedImageURLs.add(getImageURLs().get(key));
+            }
+        }
+        return selectedImageURLs;
     }
 
     public boolean toggleMultipleChoiceImagesEnabled() {
         if (listener != null) {
             setMultipleChoiceEnabled(!isMultipleChoice);
-        }
-        else{
+            notifyDataSetChanged(); // Notify adapter to update views
+        } else {
             Log.v("ImageAdapter", "toggleMultipleChoiceImagesEnabled: listener is null");
         }
-        if (getMultipleChoiceImagesEnabled()) {
-            View view = LayoutInflater.from(context).inflate(R.layout.item_image, null);
-            CheckBox checkBox = view.findViewById(R.id.checkbox);
-            checkBox.setVisibility(View.INVISIBLE);
-        }
+        Log.v("ImageAdapter", "isMultipleChoice: " + isMultipleChoice);
         return isMultipleChoice;
     }
 
     public void clearSelectedItems() {
-        selectedItems.clear();
-        selectedURIs.clear();
-        notifyDataSetChanged();
-    }
-
-    @Override
-    public void onClick(View view) {
-
+        getSelectedItems().clear();
+        isMultipleChoice = false;
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {
@@ -120,12 +118,11 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> 
             super(itemView);
             imageView = itemView.findViewById(R.id.imageView);
             checkbox = itemView.findViewById(R.id.checkbox);
-            progressIndicator = (CircularProgressIndicator) itemView.findViewById(R.id.circularProgressIndicator);
+            progressIndicator = itemView.findViewById(R.id.circularProgressIndicator);
             progressIndicator.setVisibility(View.VISIBLE);
         }
 
-        public void bind(String imageURL, int position) {
-            checkbox.setChecked(selectedItems.get(position, false));
+        public void bind(String imageURL) {
             Glide.with(context)
                     .load(Uri.parse(imageURL))
                     .listener(new RequestListener<Drawable>() {
@@ -143,39 +140,47 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> 
                     })
                     .into(imageView);
 
+            checkbox.setOnClickListener(view -> toggleSelection());
+
             itemView.setOnClickListener(view -> {
                 if (!isMultipleChoice) {
-                    listener.handleImagePick(imageView, imageURL, position);
+                    listener.handleImagePick(imageView, imageURL, getAdapterPosition());
                 } else {
-                    toggleSelection(position, imageURL);
-                    listener.getInteractedURIs(imageURL);
-                    listener.getSelectedItemsCount(selectedItems.size());
+                    toggleSelection();
                 }
             });
 
-            checkbox.setVisibility(isMultipleChoice ? View.VISIBLE : View.INVISIBLE);
+            itemView.setOnLongClickListener(view -> {
+                isMultipleChoice = true;
+                toggleSelection();
+                return true;
+            });
+            listener.getInteractedURIs(imageURL);
+        }
+
+        private void toggleSelection() {
+            int position = getAdapterPosition();
+            if (getSelectedItems().get(position, false)) {
+                checkbox.setChecked(false);
+                checkbox.setVisibility(View.GONE);
+                getSelectedItems().delete(position);
+            } else {
+                checkbox.setChecked(true);
+                checkbox.setVisibility(View.VISIBLE);
+                getSelectedItems().put(position, true);
+            }
+            listener.toggleMultipleChoice();
         }
     }
-
-    private void toggleSelection(int position, String uri) {
-        if (selectedItems.get(position, false)) {
-            selectedItems.delete(position);
-        } else {
-            selectedItems.put(position, true);
-        }
-        notifyItemChanged(position);
-    }
-
-
-    // Xử lý sắp xếp hình ảnh theo date
-    public void sortImageByDate() {
-        Collections.sort(imageURLs, (path_1, path_2) -> Long.compare(getImageDate(path_1), getImageDate(path_2)));
-        notifyDataSetChanged();
-    }
-
-    private long getImageDate(String imageURL) {
-        File imageFile = new File(imageURL);
-        return imageFile.exists() ? imageFile.lastModified() : 0;
-    }
-
+//
+//    // Xử lý sắp xếp hình ảnh theo date
+//    public void sortImageByDate() {
+//        Collections.sort(getImageURLs(), (path_1, path_2) -> Long.compare(getImageDate(path_1), getImageDate(path_2)));
+//        notifyDataSetChanged();
+//    }
+//
+//    private long getImageDate(String imageURL) {
+//        File imageFile = new File(imageURL);
+//        return imageFile.exists() ? imageFile.lastModified() : 0;
+//    }
 }

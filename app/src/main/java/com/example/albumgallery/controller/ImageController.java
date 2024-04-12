@@ -6,13 +6,12 @@ import static com.example.albumgallery.utils.Constant.REQUEST_CODE_EDIT_IMAGE;
 import static com.example.albumgallery.utils.Constant.REQUEST_CODE_PICK_MULTIPLE_IMAGES;
 import static com.example.albumgallery.utils.Constant.imageExtensions;
 import static com.example.albumgallery.utils.Utilities.byteArrayToBitmap;
+import static com.example.albumgallery.utils.Utilities.convertFromBitmapToUri;
 import static com.example.albumgallery.utils.Utilities.getImageAddedDate;
-import static java.text.DateFormat.getDateTimeInstance;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.ClipData;
-import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
@@ -30,7 +29,6 @@ import com.example.albumgallery.model.ImageModel;
 import com.example.albumgallery.model.Model;
 import com.example.albumgallery.utils.QRCodeRecognization;
 import com.example.albumgallery.view.activity.MainFragmentController;
-import com.example.albumgallery.view.listeners.BackgroundProcessingCallback;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
@@ -39,7 +37,6 @@ import com.google.firebase.storage.StorageMetadata;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
@@ -64,6 +61,10 @@ public class ImageController implements Controller {
 
     private DatabaseHelper getDbHelper() {
         return dbHelper;
+    }
+
+    public Activity getActivity() {
+        return activity;
     }
 
     public void create(String name, int width, int height, long capacity, String dateAdded) {
@@ -91,13 +92,6 @@ public class ImageController implements Controller {
         dbHelper.close();
     }
 
-    public void pickMultipleImages(BackgroundProcessingCallback callback) {
-        idSelectedImages.clear(); // Clear the list of image previously selected
-        Intent intent = new Intent(Intent.ACTION_GET_CONTENT, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-        intent.setAction(Intent.ACTION_PICK);
-        intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
-        activity.startActivityForResult(intent, REQUEST_CODE_PICK_MULTIPLE_IMAGES);
-    }
 
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (resultCode == RESULT_OK && data != null) {
@@ -109,7 +103,7 @@ public class ImageController implements Controller {
                 case REQUEST_CODE_CAMERA:
                     bitmap = (Bitmap) Objects.requireNonNull(data.getExtras()).get("data");
                     if (bitmap != null) {
-                        Uri imageUri = convertFromBitmapToURI(activity, bitmap);
+                        Uri imageUri = convertFromBitmapToUri(activity, bitmap);
                         handleImage(imageUri, requestCode);
                     } else {
                         Log.d("Camera in app", "Bitmap Image is null");
@@ -119,7 +113,7 @@ public class ImageController implements Controller {
                     byte[] byteArray = data.getByteArrayExtra("imageByteArray");
                     bitmap = byteArrayToBitmap(byteArray);
                     if (bitmap != null) {
-                        Uri imageUri = convertFromBitmapToURI(activity, bitmap);
+                        Uri imageUri = convertFromBitmapToUri(activity, bitmap);
                         handleImage(imageUri, requestCode);
                     } else {
                         Log.d("Edit image", "Bitmap Image is null");
@@ -129,14 +123,6 @@ public class ImageController implements Controller {
         }
     }
 
-
-    public Uri convertFromBitmapToURI(Context inContext, Bitmap inImage) {
-        String imageName = "IMG_" + System.currentTimeMillis() + ".jpg";
-        ByteArrayOutputStream bytes = new ByteArrayOutputStream();
-        inImage.compress(Bitmap.CompressFormat.JPEG, 100, bytes);
-        String path = MediaStore.Images.Media.insertImage(inContext.getContentResolver(), inImage, imageName, null);
-        return Uri.parse(path);
-    }
 
     private void handleImagePicked(Intent data) {
         Log.v("Image", "Image picked" + " " + data.getData());
@@ -191,7 +177,6 @@ public class ImageController implements Controller {
             uploadTask.addOnCompleteListener(task -> {
                 if (task.isSuccessful()) {
                     Uri firebaseURI = task.getResult();
-                    Log.d("test firebase uri", firebaseURI.toString());
                     update("ref", firebaseURI.toString(), "id = " + id_string);
                     if (requestCode == REQUEST_CODE_CAMERA) {
                         activity.runOnUiThread(() -> {
@@ -218,7 +203,6 @@ public class ImageController implements Controller {
             if (cursor != null && cursor.moveToFirst()) {
                 name = cursor.getString(cursor.getColumnIndex(MediaStore.Images.Media.DISPLAY_NAME));
                 capacity = cursor.getLong(cursor.getColumnIndex(MediaStore.Images.Media.SIZE));
-                long temp = cursor.getLong(cursor.getColumnIndex(MediaStore.Images.Media.DATE_ADDED));
                 // Convert milliseconds to a more readable format (optional)
                 dateAdded = getImageAddedDate();
             }
@@ -288,12 +272,18 @@ public class ImageController implements Controller {
         }
         return true;
     }
+
     public String getExtensionName(Uri uri) {
         String fileName = uri.getPathSegments().get(uri.getPathSegments().size() - 1);
         return fileName.split("\\.")[fileName.split("\\.").length - 1];
     }
+
     public List<String> getAllImageURLs() {
-        return dbHelper.getAllRef("Image");
+        return dbHelper.getAllRef("Image", null);
+    }
+
+    public List<String> getAllImageURLsUndeleted() {
+        return dbHelper.getAllRef("Image", "is_deleted = 0");
     }
 
     public ImageModel getImageById(long id) {
@@ -302,7 +292,7 @@ public class ImageController implements Controller {
         boolean isFavourited = temp[10].equals("1");
         boolean isDeleted = temp[9].equals("1");
         return new ImageModel(Integer.parseInt(temp[0]), temp[1], Integer.parseInt(temp[2]), Integer.parseInt(temp[3]), Long.parseLong(temp[4]), temp[5], temp[6], temp[7], temp[8], isDeleted, isFavourited);
-     }
+    }
 
     public long getIdByRef(String ref) {
         return dbHelper.getId("Image", "ref = '" + ref + "'");
@@ -311,6 +301,11 @@ public class ImageController implements Controller {
     public List<String> getAllImageURLsSortByDate() {
         return dbHelper.selectImagesSortByDate("Image", "ref", "descending");
     }
+
+    public List<String> getAllImageURLsSortByDateAtBin() {
+        return dbHelper.selectImagesSortByDateAtBin("Image", "ref", "descending");
+    }
+
     public List<String> getAllImageIds() {
         return dbHelper.getFromImage("id");
     }
@@ -324,12 +319,15 @@ public class ImageController implements Controller {
         dbHelper.update("image", "is_favourited", isFavourited ? "0" : "1", "id = " + imageId);
         return !isFavourited;
     }
+
     public boolean isFavoriteImage(long imageId) {
         return dbHelper.isFavoriteImage(imageId);
     }
+
     public List<String> getAllFavoriteImageRef() {
         return dbHelper.getAllFavoriteImageRef();
     }
+
     public List<String> getSelectedImageURLs() {
         final String replace = idSelectedImages.toString().replace("[", "").replace("]", "");
         Log.v("Image", "Selected images: " + "ref" + "id IN (" + replace + ")");
@@ -363,24 +361,18 @@ public class ImageController implements Controller {
         StorageReference desertRef = storageRef.child(URL);
 
         // Delete the file
-        desertRef.delete().addOnSuccessListener(new OnSuccessListener<Void>() {
-            @Override
-            public void onSuccess(Void aVoid) {
-                // File deleted successfully
-                delete("ref = '" + imageURL + "'");
-                Toast.makeText(activity, "Image deleted successfully", Toast.LENGTH_SHORT).show();
-                // You may want to update your local data or UI here if necessary.
+        desertRef.delete().addOnSuccessListener(aVoid -> {
+            // File deleted successfully
+            delete("ref = '" + imageURL + "'");
+            Toast.makeText(activity, "Image deleted successfully", Toast.LENGTH_SHORT).show();
+            // You may want to update your local data or UI here if necessary.
 
-                Intent intent = new Intent(activity, MainFragmentController.class);
-                activity.startActivity(intent);
-                activity.finish();
-            }
-        }).addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception exception) {
-                // Uh-oh, an error occurred!
-                Toast.makeText(activity, "Image deleted failed", Toast.LENGTH_SHORT).show();
-            }
+//            Intent intent = new Intent(activity, MainFragmentController.class);
+//            activity.startActivity(intent);
+//            activity.finish();
+        }).addOnFailureListener(exception -> {
+            // Uh-oh, an error occurred!
+            Toast.makeText(activity, "Image deleted failed", Toast.LENGTH_SHORT).show();
         });
     }
 
@@ -409,41 +401,104 @@ public class ImageController implements Controller {
         return getAllImageURLs();
     }
 
-    public void deleteSelectedImageAtHomeScreeen(List<Task> imageURLs) {
+    public void deleteSelectedImageAtBin(List<Task> imageURLs) {
         FirebaseStorage storage = FirebaseStorage.getInstance();
         // Create a storage reference from our app
         StorageReference storageRef = storage.getReference();
+        try {
+            Log.v("Image", "Deleting images" + " " + imageURLs.size());
+            for (Task taskImageURL : imageURLs) {
+                if (taskImageURL.isSuccessful()) {
+                    String imageURL = taskImageURL.getResult().toString();
+                    Log.d("Image task", imageURL);
+                    String URL = parseURL(imageURL);
 
+                    // Create a reference to the file to delete
+                    StorageReference desertRef = storageRef.child(URL);
+
+                    // Delete the file
+                    desertRef.delete().addOnSuccessListener(new OnSuccessListener<Void>() {
+                        @Override
+                        public void onSuccess(Void aVoid) {
+                            // File deleted successfully
+                            delete("ref = '" + imageURL + "'");
+                            if (allTasksCompletedGeneric(imageURLs)) {
+                                Log.v("Image", "All images deleted" + activity);
+                                activity.runOnUiThread(() -> {
+                                    ((MainFragmentController) activity).onBackgroundTaskCompleted();
+                                });
+                            }
+                        }
+                    }).addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception exception) {
+                            // Uh-oh, an error occurred!
+                            Toast.makeText(activity, "Image deleted failed", Toast.LENGTH_SHORT).show();
+                        }
+                    });
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void deleteSelectedImageAtHomeScreeen(List<Task> imageURLs) {
+        Log.d("get into delete at homescreen function", String.valueOf(activity));
         for (Task taskImageURL : imageURLs) {
             if (taskImageURL.isSuccessful()) {
                 String imageURL = taskImageURL.getResult().toString();
                 Log.d("Image task", imageURL);
                 String URL = parseURL(imageURL);
 
-                // Create a reference to the file to delete
-                StorageReference desertRef = storageRef.child(URL);
+                long imageID = dbHelper.getImageIdByURL(imageURL);
+
+                setDeleteAtHomeScreen(imageID, true);
+
+                Log.d("delete image url", imageURL);
+                Log.d("delete id", String.valueOf(imageID));
 
                 // Delete the file
-                desertRef.delete().addOnSuccessListener(new OnSuccessListener<Void>() {
-                    @Override
-                    public void onSuccess(Void aVoid) {
-                        // File deleted successfully
-                        delete("ref = '" + imageURL + "'");
-                        if (allTasksCompletedGeneric(imageURLs)) {
-                            activity.runOnUiThread(() -> {
-                                ((MainFragmentController) activity).onBackgroundTaskCompleted();
-                            });
-                        }
-                    }
-                }).addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception exception) {
-                        // Uh-oh, an error occurred!
-                        Toast.makeText(activity, "Image deleted failed", Toast.LENGTH_SHORT).show();
-                    }
-                });
+                if (allTasksCompletedGeneric(imageURLs)) {
+                    Log.v("Image", "All images deleted" + activity);
+//                    try{
+//                        activity.runOnUiThread(() -> {
+//                            ((MainFragmentController) activity).onBackgroundTaskCompleted();
+//                        });
+//                    } catch (Exception e) {
+//                        e.printStackTrace();
+//                    }
+                }
             }
         }
+    }
+
+    public long getTotalCapacityFromImageIDs(List<Long> imageIDs) {
+        return dbHelper.getTotalCapacityFromImageIDs(imageIDs);
+    }
+
+    public void toggleDeleteImage(long imageId) {
+        dbHelper.toggleDeleteImage(imageId);
+    }
+
+    public void setDelete(long imageId, boolean isDelete) {
+        dbHelper.setDelete(imageId, isDelete);
+
+//        Intent intent = new Intent(activity, MainFragmentController.class);
+//        activity.startActivity(intent);
+//        activity.finish();
+    }
+
+    public void setDeleteAtHomeScreen(long imageId, boolean isDelete) {
+        dbHelper.setDelete(imageId, isDelete);
+    }
+
+    public boolean isDeleteImage(long imageId) {
+        return dbHelper.isDeleteImage(imageId);
+    }
+
+    public List<String> getAllDeleteImageRef() {
+        return dbHelper.getAllDeleteImageRef();
     }
 
     public String recognizeQRCode(String uri) {
