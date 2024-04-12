@@ -54,6 +54,34 @@ android {
     kotlinOptions {
         jvmTarget = "19"
     }
+    sourceSets {
+        getByName("main").java.srcDirs("src/main/java")
+        getByName("main").res.srcDirs(
+            "src/main/res",
+            "src/main/res/drawable",
+            "src/main/res/drawable-v24",
+            "src/main/res/layout/activity/user",
+            "src/main/res/layout/activity/albums",
+            "src/main/res/layout/activity/album_detail",
+            "src/main/res/layout/activity/images",
+            "src/main/res/layout/activity/image_detail",
+            "src/main/res/layout/activity/images",
+            "src/main/res/layout/activity/images",
+            "src/main/res/layout/activity",
+            "src/main/res/layout/fragment",
+            "src/main/res/layout",
+            "src/main/res/menu",
+            "src/main/res/mipmap-anydpi-v26",
+            "src/main/res/mipmap-hdpi",
+            "src/main/res/mipmap-mdpi",
+            "src/main/res/mipmap-xhdpi",
+            "src/main/res/mipmap-xxhdpi",
+            "src/main/res/mipmap-xxxhdpi",
+            "src/main/res/values",
+            "src/main/res/values-night",
+            "src/main/res/xml"
+        )
+    }
 
 }
 
@@ -103,5 +131,4 @@ dependencies {
     implementation("com.google.zxing:core:3.4.1")
 
 
-
-}    
+}

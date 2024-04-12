@@ -11,6 +11,8 @@ import android.provider.MediaStore;
 
 import androidx.appcompat.app.AlertDialog;
 
+import com.example.albumgallery.helper.SharePreferenceHelper;
+
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.net.URL;
@@ -62,5 +64,7 @@ public class Utilities {
         return new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(currentTime);
     }
 
-
+    public static boolean isDarkModeEnabled(Context context) {
+        return SharePreferenceHelper.isDarkModeEnabled(context);
+    }
 }

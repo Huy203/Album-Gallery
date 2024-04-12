@@ -26,6 +26,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.albumgallery.R;
 import com.example.albumgallery.controller.MainController;
+import com.example.albumgallery.helper.SharePreferenceHelper;
 import com.example.albumgallery.view.activity.DetailPicture;
 import com.example.albumgallery.view.adapter.ImageAdapter;
 import com.example.albumgallery.view.listeners.BackgroundProcessingCallback;
@@ -81,6 +82,10 @@ public class HomeScreenFragment extends Fragment {
         initializeVariables(view);
         setupButtons();
         updateUI();
+
+        view.findViewById(R.id.refreshButton).setOnClickListener(v -> {
+            SharePreferenceHelper.setDarkModeEnabled(getActivity(), !SharePreferenceHelper.isDarkModeEnabled(getActivity()));
+        });
     }
 
     private void initializeVariables(View view) {

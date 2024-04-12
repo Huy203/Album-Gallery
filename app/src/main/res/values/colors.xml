@@ -43,5 +43,25 @@
     <color name="pinkColor">#FFC2185B</color>
     <color name="transparent">#00000000</color>
 
+    <color name="colorPrimary">#FF6200EE</color>
+    <color name="colorPrimaryDark">#FF3700B3</color>
+    <color name="colorAccent">#FF03DAC5</color>
+    <color name="colorPrimaryVariant">#FF3700B3</color>
+    <color name="colorSecondary">#FF03DAC5</color>
+    <color name="colorSecondaryVariant">#FF018786</color>
+    <color name="colorBackground">#FFFFFFFF</color>
+    <color name="colorSurface">#FFFFFFFF</color>
+    <color name="colorError">#FFB00020</color>
+    <color name="colorOnPrimary">#FFFFFFFF</color>
+    <color name="colorOnSecondary">#FF000000</color>
+    <color name="colorOnBackground">#FF000000</color>
+    <color name="colorOnSurface">#FF000000</color>
+    <color name="colorOnError">#FFFFFFFF</color>
+    <color name="colorOnPrimaryVariant">#FFFFFFFF</color>
+    <color name="colorControlActivated">#FF03DAC5</color>
+    <color name="colorControlNormal">#FF9E9E9E</color>
+    <color name="colorControlHighlight">#FF03DAC5</color>
+
+
     <color name="hintTextColor">#7C7C7C</color>
 </resources>

@@ -17,46 +17,41 @@
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/action_zoom_in"
-                style="?attr/materialIconButtonStyle"
+                style="@style/AppButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                app:icon="@drawable/zoom_in"
-                app:iconTint="@color/black" />
+                app:icon="@drawable/zoom_in" />
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/action_zoom_out"
-                style="?attr/materialIconButtonStyle"
+                style="@style/AppButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                app:icon="@drawable/zoom_out"
-                app:iconTint="@color/black" />
+                app:icon="@drawable/zoom_out" />
 
             <!-- com.google.android.material.button.MaterialButton Rotate -->
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/action_rotate"
-                style="?attr/materialIconButtonStyle"
+                style="@style/AppButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                app:icon="@drawable/refresh"
-                app:iconTint="@color/black" />
+                app:icon="@drawable/refresh" />
 
             <!-- com.google.android.material.button.MaterialButton Cut -->
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/action_crop"
-                style="?attr/materialIconButtonStyle"
+                style="@style/AppButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                app:icon="@drawable/crop"
-                app:iconTint="@color/black" />
+                app:icon="@drawable/crop" />
 
             <!-- com.google.android.material.button.MaterialButton Beautify -->
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/action_beautify"
-                style="?attr/materialIconButtonStyle"
+                style="@style/AppButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                app:icon="@drawable/beautiful"
-                app:iconTint="@color/black" />
+                app:icon="@drawable/beautiful" />
 
         </com.google.android.flexbox.FlexboxLayout>
 

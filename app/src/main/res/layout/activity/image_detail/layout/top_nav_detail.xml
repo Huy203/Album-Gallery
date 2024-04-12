@@ -23,12 +23,11 @@
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/action_back"
-                    style="?attr/materialIconButtonStyle"
+                    style="@style/AppButton"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:onClick="backAction"
-                    app:icon="@drawable/back_black"
-                    app:iconTint="@color/black" />
+                    app:icon="@drawable/back_black" />
 
                 <LinearLayout
                     android:layout_width="wrap_content"
@@ -64,21 +63,19 @@
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/action_edit"
-                    style="?attr/materialIconButtonStyle"
+                    style="@style/AppButton"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:onClick="editAction"
-                    app:icon="@drawable/pencil_black"
-                    app:iconTint="@color/black" />
+                    app:icon="@drawable/pencil_black" />
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/action_menu"
-                    style="?attr/materialIconButtonStyle"
+                    style="@style/AppButton"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:onClick="menuAction"
-                    app:icon="@drawable/menu_black"
-                    app:iconTint="@color/black" />
+                    app:icon="@drawable/menu_black" />
             </LinearLayout>
 
         </com.google.android.flexbox.FlexboxLayout>

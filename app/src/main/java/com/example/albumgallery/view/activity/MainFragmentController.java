@@ -17,12 +17,14 @@ import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatDelegate;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
 import com.example.albumgallery.R;
 import com.example.albumgallery.databinding.ActivityFragmentControllerBinding;
+import com.example.albumgallery.helper.SharePreferenceHelper;
 import com.example.albumgallery.view.fragment.AlbumsMainFragment;
 import com.example.albumgallery.view.fragment.BinFragment;
 import com.example.albumgallery.view.fragment.FavoriteFragment;
@@ -33,7 +35,6 @@ import com.example.albumgallery.view.listeners.ImageAdapterListener;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 
 
 public class MainFragmentController extends AppCompatActivity implements BackgroundProcessingCallback, ImageAdapterListener, FragToActivityListener {
@@ -46,6 +47,12 @@ public class MainFragmentController extends AppCompatActivity implements Backgro
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        boolean isDarkMode = SharePreferenceHelper.isDarkModeEnabled(this);
+        if (isDarkMode) {
+            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
+        } else {
+            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
+        }
         HomeScreenFragment fragment = new HomeScreenFragment();
         getSupportFragmentManager().beginTransaction()
                 .add(R.id.fragment_container, fragments.get(0))
@@ -87,15 +94,13 @@ public class MainFragmentController extends AppCompatActivity implements Backgro
 
         if (currentFragment instanceof HomeScreenFragment) {
             if (isBackgroundTaskCompleted)
-                ((HomeScreenFragment)currentFragment).updateUI();
-        }
-        else if (currentFragment instanceof FavoriteFragment) {
+                ((HomeScreenFragment) currentFragment).updateUI();
+        } else if (currentFragment instanceof FavoriteFragment) {
 //            if (isBackgroundTaskCompleted)
 //                ((FavoriteFragment)currentFragment).updateUI();
-        }
-        else if (currentFragment instanceof BinFragment) {
+        } else if (currentFragment instanceof BinFragment) {
             if (isBackgroundTaskCompleted)
-                ((BinFragment)currentFragment).updateUI();
+                ((BinFragment) currentFragment).updateUI();
         }
     }
 
@@ -187,6 +192,7 @@ public class MainFragmentController extends AppCompatActivity implements Backgro
     public void getInteractedURIs(String uri) {
 
     }
+
     /**
      * This method is used to toggle multiple choice mode in the fragment
      */
@@ -282,7 +288,7 @@ public class MainFragmentController extends AppCompatActivity implements Backgro
             case "Delete":
                 boolean isDeleted = (boolean) data;
                 Log.v("MainFragmentController", "Is deleted: " + isDeleted);
-                if(isDeleted) {
+                if (isDeleted) {
                     toggleMultipleChoice();
                 } else {
                     Toast.makeText(this, "Failed to delete image", Toast.LENGTH_SHORT).show();

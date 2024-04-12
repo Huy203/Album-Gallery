@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/top_nav_main"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:id="@+id/top_nav_main">
+    android:layout_height="wrap_content">
 
     <com.google.android.material.appbar.AppBarLayout
         android:layout_width="match_parent"
@@ -38,31 +38,33 @@
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/action_select"
-                    style="?attr/materialIconButtonStyle"
-                    android:layout_width="50dp"
-                    android:layout_height="50dp"
+                    style="@style/AppButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:importantForAccessibility="no"
                     android:onClick="selectAction"
-                    app:icon="@drawable/baseline_add_50"
-                    app:iconTint="@color/black" />
+                    android:scaleType="fitCenter"
+                    app:icon="@drawable/add_black" />
 
-                <ImageButton
+                <com.google.android.material.button.MaterialButton
                     android:id="@+id/btnCamera"
-                    android:layout_width="50dp"
-                    android:layout_height="50dp"
+                    style="@style/AppButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
                     android:background="?attr/selectableItemBackgroundBorderless"
-                    android:contentDescription="camera"
+                    android:importantForAccessibility="no"
                     android:onClick="cameraAction"
-                    android:padding="8dp"
-                    android:scaleType="fitCenter"
-                    android:src="@drawable/camera_icon" />
+                    app:icon="@drawable/camera_black" />
 
                 <ImageButton
-                    android:id="@+id/action_menu"
+                    android:id="@+id/action_user"
                     android:layout_width="50dp"
                     android:layout_height="50dp"
                     android:background="?attr/selectableItemBackgroundBorderless"
-                    android:src="@drawable/logo"
+                    android:importantForAccessibility="no"
+                    android:onClick="userAction"
                     android:scaleType="fitCenter"
+                    android:src="@drawable/logo"
                     app:cornerRadius="4dp" />
 
             </LinearLayout>
