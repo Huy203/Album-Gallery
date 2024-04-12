@@ -25,6 +25,7 @@ import androidx.fragment.app.FragmentTransaction;
 import com.example.albumgallery.R;
 import com.example.albumgallery.databinding.ActivityFragmentControllerBinding;
 import com.example.albumgallery.helper.SharePreferenceHelper;
+import com.example.albumgallery.presentations.user.UserActivity;
 import com.example.albumgallery.view.fragment.AlbumsMainFragment;
 import com.example.albumgallery.view.fragment.BinFragment;
 import com.example.albumgallery.view.fragment.FavoriteFragment;
@@ -275,6 +276,11 @@ public class MainFragmentController extends AppCompatActivity implements Backgro
         intent.setType("image/*");
         intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
         this.startActivityForResult(intent, REQUEST_CODE_PICK_MULTIPLE_IMAGES);
+    }
+
+    public void userAction(View view) {
+        Intent intent = new Intent(this, UserActivity.class);
+        startActivity(intent);
     }
 
     @SuppressLint("SetTextI18n")

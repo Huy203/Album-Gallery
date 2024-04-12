@@ -40,4 +40,5 @@
     <string name="dark_mode">Dark mode</string>
     <string name="save_settings">Save Settings</string>
     <string name="album_gallery">Album Gallery</string>
+    <string name="sign_out">Sign Out</string>
 </resources>
