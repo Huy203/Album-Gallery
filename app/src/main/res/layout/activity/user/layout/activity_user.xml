@@ -1,0 +1,81 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:style="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <!-- Avatar Image -->
+    <com.google.android.material.imageview.ShapeableImageView
+        android:id="@+id/avatarImageView"
+        android:layout_width="120dp"
+        android:layout_height="120dp"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="32dp"
+        android:scaleType="centerCrop"
+        android:src="@drawable/meme"
+        style:shapeAppearance="@style/ShapeAppearance.Material3.Corner.Full" />
+
+    <!-- Change Avatar Button -->
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/changeAvatarButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/avatarImageView"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="16dp"
+        android:background="@drawable/button_background"
+        android:onClick="changeAvatarAction"
+        android:text="Change Avatar"
+        android:textColor="@color/white" />
+
+    <!-- User Name -->
+    <TextView
+        android:id="@+id/usernameTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/changeAvatarButton"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="16dp"
+        android:text="John Doe"
+        android:textSize="18sp" />
+
+    <!-- Settings Section -->
+    <LinearLayout
+        android:id="@+id/settingsLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/usernameTextView"
+        android:layout_marginTop="32dp"
+        android:gravity="center"
+        android:orientation="vertical">
+
+        <!-- Dark Mode Switch -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/dark_mode"
+                android:textSize="18sp" />
+
+            <com.google.android.material.switchmaterial.SwitchMaterial
+                android:id="@+id/darkModeSwitch"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:onClick="darkModeAction" />
+        </LinearLayout>
+
+        <!-- Sign Out Button -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/signOutButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/button_background"
+            android:onClick="signOutAction"
+            android:text="@string/sign_out" />
+    </LinearLayout>
+
+</RelativeLayout>

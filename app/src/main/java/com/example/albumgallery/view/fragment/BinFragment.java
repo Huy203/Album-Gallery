@@ -66,7 +66,8 @@ public class BinFragment extends Fragment {
 
         imageURIs = new ArrayList<>();
         selectedImageURLs = new ArrayList<>();
-        imageURIs = mainController.getImageController().getAllDeleteImageRef();
+        imageURIs = mainController.getImageController().getAllImageURLsDeleted();
+
         selectedImageURLsTask = new ArrayList<>();
 
         imageAdapter = new ImageAdapter(getActivity(), imageURIs);
@@ -121,7 +122,9 @@ public class BinFragment extends Fragment {
         intent.putExtra("id", id);
         intent.putExtra("position", position);
         Log.v("ImageAdapter", "Image selected: " + view);
-        startActivity(intent, options.toBundle());
+        if (options != null) {
+            startActivity(intent, options.toBundle());
+        }
     }
     private void showDeleteConfirmationDialog() {
         Log.d("size of image urls before delete", String.valueOf(selectedImageURLsTask.size()));

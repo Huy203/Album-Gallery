@@ -26,7 +26,7 @@
         <ImageButton
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:src="@drawable/camera_icon"
+            android:src="@drawable/camera_black"
             android:padding="8dp"
             android:background="?attr/selectableItemBackgroundBorderless"
             android:contentDescription="camera"

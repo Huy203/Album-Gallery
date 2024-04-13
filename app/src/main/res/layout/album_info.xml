@@ -18,7 +18,7 @@
         android:inputType="text"
         android:maxLength="20"
         android:padding="8dp"
-        android:textColor="@color/black"
+        
         android:textSize="20sp" />
 
     <LinearLayout
@@ -41,7 +41,7 @@
                 android:gravity="left"
                 android:padding="8dp"
                 android:text="Lúc 3giờ, ngày 20 tháng 2 năm 2021"
-                android:textColor="@color/black"
+                
                 android:textSize="16sp" />
         </LinearLayout>
 
@@ -54,7 +54,7 @@
             android:gravity="start"
             android:padding="8dp"
             android:text="Tên album"
-            android:textColor="@color/black"
+            
             android:textSize="16sp" />
     </LinearLayout>
 
@@ -72,7 +72,7 @@
             android:gravity="left"
             android:padding="8dp"
             android:text="X MP"
-            android:textColor="@color/black"
+            
             android:textSize="16sp" />
 
     </LinearLayout>
@@ -86,7 +86,6 @@
         android:onClick="addLocation"
         android:padding="8dp"
         android:text="Thêm vị trí"
-        android:textColor="@color/black"
         android:textSize="20sp" />
 
     <Button

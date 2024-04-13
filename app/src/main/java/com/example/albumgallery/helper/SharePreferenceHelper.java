@@ -1,0 +1,37 @@
+package com.example.albumgallery.helper;
+
+import android.content.Context;
+import android.content.SharedPreferences;
+import android.util.Log;
+
+public class SharePreferenceHelper {
+    private static final String PREF_NAME = "MyAppPrefs";
+    private static final String DARK_MODE_KEY = "darkMode";
+    private static final String GRID_LAYOUT_KEY = "gridLayout";
+
+    private static SharedPreferences getSharedPreferences(Context context) {
+        return context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);
+    }
+
+    public static boolean isDarkModeEnabled(Context context) {
+        Log.v("SharePreferenceHelper", "isDarkModeEnabled");
+        return getSharedPreferences(context).getBoolean(DARK_MODE_KEY, false);
+    }
+
+    public static void setDarkModeEnabled(Context context, boolean enabled) {
+        SharedPreferences.Editor editor = getSharedPreferences(context).edit();
+        editor.putBoolean(DARK_MODE_KEY, enabled);
+        editor.apply();
+    }
+
+    public static boolean isGridLayoutEnabled(Context context) {
+        return getSharedPreferences(context).getBoolean(GRID_LAYOUT_KEY, false);
+    }
+
+    public static void setGridLayoutEnabled(Context context, boolean enabled) {
+        Log.v("SharePreferenceHelper", "setGridLayoutEnabled"+enabled);
+        SharedPreferences.Editor editor = getSharedPreferences(context).edit();
+        editor.putBoolean(GRID_LAYOUT_KEY, enabled);
+        editor.apply();
+    }
+}

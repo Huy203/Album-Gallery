@@ -7,23 +7,30 @@ import android.widget.Button;
 
 import androidx.activity.ComponentActivity;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatDelegate;
 
-import com.example.albumgallery.view.activity.MainFragmentController;
+import com.example.albumgallery.helper.SharePreferenceHelper;
 import com.example.albumgallery.view.activity.LoginScreen;
-import com.example.albumgallery.view.activity.CropImageActivity;
+import com.example.albumgallery.view.activity.MainFragmentController;
 
 public class MainActivity extends ComponentActivity {
-
     DatabaseManager db;
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        boolean isDarkMode = SharePreferenceHelper.isDarkModeEnabled(this);
+        Log.v("MainActivity", "isDarkMode: " + isDarkMode);
+        if(isDarkMode) {
+            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
+        } else {
+            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
+        }
+
         final Button button = findViewById(R.id.testBtn);
         final Button editButton = findViewById(R.id.editImageButton);
         button.setOnClickListener(v -> {
-//            Intent intent = new Intent(this, HomeScreen.class);
             Intent intent = new Intent(this, MainFragmentController.class);
             startActivity(intent);
         });

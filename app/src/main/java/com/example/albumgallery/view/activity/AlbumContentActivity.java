@@ -131,7 +131,7 @@ public class AlbumContentActivity extends AppCompatActivity implements ImageAdap
 
     @SuppressLint("SetTextI18n")
     @Override
-    public void getSelectedItemsCount(int count) {
+    public void getSelectedItemsCount( ){
 //        Log.v("SelectedItems", count + " items selected");
 //        numberOfImagesSelected.setText(count + " images selected");
 //
@@ -164,6 +164,11 @@ public class AlbumContentActivity extends AppCompatActivity implements ImageAdap
 
     @Override
     public void getInteractedURIs(String uri) {
+
+    }
+
+    @Override
+    public void toggleMultipleChoice() {
 
     }
 

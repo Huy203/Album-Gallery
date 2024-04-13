@@ -33,8 +33,8 @@
                 android:id="@+id/albumNameItemAlbum"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="album name"
-                android:textSize="20dp"
+                android:text="@string/album_name"
+                android:textSize="20sp"
 
                 android:textAppearance="?attr/textAppearanceTitleMedium"
                 />

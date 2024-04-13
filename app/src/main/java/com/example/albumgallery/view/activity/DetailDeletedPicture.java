@@ -101,6 +101,7 @@ public class DetailDeletedPicture extends DetailPicture {
             public void onClick(DialogInterface dialog, int which) {
                 // Call deleteSelectedImage() method from ImageController
                 mainController.getImageController().deleteSelectedImage(uri);
+                finish();
             }
         });
         builder.setNegativeButton("Cancel", null);
