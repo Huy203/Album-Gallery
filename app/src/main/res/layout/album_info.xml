@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical">
@@ -86,6 +87,54 @@
         android:padding="8dp"
         android:text="Thêm vị trí"
         android:textSize="20sp" />
+
+    <Button
+        style="?attr/materialButtonOutlinedStyle"
+        android:id="@+id/btnRemovePassword"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/remove_password"
+        android:layout_gravity="center"
+        android:visibility="gone"
+        />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginHorizontal="10dp"
+        android:id="@+id/setPasswordField"
+        android:visibility="visible">
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/outlinedTextField"
+            android:layout_width="220dp"
+            android:layout_height="wrap_content"
+            app:endIconMode="password_toggle"
+            android:hint="Add password..."
+            android:layout_gravity="left">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="textPassword"
+                android:id="@+id/passwordInputAlbumInfo"
+                />
+
+        </com.google.android.material.textfield.TextInputLayout>
+        <Button
+            style="?attr/materialButtonOutlinedStyle"
+            android:id="@+id/applyPasswordAlbumInfo"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:text="Apply Password"
+            android:layout_gravity="center"
+            android:layout_marginLeft="10dp"
+            android:enabled="false"
+            />
+
+    </LinearLayout>
+
+
 </LinearLayout>
 
 

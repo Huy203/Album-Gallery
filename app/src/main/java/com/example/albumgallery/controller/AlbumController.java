@@ -95,6 +95,10 @@ public class AlbumController implements Controller {
         dbHelper.close();
     }
 
+    public void removeAlbumPasswordByName(String albumName) {
+        dbHelper.removeAlbumPasswordByName(albumName);
+    }
+
     public void editAlbum() {
         // Edit an album
     }

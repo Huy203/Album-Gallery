@@ -14,8 +14,11 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -36,6 +39,7 @@ import com.example.albumgallery.view.fragment.ImageInfo;
 import com.example.albumgallery.view.listeners.ImageInfoListener;
 import com.example.albumgallery.view.listeners.OnSwipeTouchListener;
 import com.google.android.material.button.MaterialButton;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
 import java.io.IOException;
 import java.util.List;
@@ -145,6 +149,30 @@ public class DetailPicture extends AppCompatActivity implements ImageInfoListene
     }
 
     private void showOptionsDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Options");
+        builder.setItems(new CharSequence[]{"Add to album", "Set as Wallpaper", "Start referencing", "Detail"}, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                // Xử lý khi người dùng chọn một tùy chọn
+                switch (which) {
+                    case 0:
+                        // Xử lý khi người dùng chọn "Add to album"
+                        addToAlbumBtnHandler();
+                        break;
+                    case 1:
+                        // Xử lý khi người dùng chọn "Set as Wallpaper"
+                        setAsWallpaper(imagePaths.get(currentPosition));
+                        break;
+                    case 2:
+                        // Xử lý khi người dùng chọn "Start referencing"
+                        break;
+                    case 3:
+                        // Xử lý khi người dùng chọn "Detail"
+                        break;
+                }
+            }
+        });
 
     }
 
@@ -233,6 +261,44 @@ public class DetailPicture extends AppCompatActivity implements ImageInfoListene
         });
         builder.setNegativeButton("Cancel", null);
         builder.show();
+    }
+
+    private void addToAlbumBtnHandler() {
+        List<String> albumNames = mainController.getAlbumController().getAlbumNames();
+        LayoutInflater inflater = DetailPicture.this.getLayoutInflater();
+        View dialogView = inflater.inflate(R.layout.albums_dialog, null);
+        RadioGroup albumGroup = dialogView.findViewById(R.id.albumDialog);
+
+        for(String a: albumNames) {
+            RadioButton albumBtn = new RadioButton(DetailPicture.this);
+            albumBtn.setText(a);
+            albumGroup.addView(albumBtn);
+        }
+
+        MaterialAlertDialogBuilder albumsDialog = new MaterialAlertDialogBuilder(DetailPicture.this);
+        albumsDialog.setView(dialogView)
+                .setTitle("Choose an album")
+                .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        int selectedRadioButtonId = albumGroup.getCheckedRadioButtonId();
+                        RadioButton selectedRadioBtn = dialogView.findViewById(selectedRadioButtonId);
+                        if(selectedRadioBtn != null) {
+                            String selectedAlbum = selectedRadioBtn.getText().toString();
+                            long album_id = mainController.getAlbumController().getAlbumIdByName(selectedAlbum);
+                            long image_id = mainController.getImageController().getIdByRef(imagePaths.get(currentPosition));
+                            Log.d("add to album", Long.toString(album_id) + " " + Long.toString(image_id));
+                            mainController.getImageAlbumController().addImageAlbum((int) image_id, (int) album_id);
+                        }
+                    }
+                })
+                .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        dialogInterface.dismiss();
+                    }
+                });
+        albumsDialog.show();
     }
 
     private void update() {
