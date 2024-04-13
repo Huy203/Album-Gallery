@@ -14,7 +14,6 @@ public class SharePreferenceHelper {
     }
 
     public static boolean isDarkModeEnabled(Context context) {
-        Log.v("SharePreferenceHelper", "isDarkModeEnabled");
         return getSharedPreferences(context).getBoolean(DARK_MODE_KEY, false);
     }
 
@@ -29,7 +28,6 @@ public class SharePreferenceHelper {
     }
 
     public static void setGridLayoutEnabled(Context context, boolean enabled) {
-        Log.v("SharePreferenceHelper", "setGridLayoutEnabled"+enabled);
         SharedPreferences.Editor editor = getSharedPreferences(context).edit();
         editor.putBoolean(GRID_LAYOUT_KEY, enabled);
         editor.apply();

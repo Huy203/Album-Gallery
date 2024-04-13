@@ -72,7 +72,7 @@
                     android:paddingTop="5dp"
                     android:paddingRight="15dp"
                     android:paddingBottom="5dp"
-                    android:text="Sign Up"
+                    android:text="@string/sign_up"
                     android:textAlignment="center"
                     android:textColor="@color/pinkColor"
                     android:textSize="16sp"
@@ -97,7 +97,7 @@
                     android:layout_marginLeft="5dp"
                     android:layout_marginTop="5dp"
                     android:layout_marginRight="5dp"
-                    android:hint="Email or Username"
+                    android:hint="@string/email_or_username"
                     app:boxStrokeColor="#4E4A4A"
                     app:boxStrokeWidth="1dp"
                     app:hintTextColor="#4E4A4A"
@@ -121,7 +121,7 @@
                     android:layout_marginLeft="5dp"
                     android:layout_marginTop="5dp"
                     android:layout_marginRight="5dp"
-                    android:hint="Password"
+                    android:hint="@string/password"
                     app:boxStrokeColor="#4E4A4A"
                     app:boxStrokeWidth="1dp"
                     app:endIconMode="password_toggle"
@@ -144,7 +144,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="10dp"
-                    android:text="Forget Password?"
+                    android:text="@string/forgot_password"
                     android:textAlignment="textEnd"
                     android:textColor="#616161"
                     android:textSize="11sp"
@@ -186,7 +186,7 @@
                     android:layout_marginLeft="5dp"
                     android:layout_marginTop="5dp"
                     android:layout_marginRight="5dp"
-                    android:hint="Email"
+                    android:hint="@string/email"
                     app:boxStrokeColor="#4E4A4A"
                     app:boxStrokeWidth="1dp"
                     app:hintTextColor="#4E4A4A"
@@ -210,7 +210,7 @@
                     android:layout_marginLeft="5dp"
                     android:layout_marginTop="5dp"
                     android:layout_marginRight="5dp"
-                    android:hint="UserName"
+                    android:hint="@string/user_name"
                     app:boxStrokeColor="#4E4A4A"
                     app:boxStrokeWidth="1dp"
                     app:hintTextColor="#4E4A4A"
@@ -234,7 +234,7 @@
                     android:layout_marginLeft="5dp"
                     android:layout_marginTop="5dp"
                     android:layout_marginRight="5dp"
-                    android:hint="Phone"
+                    android:hint="@string/phone"
                     app:boxStrokeColor="#4E4A4A"
                     app:boxStrokeWidth="1dp"
                     app:hintTextColor="#4E4A4A"
@@ -252,13 +252,13 @@
                 </com.google.android.material.textfield.TextInputLayout>
 
                 <com.google.android.material.textfield.TextInputLayout
+                    android:hint="@string/password"
                     style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="5dp"
                     android:layout_marginTop="5dp"
                     android:layout_marginRight="5dp"
-                    android:hint="Address"
                     app:boxStrokeColor="#4E4A4A"
                     app:boxStrokeWidth="1dp"
                     app:hintTextColor="#4E4A4A"
@@ -282,7 +282,7 @@
                     android:layout_marginLeft="5dp"
                     android:layout_marginTop="5dp"
                     android:layout_marginRight="5dp"
-                    android:hint="Password"
+                    android:hint="@string/password"
                     app:boxStrokeColor="#4E4A4A"
                     app:boxStrokeWidth="1dp"
                     app:endIconMode="password_toggle"
@@ -307,7 +307,7 @@
                     android:layout_marginLeft="5dp"
                     android:layout_marginTop="5dp"
                     android:layout_marginRight="5dp"
-                    android:hint="Confirm Password"
+                    android:hint="@string/confirm_password"
                     app:boxStrokeColor="#4E4A4A"
                     app:boxStrokeWidth="1dp"
                     app:endIconMode="password_toggle"
@@ -335,7 +335,7 @@
                     android:layout_marginEnd="24dp"
                     android:elevation="15dp"
                     android:gravity="center"
-                    android:text="Sign Up"
+                    android:text="@string/sign_up"
                     android:textAllCaps="false"
                     android:textColor="@color/textColor"
                     android:textSize="17sp"
@@ -352,7 +352,7 @@
                 android:layout_marginTop="10dp"
                 android:layout_marginBottom="16dp"
                 android:gravity="center"
-                android:text="OR"
+                android:text="@string/or"
                 android:textAlignment="center"
                 android:textColor="#474646"
                 android:textSize="18sp"
@@ -370,19 +370,22 @@
                     android:layout_width="35dp"
                     android:layout_height="35dp"
                     android:layout_margin="10dp"
-                    android:src="@drawable/ic_facebook" />
+                    android:src="@drawable/ic_facebook"
+                    android:importantForAccessibility="no" />
 
                 <ImageView
                     android:layout_width="35dp"
                     android:layout_height="35dp"
                     android:layout_margin="10dp"
-                    android:src="@drawable/ic_google" />
+                    android:src="@drawable/ic_google"
+                    android:importantForAccessibility="no" />
 
                 <ImageView
                     android:layout_width="35dp"
                     android:layout_height="35dp"
                     android:layout_margin="10dp"
-                    android:src="@drawable/ic_twitter" />
+                    android:src="@drawable/ic_twitter"
+                    android:importantForAccessibility="no" />
 
 
             </LinearLayout>

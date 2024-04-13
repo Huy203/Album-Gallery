@@ -61,6 +61,7 @@
     <color name="colorControlActivated">#FF03DAC5</color>
     <color name="colorControlNormal">#FF9E9E9E</color>
     <color name="colorControlHighlight">#FF03DAC5</color>
+    <color name="none">#00000000</color>
 
 
     <color name="hintTextColor">#7C7C7C</color>

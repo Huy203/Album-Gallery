@@ -13,18 +13,20 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 
 public class AuthenticationManager {
     // AuthenticationManager class for authentication
     private Credentials credentials;
     private FirebaseAuth mAuth;
+
     //private UserModel user;
 
     public AuthenticationManager(Credentials credentials) {
         this.credentials = credentials;
         mAuth = FirebaseAuth.getInstance();
     }
-
     public void checkEmailAndUsernameExist(String email, String username, OnCheckExistListener listener) {
         DatabaseReference usersRef = FirebaseDatabase.getInstance().getReference().child("users");
 
@@ -70,15 +72,32 @@ public class AuthenticationManager {
                     if (task.isSuccessful()) {
                         FirebaseUser firebaseUser = mAuth.getCurrentUser();
                         if (firebaseUser != null) {
-                            // Lấy ID của người dùng mới tạo
                             String userId = firebaseUser.getUid();
 
-                            // Lưu thông tin người dùng vào Firebase Realtime Database
-                            DatabaseReference usersRef = FirebaseDatabase.getInstance().getReference().child("users").child(userId);
-                            usersRef.setValue(user);
+                            // Create a reference to the root directory of Firebase Storage
+                            StorageReference storageRef = FirebaseStorage.getInstance().getReference();
 
-                            // Gửi kết quả về cho người nghe
-                            listener.onSuccess(userId);
+                            // Create a reference to the user's directory
+                            StorageReference userRef = storageRef.child(userId);
+
+                            // Create a reference to the images directory inside the user's directory
+                            StorageReference imagesRef = userRef.child("images/");
+
+                            // Create a placeholder file inside the images directory
+                            imagesRef.child(".placeholder").putBytes(new byte[0]) // Put an empty byte array to create the placeholder file
+                                    .addOnSuccessListener(taskSnapshot -> {
+                                        // Placeholder file created successfully
+                                        // Proceed to store user's information in the Realtime Database
+                                        DatabaseReference usersRef = FirebaseDatabase.getInstance().getReference().child("users").child(userId);
+                                        usersRef.setValue(user);
+
+                                        // Notify the listener about successful registration
+                                        listener.onSuccess(userId);
+                                    })
+                                    .addOnFailureListener(e -> {
+                                        // Failed to create placeholder file
+                                        listener.onFailure("Failed to create images directory: " + e.getMessage());
+                                    });
                         } else {
                             listener.onFailure("Failed to get user information.");
                         }
@@ -204,4 +223,23 @@ public class AuthenticationManager {
         void onFailure(String errorMessage);
     }
 
+    public interface OnLogoutListener {
+        void onSuccess(); // Đăng xuất thành công
+        void onFailure(String errorMessage); // Đăng xuất thất bại
+    }
+
+    // Phương thức đăng xuất người dùng
+    public void signOut(OnLogoutListener listener) {
+        mAuth.signOut(); // Gọi phương thức signOut() của FirebaseAuth
+
+        // Kiểm tra xem người dùng đã đăng xuất thành công hay không
+        if (mAuth.getCurrentUser() == null) {
+            // Đăng xuất thành công, gọi phương thức onSuccess của listener
+            listener.onSuccess();
+        } else {
+            // Đăng xuất thất bại, gọi phương thức onFailure của listener
+            listener.onFailure("Logout failed: User is still logged in.");
+        }
+    }
 }
+

@@ -13,15 +13,46 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
-        <ImageView
-            android:id="@+id/imageView"
-            android:layout_width="100dp"
-            android:layout_height="100dp"
-            android:outlineSpotShadowColor="@color/black"
-            android:scaleType="centerCrop"
-            android:src="@drawable/ic_launcher_foreground"
-            android:transitionName="image"
-            tools:ignore="ContentDescription" />
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <ImageView
+                android:id="@+id/imageView"
+                android:layout_width="100dp"
+                android:layout_height="100dp"
+                android:scaleType="centerCrop"
+                android:src="@drawable/ic_launcher_foreground"
+                android:transitionName="image"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                tools:ignore="ContentDescription" />
+
+            <com.google.android.material.checkbox.MaterialCheckBox
+                android:id="@+id/checkbox"
+                style="@style/AppCheckbox"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:checked="true"
+                android:visibility="visible"
+                app:layout_constraintBottom_toBottomOf="@+id/imageView"
+                app:layout_constraintEnd_toEndOf="@+id/imageView" />
+
+            <com.google.android.material.imageview.ShapeableImageView
+                android:id="@+id/isLiked"
+                style="?attr/materialIconButtonStyle"
+                android:layout_width="15dp"
+                android:layout_height="15dp"
+                android:layout_margin="5dp"
+                android:minHeight="0dip"
+                android:padding="0dp"
+                android:src="@drawable/heart_black"
+                android:visibility="visible"
+                app:layout_constraintBottom_toBottomOf="@+id/imageView"
+                app:layout_constraintStart_toStartOf="@+id/imageView"
+                app:tint="@color/blue_500" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
 
         <com.google.android.material.progressindicator.CircularProgressIndicator
             android:id="@+id/circularProgressIndicator"
@@ -30,30 +61,7 @@
             android:layout_gravity="center"
             android:indeterminate="true"
             android:visibility="invisible" />
+
     </FrameLayout>
-
-    <com.google.android.material.checkbox.MaterialCheckBox
-        android:id="@+id/checkbox"
-        style="@style/AppCheckbox"
-        android:layout_width="20dp"
-        android:layout_height="20dp"
-        android:checked="true"
-        android:visibility="visible"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
-
-    <com.google.android.material.imageview.ShapeableImageView
-        android:id="@+id/isLiked"
-        style="?attr/materialIconButtonStyle"
-        android:layout_width="15dp"
-        android:layout_height="15dp"
-        android:layout_margin="5dp"
-        android:minHeight="0dip"
-        android:padding="0dp"
-        android:src="@drawable/heart_black"
-        android:visibility="visible"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:tint="@color/blue_500" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

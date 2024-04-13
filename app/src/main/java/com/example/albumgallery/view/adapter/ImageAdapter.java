@@ -83,8 +83,6 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> 
 
     public void setSelectedItems(SparseBooleanArray selectedItems) {
         this.selectedItems.clear();
-//        app:backgroundTint="@color/blue_200"
-//        app:iconTint="@color/white"
 
         for (int i = 0; i < selectedItems.size(); i++) {
             int key = selectedItems.keyAt(i);
@@ -117,7 +115,6 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> 
         } else {
             Log.v("ImageAdapter", "toggleMultipleChoiceImagesEnabled: listener is null");
         }
-        Log.v("ImageAdapter", "isMultipleChoice: " + isMultipleChoice);
         return isMultipleChoice;
     }
 
@@ -140,11 +137,6 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> 
             checkbox = itemView.findViewById(R.id.checkbox);
             progressIndicator = itemView.findViewById(R.id.circularProgressIndicator);
             progressIndicator.setVisibility(View.VISIBLE);
-
-//            ViewGroup.LayoutParams layoutParams = imageView.getLayoutParams();
-//            Log.v("ViewHolder", "layoutParams: " + layoutParams.width + "x" + layoutParams.height);
-//            layoutParams.height = (int) (itemView.getResources().getDisplayMetrics().widthPixels / aspectRatio);
-//            imageView.setLayoutParams(layoutParams);
         }
 
         public void bind(String imageURL) {
@@ -199,11 +191,6 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> 
                                 progressIndicator.setVisibility(View.GONE);
                                 imageView.setScaleType(ImageView.ScaleType.FIT_CENTER);
                                 imageView.setAdjustViewBounds(true);
-
-//                                ViewGroup.LayoutParams layoutParams = imageView.getLayoutParams();
-//                                layoutParams.height = resource.getIntrinsicHeight() / 10;
-//                                Log.v("tag", "layoutParams: " + layoutParams.width + "x" + layoutParams.height);
-//                                imageView.setLayoutParams(layoutParams);
                                 return false;
                             }
                         })
@@ -220,7 +207,6 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> 
 
                             @Override
                             public boolean onResourceReady(@NonNull Drawable resource, @NonNull Object model, Target<Drawable> target, @NonNull DataSource dataSource, boolean isFirstResource) {
-                                Log.v("tag", "onResourceReady: " + resource.getIntrinsicWidth() + "x" + resource.getIntrinsicHeight());
                                 progressIndicator.setVisibility(View.GONE);
                                 imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
                                 imageView.setAdjustViewBounds(false);

@@ -25,11 +25,9 @@
                 style="@style/AppButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                app:icon="@drawable/tick_black"
-                android:padding="0dp"
                 android:minHeight="0dp"
-
-                />
+                android:padding="0dp"
+                app:icon="@drawable/tick_black" />
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/changeGridViewBtn"

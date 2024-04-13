@@ -12,6 +12,7 @@ import android.os.Bundle;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.util.SparseBooleanArray;
+import android.view.ContextThemeWrapper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -47,11 +48,8 @@ public class HomeScreenFragment extends Fragment {
     private List<String> imageURIs; //contains the list of image encoded.
     private ImageAdapter imageAdapter; //adapter for the recycler view
     private MainController mainController; //controller contains other controllers
-    private ImageAdapterListener iListener;
-    private BackgroundProcessingCallback bgListener;
     List<String> selectedImageURLs;
     List<Task> selectedImageURLsTask;
-    private View view;
     private FragToActivityListener fragToActivityListener;
     private boolean isSelectAll = false;
 
@@ -63,8 +61,6 @@ public class HomeScreenFragment extends Fragment {
     public void onAttach(@NonNull Context context) {
         super.onAttach(context);
         if (context instanceof ImageAdapterListener && context instanceof BackgroundProcessingCallback && context instanceof FragToActivityListener) {
-            iListener = (ImageAdapterListener) context;
-            bgListener = (BackgroundProcessingCallback) context;
             fragToActivityListener = (FragToActivityListener) context;
         } else {
             throw new RuntimeException(context
@@ -87,7 +83,6 @@ public class HomeScreenFragment extends Fragment {
     }
 
     private void initializeVariables(View view) {
-        this.view = view;
         mainController = new MainController(getActivity());
         imageURIs = new ArrayList<>();
         selectedImageURLs = new ArrayList<>();
@@ -105,7 +100,7 @@ public class HomeScreenFragment extends Fragment {
         isSelectAll = !isSelectAll;
         MaterialButton tickBtn = view.findViewById(R.id.tickBtn);
         SparseBooleanArray selectedItems = new SparseBooleanArray();
-        if (isSelectAll){
+        if (isSelectAll) {
             imageAdapter.setMultipleChoiceEnabled(isSelectAll);
             tickBtn.setIconTint(ColorStateList.valueOf(getResources().getColor(R.color.white)));
             tickBtn.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(R.color.blue_200)));
@@ -113,8 +108,9 @@ public class HomeScreenFragment extends Fragment {
                 selectedItems.put(i, true);
             }
         } else {
-            tickBtn.setIconTint(ColorStateList.valueOf(getResources().getColor(R.color.black)));
-            tickBtn.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(R.color.white)));
+//            imageAdapter.setMultipleChoiceEnabled(isSelectAll);
+//            tickBtn.setIconTint(ColorStateList.valueOf(getResources().getColor(R.color.blue_200)));
+//            tickBtn.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(R.color.white)));
         }
         imageAdapter.setMultipleChoiceEnabled(isSelectAll);
         imageAdapter.setSelectedItems(selectedItems);
@@ -254,8 +250,6 @@ public class HomeScreenFragment extends Fragment {
     @Override
     public void onDetach() {
         super.onDetach();
-        iListener = null;
-        bgListener = null;
         Log.v("HomeScreenFragment", "onDetach");
     }
 

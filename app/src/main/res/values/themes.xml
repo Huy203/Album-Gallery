@@ -25,6 +25,7 @@
     </style>
 
     <style name="AppButton" parent="@style/Widget.Material3.Button.IconButton">
+        <item name="backgroundTint">@color/white</item>
         <item name="android:textColor">@color/black</item>
         <item name="iconTint">@color/black</item>
     </style>
