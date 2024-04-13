@@ -22,6 +22,7 @@ import com.bumptech.glide.load.engine.GlideException;
 import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.target.Target;
 import com.example.albumgallery.R;
+import com.example.albumgallery.helper.SharePreferenceHelper;
 import com.example.albumgallery.view.listeners.ImageAdapterListener;
 import com.google.android.material.progressindicator.CircularProgressIndicator;
 
@@ -31,16 +32,21 @@ import java.util.List;
 public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> {
     private final Context context;
     private final List<String> imageURLs;  // List of image URLs
+    private List<String> imageURLsFavourited; // List of favourited image URLs
     private final SparseBooleanArray selectedItems; // SparseBooleanArray to store selected items
     private boolean isMultipleChoice = false; // Flag to determine if multiple choice is enabled
     private ImageAdapterListener listener; // Listener to handle image selection
-
 
     public ImageAdapter(Activity activity, List<String> imageURLs) {
         this.context = activity;
         this.imageURLs = imageURLs;
         this.selectedItems = new SparseBooleanArray();
         this.listener = (ImageAdapterListener) activity;
+        this.imageURLsFavourited =new ArrayList<>();
+    }
+
+    public void setImageURLsFavourite(List<String> imageURLsFavourited) {
+        this.imageURLsFavourited = imageURLsFavourited;
     }
 
     @NonNull
@@ -54,6 +60,7 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> 
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         String imageURL = getImageURLs().get(position);
         holder.bind(imageURL);
+        holder.isLiked.setVisibility(imageURLsFavourited.contains(imageURL) ? View.VISIBLE : View.GONE);
         holder.checkbox.setVisibility(isMultipleChoice ? View.VISIBLE : View.GONE); // Update visibility based on isMultipleChoice
     }
 
@@ -66,7 +73,7 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> 
         this.isMultipleChoice = isMultipleChoice;
     }
 
-    public boolean getMultipleChoiceImagesEnabled() {
+    public boolean getMultipleChoiceEnabled() {
         return isMultipleChoice;
     }
 
@@ -74,9 +81,18 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> 
         return imageURLs;
     }
 
+    public void setSelectedItems(SparseBooleanArray selectedItems) {
+        this.selectedItems.clear();
+
+        for (int i = 0; i < selectedItems.size(); i++) {
+            int key = selectedItems.keyAt(i);
+            this.selectedItems.put(key, selectedItems.get(key));
+        }
+    }
     public SparseBooleanArray getSelectedItems() {
         return selectedItems;
     }
+
     public void emptySelectedItems() {
         selectedItems.clear();
     }
@@ -99,7 +115,6 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> 
         } else {
             Log.v("ImageAdapter", "toggleMultipleChoiceImagesEnabled: listener is null");
         }
-        Log.v("ImageAdapter", "isMultipleChoice: " + isMultipleChoice);
         return isMultipleChoice;
     }
 
@@ -111,34 +126,21 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> 
     public class ViewHolder extends RecyclerView.ViewHolder {
 
         private final ImageView imageView;
+        private final ImageView isLiked;
         private final CheckBox checkbox;
         private final CircularProgressIndicator progressIndicator;
 
         public ViewHolder(View itemView) {
             super(itemView);
             imageView = itemView.findViewById(R.id.imageView);
+            isLiked = itemView.findViewById(R.id.isLiked);
             checkbox = itemView.findViewById(R.id.checkbox);
             progressIndicator = itemView.findViewById(R.id.circularProgressIndicator);
             progressIndicator.setVisibility(View.VISIBLE);
         }
 
         public void bind(String imageURL) {
-            Glide.with(context)
-                    .load(Uri.parse(imageURL))
-                    .listener(new RequestListener<Drawable>() {
-                        @Override
-                        public boolean onLoadFailed(@Nullable GlideException e, @Nullable Object model, @NonNull Target<Drawable> target, boolean isFirstResource) {
-                            progressIndicator.setVisibility(View.GONE);
-                            return false;
-                        }
-
-                        @Override
-                        public boolean onResourceReady(@NonNull Drawable resource, @NonNull Object model, Target<Drawable> target, @NonNull DataSource dataSource, boolean isFirstResource) {
-                            progressIndicator.setVisibility(View.GONE);
-                            return false;
-                        }
-                    })
-                    .into(imageView);
+            showImage(imageURL);
 
             checkbox.setOnClickListener(view -> toggleSelection());
 
@@ -171,7 +173,52 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> 
             }
             listener.toggleMultipleChoice();
         }
+
+        private void showImage(String imageURL) {
+            if (SharePreferenceHelper.isGridLayoutEnabled(context)) {
+                Glide.with(context)
+                        .load(Uri.parse(imageURL))
+                        .override(Target.SIZE_ORIGINAL)
+                        .listener(new RequestListener<Drawable>() {
+                            @Override
+                            public boolean onLoadFailed(@Nullable GlideException e, @Nullable Object model, @NonNull Target<Drawable> target, boolean isFirstResource) {
+                                progressIndicator.setVisibility(View.GONE);
+                                return false;
+                            }
+
+                            @Override
+                            public boolean onResourceReady(@NonNull Drawable resource, @NonNull Object model, Target<Drawable> target, @NonNull DataSource dataSource, boolean isFirstResource) {
+                                progressIndicator.setVisibility(View.GONE);
+                                imageView.setScaleType(ImageView.ScaleType.FIT_CENTER);
+                                imageView.setAdjustViewBounds(true);
+                                return false;
+                            }
+                        })
+                        .into(imageView);
+            } else {
+                Glide.with(context)
+                        .load(Uri.parse(imageURL))
+                        .listener(new RequestListener<Drawable>() {
+                            @Override
+                            public boolean onLoadFailed(@Nullable GlideException e, @Nullable Object model, @NonNull Target<Drawable> target, boolean isFirstResource) {
+                                progressIndicator.setVisibility(View.GONE);
+                                return false;
+                            }
+
+                            @Override
+                            public boolean onResourceReady(@NonNull Drawable resource, @NonNull Object model, Target<Drawable> target, @NonNull DataSource dataSource, boolean isFirstResource) {
+                                progressIndicator.setVisibility(View.GONE);
+                                imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
+                                imageView.setAdjustViewBounds(false);
+                                return false;
+                            }
+                        })
+                        .into(imageView);
+            }
+        }
     }
+}
+
 //
 //    // Xử lý sắp xếp hình ảnh theo date
 //    public void sortImageByDate() {
@@ -183,4 +230,4 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> 
 //        File imageFile = new File(imageURL);
 //        return imageFile.exists() ? imageFile.lastModified() : 0;
 //    }
-}
+

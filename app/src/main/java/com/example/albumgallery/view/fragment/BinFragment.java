@@ -66,7 +66,8 @@ public class BinFragment extends Fragment {
 
         imageURIs = new ArrayList<>();
         selectedImageURLs = new ArrayList<>();
-        imageURIs = mainController.getImageController().getAllDeleteImageRef();
+        imageURIs = mainController.getImageController().getAllImageURLsDeleted();
+
         selectedImageURLsTask = new ArrayList<>();
 
         imageAdapter = new ImageAdapter(getActivity(), imageURIs);

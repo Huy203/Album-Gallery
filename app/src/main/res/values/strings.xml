@@ -20,6 +20,7 @@
     <string name="confirm_create_album">Create Album</string>
     <string name="private_album">Private Album</string>
     <string name="favorite">Favorite</string>
+    <string name="remove_password">Remove password</string>
     <string name="album_name">Album Name</string>
     <string name="add_notice">Add notes</string>
     <string name="add_location">Add location</string>
@@ -40,4 +41,9 @@
     <string name="dark_mode">Dark mode</string>
     <string name="save_settings">Save Settings</string>
     <string name="album_gallery">Album Gallery</string>
+    <string name="sign_out">Sign Out</string>
+    <string name="or">OR</string>
+    <string name="phone">Phone</string>
+    <string name="user_name">Username</string>
+    <string name="email_or_username">Email or Username</string>
 </resources>

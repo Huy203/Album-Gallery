@@ -228,7 +228,7 @@ public class ImageController implements Controller {
         // Set extension of the file is "jpg"
         StorageMetadata metadata = new StorageMetadata.Builder().setContentType("image/jpg").build();
         // Upload file and metadata to the path 'images/image+filepath'
-        StorageReference imageRef = firebaseManager.getStorage().getReference().child("images/image" + uri.getLastPathSegment() + "." + (imageExtensions.contains(extensionName) ? extensionName : "jpg"));
+        StorageReference imageRef = firebaseManager.getStorage().getReference().child("/image" + uri.getLastPathSegment() + "." + (imageExtensions.contains(extensionName) ? extensionName : "jpg"));
         UploadTask uploadTask = imageRef.putFile(uri, metadata);
 
         // Register observers to listen for when the download is done or if it fails
@@ -286,6 +286,14 @@ public class ImageController implements Controller {
         return dbHelper.getAllRef("Image", "is_deleted = 0");
     }
 
+    public List<String> getAllImageURLsDeleted() {
+        return dbHelper.getAllRef("Image", "is_deleted = 1");
+    }
+
+    public List<String> getAllImageURLsFavourited() {
+        return dbHelper.getAllRef("Image", "is_favourited = 1");
+    }
+
     public ImageModel getImageById(long id) {
         String data = dbHelper.getById("Image", id);
         String[] temp = data.split(",");
@@ -324,10 +332,6 @@ public class ImageController implements Controller {
         return dbHelper.isFavoriteImage(imageId);
     }
 
-    public List<String> getAllFavoriteImageRef() {
-        return dbHelper.getAllFavoriteImageRef();
-    }
-
     public List<String> getSelectedImageURLs() {
         final String replace = idSelectedImages.toString().replace("[", "").replace("]", "");
         Log.v("Image", "Selected images: " + "ref" + "id IN (" + replace + ")");
@@ -345,7 +349,7 @@ public class ImageController implements Controller {
         } catch (URISyntaxException e) {
             e.printStackTrace();
         }
-        filename = "images/" + filename;
+        filename = "/" + filename;
         return filename;
     }
 
@@ -495,10 +499,6 @@ public class ImageController implements Controller {
 
     public boolean isDeleteImage(long imageId) {
         return dbHelper.isDeleteImage(imageId);
-    }
-
-    public List<String> getAllDeleteImageRef() {
-        return dbHelper.getAllDeleteImageRef();
     }
 
     public String recognizeQRCode(String uri) {

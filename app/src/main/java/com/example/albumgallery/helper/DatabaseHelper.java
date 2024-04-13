@@ -640,4 +640,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         values.put("is_favourited", favorite);
         db.update(IMAGE_TABLE, values, "id = ?", new String[]{String.valueOf(imageId)});
     }
+
+    public void removeAlbumPasswordByName(String albumName) {
+        SQLiteDatabase db = getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put("password", "");
+        db.update(ALBUM_TABLE, values, "name = ?", new String[]{albumName});
+    }
 }

@@ -6,10 +6,13 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.ColorStateList;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.util.Log;
+import android.util.SparseBooleanArray;
+import android.view.ContextThemeWrapper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -26,16 +29,15 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.albumgallery.R;
 import com.example.albumgallery.controller.MainController;
-import com.example.albumgallery.model.auth.AuthenticationManager;
-import com.example.albumgallery.model.auth.AuthenticationManagerSingleton;
+import com.example.albumgallery.helper.SharePreferenceHelper;
 import com.example.albumgallery.view.activity.DetailPicture;
-import com.example.albumgallery.view.activity.LoginScreen;
 import com.example.albumgallery.view.adapter.ImageAdapter;
 import com.example.albumgallery.view.listeners.BackgroundProcessingCallback;
 import com.example.albumgallery.view.listeners.FragToActivityListener;
 import com.example.albumgallery.view.listeners.ImageAdapterListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.Tasks;
+import com.google.android.material.button.MaterialButton;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -46,15 +48,10 @@ public class HomeScreenFragment extends Fragment {
     private List<String> imageURIs; //contains the list of image encoded.
     private ImageAdapter imageAdapter; //adapter for the recycler view
     private MainController mainController; //controller contains other controllers
-    private ImageAdapterListener iListener;
-    private BackgroundProcessingCallback bgListener;
     List<String> selectedImageURLs;
     List<Task> selectedImageURLsTask;
-    private View view;
-
     private FragToActivityListener fragToActivityListener;
-
-    private AuthenticationManager authManager = AuthenticationManagerSingleton.getInstance();
+    private boolean isSelectAll = false;
 
     public HomeScreenFragment() {
         // Required empty public constructor
@@ -64,8 +61,6 @@ public class HomeScreenFragment extends Fragment {
     public void onAttach(@NonNull Context context) {
         super.onAttach(context);
         if (context instanceof ImageAdapterListener && context instanceof BackgroundProcessingCallback && context instanceof FragToActivityListener) {
-            iListener = (ImageAdapterListener) context;
-            bgListener = (BackgroundProcessingCallback) context;
             fragToActivityListener = (FragToActivityListener) context;
         } else {
             throw new RuntimeException(context
@@ -84,37 +79,44 @@ public class HomeScreenFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         initializeVariables(view);
-        setupButtons();
         updateUI();
     }
 
     private void initializeVariables(View view) {
-        this.view = view;
         mainController = new MainController(getActivity());
         imageURIs = new ArrayList<>();
         selectedImageURLs = new ArrayList<>();
         selectedImageURLsTask = new ArrayList<>();
         imageAdapter = new ImageAdapter(getActivity(), imageURIs);
         recyclerMediaView = view.findViewById(R.id.recyclerMediaView);
+
+        MaterialButton changeGridViewBtn = view.findViewById(R.id.changeGridViewBtn);
+        changeGridViewBtn.setOnClickListener(this::changeGridView);
+        MaterialButton tickBtn = view.findViewById(R.id.tickBtn);
+        tickBtn.setOnClickListener(this::choiceAll);
     }
 
-//    private void setupButtons() {
-//        view.findViewById(R.id.btnCamera).setOnClickListener(v -> openCamera());
-//        view.findViewById(R.id.btnPickImageFromDevice).setOnClickListener(v -> pickImagesFromDevice());
-//        view.findViewById(R.id.btnPickMultipleImages).setOnClickListener(v -> showDeleteConfirmationDialog());
-//        view.findViewById(R.id.btnDeleteMultipleImages).setOnClickListener(v -> toggleMultipleChoiceImages(view.findViewById(R.id.btnDeleteMultipleImages)));
-//    }
-
-    private void setupButtons() {
-//        view.findViewById(R.id.btnCamera).setOnClickListener(v -> openCamera());
-//        view.findViewById(R.id.action_add).setOnClickListener(v -> pickImagesFromDevice());
-//        view.findViewById(R.id.action_delete).setOnClickListener(v -> showDeleteConfirmationDialog());
-        view.findViewById(R.id.btnLogOut).setOnClickListener(v -> logOut());
+    private void choiceAll(View view) {
+        isSelectAll = !isSelectAll;
+        MaterialButton tickBtn = view.findViewById(R.id.tickBtn);
+        SparseBooleanArray selectedItems = new SparseBooleanArray();
+        if (isSelectAll) {
+            imageAdapter.setMultipleChoiceEnabled(isSelectAll);
+            tickBtn.setIconTint(ColorStateList.valueOf(getResources().getColor(R.color.white)));
+            tickBtn.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(R.color.blue_200)));
+            for (int i = 0; i < imageURIs.size(); i++) {
+                selectedItems.put(i, true);
+            }
+        } else {
+//            imageAdapter.setMultipleChoiceEnabled(isSelectAll);
+//            tickBtn.setIconTint(ColorStateList.valueOf(getResources().getColor(R.color.blue_200)));
+//            tickBtn.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(R.color.white)));
+        }
+        imageAdapter.setMultipleChoiceEnabled(isSelectAll);
+        imageAdapter.setSelectedItems(selectedItems);
+        fragToActivityListener.onFragmentAction("SelectAll", true);
+        imageAdapter.notifyDataSetChanged();
     }
-
-//    private void pickImagesFromDevice() {
-////        mainController.getImageController().pickMultipleImages(bgListener);
-//    }
 
     public boolean toggleMultipleChoice() {
         int length = imageAdapter.getSelectedItems().size(); // get the number of selected items
@@ -139,27 +141,6 @@ public class HomeScreenFragment extends Fragment {
         for (int i = 0; i < count; i++) {
             selectedImageURLs.add(imageURIs.get(i));
             Log.d("Deleted images", selectedImageURLs.get(i));
-        }
-    }
-
-    private void logOut() {
-        // Thực hiện đăng xuất
-        if(authManager!=null){
-            authManager.signOut(new AuthenticationManager.OnLogoutListener() {
-                @Override
-                public void onSuccess() {
-                    // Đăng xuất thành công, thực hiện các hành động cần thiết (ví dụ: chuyển hướng đến màn hình đăng nhập)
-                    Intent intent = new Intent(getActivity(), LoginScreen.class);
-                    startActivity(intent);
-                    getActivity().finish(); // Đóng màn hình hiện tại (HomeScreenFragment)
-                }
-
-                @Override
-                public void onFailure(String errorMessage) {
-                    // Xử lý khi đăng xuất thất bại (nếu cần)
-                    Toast.makeText(getActivity(), "Logout failed: " + errorMessage, Toast.LENGTH_SHORT).show();
-                }
-            });
         }
     }
 
@@ -198,10 +179,13 @@ public class HomeScreenFragment extends Fragment {
         Log.v("HomeScreenFragment", "updateUI");
         imageURIs.clear();
         // lấy ảnh sort theo date (mới nhất xếp trước).
-        //imageURIs.addAll(mainController.getImageController().getAllImageURLsSortByDate());
+//        imageURIs.addAll(mainController.getImageController().getAllImageURLsSortByDate());
+        List<String> imageURLsFavourited = mainController.getImageController().getAllImageURLsFavourited();
         imageURIs.addAll(mainController.getImageController().getAllImageURLsUndeleted());
         imageAdapter = new ImageAdapter(getActivity(), imageURIs);
-        recyclerMediaView.setLayoutManager(new GridLayoutManager(getContext(), 3));
+        imageAdapter.setImageURLsFavourite(imageURLsFavourited);
+        // Switch to list display
+        recyclerMediaView.setLayoutManager(new GridLayoutManager(getContext(), 4));
         recyclerMediaView.setAdapter(imageAdapter);
         imageAdapter.notifyDataSetChanged();
     }
@@ -258,11 +242,14 @@ public class HomeScreenFragment extends Fragment {
         }
     }
 
+    public void changeGridView(View view) {
+        SharePreferenceHelper.setGridLayoutEnabled(requireContext(), !SharePreferenceHelper.isGridLayoutEnabled(requireContext()));
+        imageAdapter.notifyDataSetChanged();
+    }
+
     @Override
     public void onDetach() {
         super.onDetach();
-        iListener = null;
-        bgListener = null;
         Log.v("HomeScreenFragment", "onDetach");
     }
 
@@ -272,11 +259,6 @@ public class HomeScreenFragment extends Fragment {
         mainController = null;
         Log.v("HomeScreenFragment", "onDestroy");
     }
-
-    public List<Task> getSelectedImageURLsTask() {
-        return selectedImageURLsTask;
-    }
-
 
     public void ActivityToFragListener(String action) {
         switch (action) {
@@ -301,6 +283,17 @@ public class HomeScreenFragment extends Fragment {
                 }
                 // Frag to activity listener
                 fragToActivityListener.onFragmentAction("Share", tempUri);
+                break;
+            case "Like":
+                for (String url : imageAdapter.getSelectedImageURLs()) {
+                    long id = mainController.getImageController().getIdByRef(url);
+                    mainController.getImageController().toggleFavoriteImage(id);
+                }
+                imageAdapter.clearSelectedItems();
+                fragToActivityListener.onFragmentAction("Like", true);
+                updateUI();
+                break;
+            case "Add":
                 break;
         }
     }

@@ -53,8 +53,10 @@
         <activity android:name=".view.activity.CreateAlbumActivity" />
         <activity android:name=".view.activity.SelectImageActivity" />
         <activity android:name=".view.activity.CropImageActivity" />
-        <activity android:name=".view.activity.AlbumContentActivity" />
+        <activity android:name=".view.activity.AlbumContentActivity"
+            android:windowSoftInputMode="adjustPan"/>
         <activity android:name=".view.activity.PasswordAlbumActivity" />
+        <activity android:name=".presentations.user.UserActivity" />
 
         <provider
             android:name="androidx.core.content.FileProvider"
