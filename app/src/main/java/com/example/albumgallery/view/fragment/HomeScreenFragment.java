@@ -53,6 +53,7 @@ public class HomeScreenFragment extends Fragment {
     List<Task> selectedImageURLsTask;
     private View view;
     private FragToActivityListener fragToActivityListener;
+    private boolean isSelectAll = false;
 
     public HomeScreenFragment() {
         // Required empty public constructor
@@ -101,20 +102,23 @@ public class HomeScreenFragment extends Fragment {
     }
 
     private void choiceAll(View view) {
-        imageAdapter.setMultipleChoiceEnabled(!imageAdapter.getMultipleChoiceEnabled());
+        isSelectAll = !isSelectAll;
         MaterialButton tickBtn = view.findViewById(R.id.tickBtn);
-        if (imageAdapter.getMultipleChoiceEnabled()) {
+        SparseBooleanArray selectedItems = new SparseBooleanArray();
+        if (isSelectAll){
+            imageAdapter.setMultipleChoiceEnabled(isSelectAll);
             tickBtn.setIconTint(ColorStateList.valueOf(getResources().getColor(R.color.white)));
             tickBtn.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(R.color.blue_200)));
+            for (int i = 0; i < imageURIs.size(); i++) {
+                selectedItems.put(i, true);
+            }
         } else {
             tickBtn.setIconTint(ColorStateList.valueOf(getResources().getColor(R.color.black)));
             tickBtn.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(R.color.white)));
         }
-        SparseBooleanArray selectedItems = new SparseBooleanArray();
-        for (int i = 0; i < imageURIs.size(); i++) {
-            selectedItems.put(i, true);
-        }
+        imageAdapter.setMultipleChoiceEnabled(isSelectAll);
         imageAdapter.setSelectedItems(selectedItems);
+        fragToActivityListener.onFragmentAction("SelectAll", true);
         imageAdapter.notifyDataSetChanged();
     }
 

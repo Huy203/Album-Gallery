@@ -4,14 +4,14 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    >
+    android:layout_margin="2dp">
 
     <FrameLayout
         android:id="@+id/frameLayout"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="parent">
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
 
         <ImageView
             android:id="@+id/imageView"
@@ -37,7 +37,6 @@
         style="@style/AppCheckbox"
         android:layout_width="20dp"
         android:layout_height="20dp"
-        android:layout_margin="0dp"
         android:checked="true"
         android:visibility="visible"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -46,10 +45,10 @@
     <com.google.android.material.imageview.ShapeableImageView
         android:id="@+id/isLiked"
         style="?attr/materialIconButtonStyle"
-        android:layout_width="10dp"
-        android:layout_height="10dp"
-        android:minHeight="0dip"
+        android:layout_width="15dp"
+        android:layout_height="15dp"
         android:layout_margin="5dp"
+        android:minHeight="0dip"
         android:padding="0dp"
         android:src="@drawable/heart_black"
         android:visibility="visible"

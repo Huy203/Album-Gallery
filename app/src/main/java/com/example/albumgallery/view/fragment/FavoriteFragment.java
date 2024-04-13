@@ -55,9 +55,10 @@ public class FavoriteFragment extends Fragment {
         handleInteractions(view);
 
         imageURIs = new ArrayList<>();
-        imageURIs = mainController.getImageController().getAllFavoriteImageRef();
+        imageURIs = mainController.getImageController().getAllImageURLsFavourited();
 
         imageAdapter = new ImageAdapter(getActivity(), imageURIs);
+        imageAdapter.setImageURLsFavourite(imageURIs);
         recyclerView = (RecyclerView) view.findViewById(R.id.recyclerViewFavorite);
         recyclerView.setLayoutManager(new GridLayoutManager(getContext(), 3));
         recyclerView.setAdapter(imageAdapter);

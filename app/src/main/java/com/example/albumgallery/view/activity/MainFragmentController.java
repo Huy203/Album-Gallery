@@ -318,6 +318,10 @@ public class MainFragmentController extends AppCompatActivity implements Backgro
             case "ShowMultipleChoice":
                 int count = (int) data;
                 ((TextView) findViewById(R.id.numberOfSelectedImages)).setText(count + " items selected");
+                break;
+            case "SelectAll":
+                toggleMultipleChoice();
+                break;
         }
     }
 

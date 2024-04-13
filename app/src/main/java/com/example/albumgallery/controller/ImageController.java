@@ -286,6 +286,10 @@ public class ImageController implements Controller {
         return dbHelper.getAllRef("Image", "is_deleted = 0");
     }
 
+    public List<String> getAllImageURLsDeleted() {
+        return dbHelper.getAllRef("Image", "is_deleted = 1");
+    }
+
     public List<String> getAllImageURLsFavourited() {
         return dbHelper.getAllRef("Image", "is_favourited = 1");
     }
@@ -326,10 +330,6 @@ public class ImageController implements Controller {
 
     public boolean isFavoriteImage(long imageId) {
         return dbHelper.isFavoriteImage(imageId);
-    }
-
-    public List<String> getAllFavoriteImageRef() {
-        return dbHelper.getAllFavoriteImageRef();
     }
 
     public List<String> getSelectedImageURLs() {
@@ -499,10 +499,6 @@ public class ImageController implements Controller {
 
     public boolean isDeleteImage(long imageId) {
         return dbHelper.isDeleteImage(imageId);
-    }
-
-    public List<String> getAllDeleteImageRef() {
-        return dbHelper.getAllDeleteImageRef();
     }
 
     public String recognizeQRCode(String uri) {

@@ -70,6 +70,8 @@ public class DetailPicture extends AppCompatActivity implements ImageInfoListene
     protected void onResume() {
         super.onResume();
         update();
+
+        setIconTintButton(findViewById(R.id.action_like), imageModel.getIs_favourited());
     }
 
     private void initializeViews() {

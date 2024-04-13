@@ -42,6 +42,7 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> 
         this.imageURLs = imageURLs;
         this.selectedItems = new SparseBooleanArray();
         this.listener = (ImageAdapterListener) activity;
+        this.imageURLsFavourited =new ArrayList<>();
     }
 
     public void setImageURLsFavourite(List<String> imageURLsFavourited) {
