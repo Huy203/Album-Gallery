@@ -249,6 +249,12 @@ public class MainFragmentController extends AppCompatActivity implements Backgro
     }
 
     public void likeAction(View view) {
+        HomeScreenFragment fragment = (HomeScreenFragment) getSupportFragmentManager().findFragmentById(R.id.fragment_container);
+        if (fragment != null && fragment.isAdded()) {
+            fragment.ActivityToFragListener("Like");
+        } else {
+            Log.e("MainFragmentController", "Fragment is null or not added");
+        }
     }
 
     public void deleteAction(View view) {
@@ -298,6 +304,15 @@ public class MainFragmentController extends AppCompatActivity implements Backgro
                     toggleMultipleChoice();
                 } else {
                     Toast.makeText(this, "Failed to delete image", Toast.LENGTH_SHORT).show();
+                }
+                break;
+            case "Like":
+                boolean isLiked = (boolean) data;
+                Log.v("MainFragmentController", "Is liked: " + isLiked);
+                if (isLiked) {
+                    toggleMultipleChoice();
+                } else {
+                    Toast.makeText(this, "Failed to like image", Toast.LENGTH_SHORT).show();
                 }
                 break;
             case "ShowMultipleChoice":

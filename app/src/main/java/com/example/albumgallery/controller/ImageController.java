@@ -286,6 +286,10 @@ public class ImageController implements Controller {
         return dbHelper.getAllRef("Image", "is_deleted = 0");
     }
 
+    public List<String> getAllImageURLsFavourited() {
+        return dbHelper.getAllRef("Image", "is_favourited = 1");
+    }
+
     public ImageModel getImageById(long id) {
         String data = dbHelper.getById("Image", id);
         String[] temp = data.split(",");

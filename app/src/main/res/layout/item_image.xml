@@ -3,7 +3,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="wrap_content"
-    android:layout_height="wrap_content">
+    android:layout_height="wrap_content"
+    >
 
     <FrameLayout
         android:id="@+id/frameLayout"
@@ -37,9 +38,23 @@
         android:layout_width="20dp"
         android:layout_height="20dp"
         android:layout_margin="0dp"
-        android:padding="0dp"
-        android:visibility="gone"
+        android:checked="true"
+        android:visibility="visible"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"/>
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <com.google.android.material.imageview.ShapeableImageView
+        android:id="@+id/isLiked"
+        style="?attr/materialIconButtonStyle"
+        android:layout_width="10dp"
+        android:layout_height="10dp"
+        android:minHeight="0dip"
+        android:layout_margin="5dp"
+        android:padding="0dp"
+        android:src="@drawable/heart_black"
+        android:visibility="visible"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:tint="@color/blue_500" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
