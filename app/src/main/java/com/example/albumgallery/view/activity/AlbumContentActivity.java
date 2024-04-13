@@ -64,6 +64,8 @@ public class AlbumContentActivity extends AppCompatActivity implements ImageAdap
 
         AlbumInfo albumInfoFragment = new AlbumInfo();
         Button AlbumInfo = findViewById(R.id.AlbumInfo);
+        SlideShowActivity slideShowActivity = new SlideShowActivity();
+        Button SlideShow = findViewById(R.id.SlideShow);
         view = findViewById(R.id.albumInfo);
 
         album_id = (int) mainController.getAlbumController().getAlbumIdByName(albumName);
@@ -87,6 +89,13 @@ public class AlbumContentActivity extends AppCompatActivity implements ImageAdap
 
         AlbumInfo.setOnClickListener(v -> {
             toggleAlbumInfo();
+        });
+
+        SlideShow.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startSlideShow();
+            }
         });
 
         albumInfoFragment.setAlbumInfo(getAlbumModel());
@@ -224,5 +233,10 @@ public class AlbumContentActivity extends AppCompatActivity implements ImageAdap
     @Override
     public void onPointerCaptureChanged(boolean hasCapture) {
         super.onPointerCaptureChanged(hasCapture);
+    }
+    private void startSlideShow() {
+        Intent intent = new Intent(this, SlideShowActivity.class);
+        intent.putStringArrayListExtra("imageURIs", new ArrayList<>(imageURIs));
+        startActivity(intent);
     }
 }

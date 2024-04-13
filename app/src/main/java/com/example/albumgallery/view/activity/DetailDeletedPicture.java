@@ -51,6 +51,7 @@ public class DetailDeletedPicture extends DetailPicture {
 
         ImageView backButton = findViewById(R.id.backButton);
         ImageView trashButton = findViewById(R.id.trashButton);
+        ImageView restoreButton = findViewById(R.id.restoreButton);
         Button ImageInfo = findViewById(R.id.ImageInfo);
         imageInfoView = findViewById(R.id.imageInfo);
 
@@ -68,6 +69,16 @@ public class DetailDeletedPicture extends DetailPicture {
                 showDeleteConfirmationDialog(uri);
             } else {
                 Toast.makeText(this, "No image to delete", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        restoreButton.setOnClickListener(v -> {
+            if (uri != null) {
+                // Call deleteSelectedImage() method from ImageController
+                // mainController.getImageController().deleteSelectedImage(uri, 0);
+                showRestoreConfirmationDialog(uri);
+            } else {
+                Toast.makeText(this, "No image to restore", Toast.LENGTH_SHORT).show();
             }
         });
 
@@ -101,6 +112,21 @@ public class DetailDeletedPicture extends DetailPicture {
             public void onClick(DialogInterface dialog, int which) {
                 // Call deleteSelectedImage() method from ImageController
                 mainController.getImageController().deleteSelectedImage(uri);
+            }
+        });
+        builder.setNegativeButton("Cancel", null);
+        builder.show();
+    }
+
+    protected void showRestoreConfirmationDialog(String uri) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Confirm Restore");
+        builder.setMessage("Restore this image?");
+        builder.setPositiveButton("Restore", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                // Call deleteSelectedImage() method from ImageController
+                mainController.getImageController().restoreSelectedImage(uri);
             }
         });
         builder.setNegativeButton("Cancel", null);

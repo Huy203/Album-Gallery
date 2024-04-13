@@ -99,7 +99,5 @@ dependencies {
     implementation("com.theartofdev.edmodo:android-image-cropper:2.8.0")
     // QR Code Scanner
     implementation("com.google.zxing:core:3.4.1")
-
-
-
+    implementation ("com.github.denzcoskun:ImageSlideshow:0.1.0")
 }    

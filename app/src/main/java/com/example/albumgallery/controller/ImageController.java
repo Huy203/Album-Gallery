@@ -375,6 +375,7 @@ public class ImageController implements Controller {
                 // You may want to update your local data or UI here if necessary.
 
                 Intent intent = new Intent(activity, MainFragmentController.class);
+                intent.putExtra("fragmentToLoad", "Bin");
                 activity.startActivity(intent);
                 activity.finish();
             }
@@ -386,7 +387,15 @@ public class ImageController implements Controller {
             }
         });
     }
+    public void restoreSelectedImage(String imageURL) {
+        long imageID = dbHelper.getImageIdByURL(imageURL);
+        dbHelper.setDelete(imageID, false);
 
+        Intent intent = new Intent(activity, MainFragmentController.class);
+        intent.putExtra("fragmentToLoad", "Bin");
+        activity.startActivity(intent);
+        activity.finish();
+    }
     public String checkExistURL(String longImageURL) {
         String[] parts = longImageURL.split("/");
         String imageURL = parts[parts.length - 1];

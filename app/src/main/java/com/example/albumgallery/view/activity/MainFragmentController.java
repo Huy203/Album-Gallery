@@ -52,8 +52,12 @@ public class MainFragmentController extends AppCompatActivity implements Backgro
         String fragmentToLoad = getIntent().getStringExtra("fragmentToLoad");
         if (fragmentToLoad != null && fragmentToLoad.equals("AlbumMain")) {
             replaceFragment(fragments.get(1));
-        } else if (fragmentToLoad != null && fragmentToLoad.equals("HomeScreen")) {
+        }
+        else if (fragmentToLoad != null && fragmentToLoad.equals("HomeScreen")) {
             replaceFragment(fragments.get(0));
+        }
+        else if (fragmentToLoad != null && fragmentToLoad.equals("Bin")) {
+            replaceFragment(fragments.get(3));
         }
 
 
