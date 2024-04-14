@@ -46,4 +46,10 @@
     <string name="phone">Phone</string>
     <string name="user_name">Username</string>
     <string name="email_or_username">Email or Username</string>
+    <string name="account_infomation">Account Infomation</string>
+    <string name="date_of_birth">Date of birth</string>
+    <string name="language">Language</string>
+    <string name="appearance">Appearance</string>
+    <string name="edit_profile">Edit Profile</string>
+    <string name="name" />
 </resources>

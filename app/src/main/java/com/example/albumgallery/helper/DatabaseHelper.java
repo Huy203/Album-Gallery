@@ -21,7 +21,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public static final int DATABASE_VERSION = 1;
     public static final String TAG_TABLE = "Tag";
     public static final String SIZE_TABLE = "Size";
-    public static final String USERS_TABLE = "Users";
+    public static final String USER_TABLE = "User";
     public static final String ALBUM_TABLE = "Album";
     public static final String IMAGE_TABLE = "Image";
     public static final String IMAGE_ALBUM_TABLE = "Image_Album";
@@ -58,7 +58,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 //                    "    width REAL,\n" +
 //                    "    height REAL\n" +
 //                    ");");
-            db.execSQL("CREATE TABLE " + USERS_TABLE + " (\n" +
+            db.execSQL("CREATE TABLE " + USER_TABLE + " (\n" +
                     "    id INTEGER PRIMARY KEY AUTOINCREMENT,\n" +
                     "    username TEXT,\n" +
                     "    password TEXT,\n" +
@@ -140,7 +140,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         try {
-            db.execSQL("DROP TABLE IF EXISTS " + USERS_TABLE);
+            db.execSQL("DROP TABLE IF EXISTS " + USER_TABLE);
             db.execSQL("DROP TABLE IF EXISTS " + TAG_TABLE);
             db.execSQL("DROP TABLE IF EXISTS " + SIZE_TABLE);
             db.execSQL("DROP TABLE IF EXISTS " + ALBUM_TABLE);
