@@ -257,9 +257,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
 
 
-    public void getConnection() {
-        SQLiteDatabase db = getWritableDatabase();
-    }
+//    public void getConnection() {
+//        SQLiteDatabase db = getWritableDatabase();
+//    }
 
     // Get all columns of a table
     public void getCols(String table) {
@@ -546,21 +546,21 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         }
         return imageId;
     }
-    public void toggleFavoriteImage(long imageId) {
-        SQLiteDatabase db = getWritableDatabase();
-        boolean isFavorite = isFavoriteImage(imageId);
-
-        int newFavorite;
-        if(isFavorite) {
-            newFavorite = 0;
-        } else {
-            newFavorite = 1;
-        }
-
-        ContentValues values = new ContentValues();
-        values.put("is_favourited", newFavorite);
-        db.update(IMAGE_TABLE, values, "id = ?", new String[]{String.valueOf(imageId)});
-    }
+//    public void toggleFavoriteImage(long imageId) {
+//        SQLiteDatabase db = getWritableDatabase();
+//        boolean isFavorite = isFavoriteImage(imageId);
+//
+//        int newFavorite;
+//        if(isFavorite) {
+//            newFavorite = 0;
+//        } else {
+//            newFavorite = 1;
+//        }
+//
+//        ContentValues values = new ContentValues();
+//        values.put("is_favourited", newFavorite);
+//        db.update(IMAGE_TABLE, values, "id = ?", new String[]{String.valueOf(imageId)});
+//    }
 
 
     public boolean isFavoriteImage(long imageId) {
@@ -578,22 +578,22 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return isFavourited;
     }
 
-    public List<String> getAllFavoriteImageRef() {
-        List<String> favoriteRefs = new ArrayList<>();
-        SQLiteDatabase db = getReadableDatabase();
-        Cursor cursor = db.rawQuery("SELECT ref FROM " + IMAGE_TABLE + " WHERE is_favourited = 1", null);
-
-        if (cursor != null) {
-            if (cursor.moveToFirst()) {
-                do {
-                    String ref = cursor.getString(0);
-                    favoriteRefs.add(ref);
-                } while (cursor.moveToNext());
-            }
-            cursor.close();
-        }
-        return favoriteRefs;
-    }
+//    public List<String> getAllFavoriteImageRef() {
+//        List<String> favoriteRefs = new ArrayList<>();
+//        SQLiteDatabase db = getReadableDatabase();
+//        Cursor cursor = db.rawQuery("SELECT ref FROM " + IMAGE_TABLE + " WHERE is_favourited = 1", null);
+//
+//        if (cursor != null) {
+//            if (cursor.moveToFirst()) {
+//                do {
+//                    String ref = cursor.getString(0);
+//                    favoriteRefs.add(ref);
+//                } while (cursor.moveToNext());
+//            }
+//            cursor.close();
+//        }
+//        return favoriteRefs;
+//    }
 
     public String getPasswordByAlbumName(String albumName) {
         SQLiteDatabase db = getReadableDatabase();
@@ -631,14 +631,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             cursor.close();
         }
         return thumbnails;
-    }
-
-    public void setFavorite(long imageId, boolean isFavorite) {
-        SQLiteDatabase db = getWritableDatabase();
-        int favorite = isFavorite ? 1 : 0;
-        ContentValues values = new ContentValues();
-        values.put("is_favourited", favorite);
-        db.update(IMAGE_TABLE, values, "id = ?", new String[]{String.valueOf(imageId)});
     }
 
     public void removeAlbumPasswordByName(String albumName) {

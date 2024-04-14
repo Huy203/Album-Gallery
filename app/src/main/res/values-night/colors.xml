@@ -33,7 +33,7 @@
 
     <color name="textInButtonColor">#FFFFFF</color>
 
-<!--    gray-->
+    <!--    gray-->
     <color name="gray_200">#FFEEEEEE</color>
     <color name="gray_500">#FF9E9E9E</color>
     <color name="gray">#FF616161</color>
@@ -64,10 +64,9 @@
     <color name="none">#00000000</color>
 
     <color name="colorPressedIconTint">@color/white</color>
-    <color name="colorIconTint">@color/black</color>
+    <color name="colorIconTint">@color/white</color>
     <color name="colorPressedBackgroundTint">@color/blue_500</color>
     <color name="colorBackgroundTint">@color/none</color>
-
 
 
     <color name="hintTextColor">#7C7C7C</color>

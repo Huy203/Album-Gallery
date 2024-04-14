@@ -1,43 +1,19 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:style="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <!-- Back Button -->
-    <ImageView
-        android:id="@+id/backButton"
-        android:layout_width="50dp"
-        android:layout_height="50dp"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="16dp"
-        android:src="@drawable/back_arrow"
+    <include
+        android:id="@+id/top_nav_bin"
+        layout="@layout/top_nav_bin"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <!-- Date TextView -->
-    <TextView
-        android:id="@+id/dateTextView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:text="7th February, 2024"
-        android:textSize="20sp"
-        android:textStyle="bold"
-        app:layout_constraintStart_toEndOf="@id/backButton"
-        app:layout_constraintTop_toTopOf="@id/backButton" />
-
-    <!-- Time TextView -->
-    <TextView
-        android:id="@+id/timeTextView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="10:24"
-        android:textSize="16sp"
-        app:layout_constraintStart_toStartOf="@id/dateTextView"
-        app:layout_constraintTop_toBottomOf="@id/dateTextView" />
-
     <!-- Meme ImageView -->
-    <ImageView
+    <com.google.android.material.imageview.ShapeableImageView
         android:id="@+id/memeImageView"
         android:layout_width="0dp"
         android:layout_height="0dp"
@@ -46,34 +22,45 @@
         app:layout_constraintDimensionRatio="H,1:1"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/backButton" />
+        app:layout_constraintTop_toBottomOf="@+id/top_nav_bin" />
 
-    <!-- Trash Button -->
 
     <!-- Restore Button -->
-
-    <ImageView
-        android:id="@+id/trashButton"
-        android:layout_width="30dp"
-        android:layout_height="30dp"
-        android:layout_marginEnd="76dp"
-        android:layout_marginBottom="16dp"
-        android:src="@drawable/trash"
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_margin="20dp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@id/restoreButton"
-        app:layout_constraintTop_toBottomOf="@id/memeImageView" />
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/memeImageView">
 
-    <!-- Image Info Button -->
-    <ImageView
-        android:id="@+id/restoreButton"
-        android:layout_width="30dp"
-        android:layout_height="30dp"
-        android:layout_marginEnd="4dp"
-        android:layout_marginBottom="16dp"
-        android:src="@drawable/restore"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@id/ImageInfo"
-        app:layout_constraintTop_toBottomOf="@id/memeImageView" />
+        <com.google.android.flexbox.FlexboxLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:alignItems="center"
+            app:justifyContent="space_evenly">
+
+            <com.google.android.material.imageview.ShapeableImageView
+                android:id="@+id/trashButton"
+                style="@style/AppImageButton"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:onClick="deleteAction"
+                android:scaleType="centerCrop"
+                android:src="@drawable/trash"
+                style:shapeAppearance="@style/ShapeAppearance.Material3.Corner.Full" />
+
+            <com.google.android.material.imageview.ShapeableImageView
+                android:id="@+id/restoreButton"
+                style="@style/AppImageButton"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:onClick="restoreAction"
+                android:scaleType="centerCrop"
+                android:src="@drawable/restore" />
+        </com.google.android.flexbox.FlexboxLayout>
+    </LinearLayout>
 
     <Button
         android:id="@+id/ImageInfo"

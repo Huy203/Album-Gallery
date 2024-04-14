@@ -12,7 +12,6 @@ import android.os.Bundle;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.util.SparseBooleanArray;
-import android.view.ContextThemeWrapper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -108,14 +107,18 @@ public class HomeScreenFragment extends Fragment {
                 selectedItems.put(i, true);
             }
         } else {
-//            imageAdapter.setMultipleChoiceEnabled(isSelectAll);
-//            tickBtn.setIconTint(ColorStateList.valueOf(getResources().getColor(R.color.blue_200)));
-//            tickBtn.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(R.color.white)));
+            if (SharePreferenceHelper.isDarkModeEnabled(requireContext())) {
+                tickBtn.setIconTint(ColorStateList.valueOf(getResources().getColor(R.color.white)));
+                tickBtn.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(R.color.none)));
+            } else {
+                tickBtn.setIconTint(ColorStateList.valueOf(getResources().getColor(R.color.black)));
+                tickBtn.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(R.color.none)));
+            }
+            imageAdapter.setMultipleChoiceEnabled(isSelectAll);
+            imageAdapter.setSelectedItems(selectedItems);
+            fragToActivityListener.onFragmentAction("SelectAll", true);
+            imageAdapter.notifyDataSetChanged();
         }
-        imageAdapter.setMultipleChoiceEnabled(isSelectAll);
-        imageAdapter.setSelectedItems(selectedItems);
-        fragToActivityListener.onFragmentAction("SelectAll", true);
-        imageAdapter.notifyDataSetChanged();
     }
 
     public boolean toggleMultipleChoice() {
@@ -182,6 +185,7 @@ public class HomeScreenFragment extends Fragment {
 //        imageURIs.addAll(mainController.getImageController().getAllImageURLsSortByDate());
         List<String> imageURLsFavourited = mainController.getImageController().getAllImageURLsFavourited();
         imageURIs.addAll(mainController.getImageController().getAllImageURLsUndeleted());
+
         imageAdapter = new ImageAdapter(getActivity(), imageURIs);
         imageAdapter.setImageURLsFavourite(imageURLsFavourited);
         // Switch to list display
@@ -228,11 +232,17 @@ public class HomeScreenFragment extends Fragment {
         if (activity != null) {
             options = ActivityOptionsCompat.makeSceneTransitionAnimation(activity, view, "image");
         }
-        long id = mainController.getImageController().getIdByRef(uri);
-        intent.putExtra("id", id);
-        intent.putExtra("position", position);
-        Log.v("ImageAdapter", "Image selected: " + view);
-        startActivityForResult(intent, REQUEST_CODE_DETAIL_IMAGE, options.toBundle());
+        if (imageURIs.contains(uri)) {
+            Log.v("HomeScreenFragment", "Image selected: " + uri);
+            long id = mainController.getImageController().getIdByRef(uri);
+            intent.putExtra("id", id);
+            intent.putExtra("position", position);
+            if (options != null) {
+                startActivityForResult(intent, REQUEST_CODE_DETAIL_IMAGE, options.toBundle());
+            }
+        } else {
+            Log.v("HomeScreenFragment", "Image not found: " + uri);
+        }
     }
 
     private void openCamera() {

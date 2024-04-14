@@ -32,7 +32,7 @@
         app:menu="@menu/bottom_nav" />
 
     <LinearLayout
-        android:id="@+id/bottomMenuMain"
+        android:id="@+id/bottomMenuMain1"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
@@ -43,12 +43,30 @@
             android:id="@+id/numberOfSelectedImages"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:textSize="15pt"
+            android:gravity="center"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent" />
 
         <include
             layout="@layout/bottom_menu_main"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:layout_constraintBottom_toBottomOf="parent" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/bottomMenuMain2"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:visibility="visible"
+        app:layout_constraintBottom_toBottomOf="parent">
+
+        <include
+            layout="@layout/bottom_menu_main2"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             app:layout_constraintBottom_toBottomOf="parent" />

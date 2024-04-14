@@ -45,7 +45,7 @@ public class LoginScreen extends AppCompatActivity {
 //        Objects.requireNonNull(getSupportActionBar()).hide();
         setContentView(R.layout.activity_login);
 
-        clearLoginStatus();
+//        clearLoginStatus();
 
         authManager = AuthenticationManagerSingleton.getInstance();
 

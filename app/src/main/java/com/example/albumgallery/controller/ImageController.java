@@ -91,6 +91,35 @@ public class ImageController implements Controller {
         dbHelper.delete("Image", where);
         dbHelper.close();
     }
+    public ImageModel getImageById(long id) {
+        String data = dbHelper.getById("Image", id);
+        String[] temp = data.split(",");
+        boolean isFavourited = temp[10].equals("1");
+        boolean isDeleted = temp[9].equals("1");
+        return new ImageModel(Integer.parseInt(temp[0]), temp[1], Integer.parseInt(temp[2]), Integer.parseInt(temp[3]), Long.parseLong(temp[4]), temp[5], temp[6], temp[7], temp[8], isDeleted, isFavourited);
+    }
+    public long getIdByRef(String ref) {
+        return dbHelper.getId("Image", "ref = '" + ref + "'");
+    }
+    public List<String> getAllImageURLs() {
+        return dbHelper.getAllRef("Image", null);
+    }
+    public List<String> getAllImageURLsUndeleted() {
+        return dbHelper.getAllRef("Image", "is_deleted = 0");
+    }
+    public List<String> getAllImageURLsDeleted() {
+        return dbHelper.getAllRef("Image", "is_deleted = 1");
+    }
+    public List<String> getAllImageURLsFavourited() {
+        return dbHelper.getAllRef("Image", "is_favourited = 1");
+    }
+    public List<String> getAllImageURLsSortByDate() {
+        return dbHelper.selectImagesSortByDate("Image", "ref", "descending");
+    }
+
+    public List<String> getAllImageURLsSortByDateAtBin() {
+        return dbHelper.selectImagesSortByDateAtBin("Image", "ref", "descending");
+    }
 
 
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -122,8 +151,6 @@ public class ImageController implements Controller {
             }
         }
     }
-
-
     private void handleImagePicked(Intent data) {
         Log.v("Image", "Image picked" + " " + data.getData());
         List<Uri> imageUris = new ArrayList<>();
@@ -278,41 +305,6 @@ public class ImageController implements Controller {
         return fileName.split("\\.")[fileName.split("\\.").length - 1];
     }
 
-    public List<String> getAllImageURLs() {
-        return dbHelper.getAllRef("Image", null);
-    }
-
-    public List<String> getAllImageURLsUndeleted() {
-        return dbHelper.getAllRef("Image", "is_deleted = 0");
-    }
-
-    public List<String> getAllImageURLsDeleted() {
-        return dbHelper.getAllRef("Image", "is_deleted = 1");
-    }
-
-    public List<String> getAllImageURLsFavourited() {
-        return dbHelper.getAllRef("Image", "is_favourited = 1");
-    }
-
-    public ImageModel getImageById(long id) {
-        String data = dbHelper.getById("Image", id);
-        String[] temp = data.split(",");
-        boolean isFavourited = temp[10].equals("1");
-        boolean isDeleted = temp[9].equals("1");
-        return new ImageModel(Integer.parseInt(temp[0]), temp[1], Integer.parseInt(temp[2]), Integer.parseInt(temp[3]), Long.parseLong(temp[4]), temp[5], temp[6], temp[7], temp[8], isDeleted, isFavourited);
-    }
-
-    public long getIdByRef(String ref) {
-        return dbHelper.getId("Image", "ref = '" + ref + "'");
-    }
-
-    public List<String> getAllImageURLsSortByDate() {
-        return dbHelper.selectImagesSortByDate("Image", "ref", "descending");
-    }
-
-    public List<String> getAllImageURLsSortByDateAtBin() {
-        return dbHelper.selectImagesSortByDateAtBin("Image", "ref", "descending");
-    }
 
     public List<String> getAllImageIds() {
         return dbHelper.getFromImage("id");
@@ -324,7 +316,7 @@ public class ImageController implements Controller {
 
     public boolean toggleFavoriteImage(long imageId) {
         boolean isFavourited = getImageById(imageId).getIs_favourited();
-        dbHelper.update("image", "is_favourited", isFavourited ? "0" : "1", "id = " + imageId);
+        update("is_favourited", isFavourited ? "0" : "1", "id = " + imageId);
         return !isFavourited;
     }
 
@@ -481,12 +473,14 @@ public class ImageController implements Controller {
         return dbHelper.getTotalCapacityFromImageIDs(imageIDs);
     }
 
-    public void toggleDeleteImage(long imageId) {
-        dbHelper.toggleDeleteImage(imageId);
+    public boolean toggleDeleteImage(long imageId) {
+        boolean isDeleted = getImageById(imageId).getIs_deleted();
+        update("is_deleted", isDeleted ? "0" : "1", "id = " + imageId);
+        return !isDeleted;
     }
 
     public void setDelete(long imageId, boolean isDelete) {
-        dbHelper.setDelete(imageId, isDelete);
+        update("is_deleted", isDelete ? "1" : "0", "id = " + imageId);
 
 //        Intent intent = new Intent(activity, MainFragmentController.class);
 //        activity.startActivity(intent);

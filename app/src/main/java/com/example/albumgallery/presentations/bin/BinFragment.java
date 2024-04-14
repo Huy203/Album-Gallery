@@ -1,10 +1,20 @@
-package com.example.albumgallery.view.fragment;
+package com.example.albumgallery.presentations.bin;
+
+import static com.example.albumgallery.utils.Constant.REQUEST_CODE_DETAIL_IMAGE;
 
 import android.annotation.SuppressLint;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.ImageButton;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -15,20 +25,13 @@ import androidx.fragment.app.FragmentActivity;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import android.util.Log;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.Button;
-import android.widget.ImageButton;
-import android.widget.TextView;
-
 import com.example.albumgallery.R;
 import com.example.albumgallery.controller.MainController;
-import com.example.albumgallery.view.activity.DetailDeletedPicture;
-import com.example.albumgallery.view.activity.DetailPicture;
 import com.example.albumgallery.view.activity.MainFragmentController;
 import com.example.albumgallery.view.adapter.ImageAdapter;
+import com.example.albumgallery.view.listeners.BackgroundProcessingCallback;
+import com.example.albumgallery.view.listeners.FragToActivityListener;
+import com.example.albumgallery.view.listeners.ImageAdapterListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.Tasks;
 
@@ -37,26 +40,42 @@ import java.util.List;
 
 public class BinFragment extends Fragment {
     private RecyclerView recyclerView;
-    private RecyclerView recyclerMediaView;
     private List<String> imageURIs;
     List<String> selectedImageURLs;
     private ImageAdapter imageAdapter;
     List<Task> selectedImageURLsTask;
     private TextView numberOfImagesSelected;
     private MainController mainController;
+    private FragToActivityListener fragToActivityListener;
+    private boolean isSelectAll = false;
+
     public BinFragment() {
         // Required empty public constructor
     }
+
+    @Override
+    public void onAttach(@NonNull Context context) {
+        super.onAttach(context);
+        if (context instanceof ImageAdapterListener && context instanceof BackgroundProcessingCallback && context instanceof FragToActivityListener) {
+            fragToActivityListener = (FragToActivityListener) context;
+        } else {
+            throw new RuntimeException(context
+                    + " must implement Interface");
+        }
+    }
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
     }
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_bin, container, false);
     }
+
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
@@ -75,28 +94,8 @@ public class BinFragment extends Fragment {
         recyclerView.setLayoutManager(new GridLayoutManager(getContext(), 3));
         recyclerView.setAdapter(imageAdapter);
         imageAdapter.notifyDataSetChanged();
-        // recyclerMediaView = view.findViewById(R.id.recyclerMediaView);
 
-        Button btnPickMultipleImages = view.findViewById(R.id.btnPickMultipleImages);
-        Button btnDeleteMultipleImages = view.findViewById(R.id.btnDeleteMultipleImages);
         numberOfImagesSelected = view.findViewById(R.id.numberOfSelectedImages);
-
-        btnPickMultipleImages.setOnClickListener(v -> {
-            if (imageAdapter.toggleMultipleChoiceImagesEnabled()) {
-                btnPickMultipleImages.setText("Cancel");
-                numberOfImagesSelected.setVisibility(TextView.VISIBLE);
-                // numberOfImagesSelected.setText("0 images selected");
-            } else {
-                btnPickMultipleImages.setText("Select");
-                numberOfImagesSelected.setVisibility(TextView.GONE);
-                imageAdapter.clearSelectedItems();
-            }
-        });
-
-        btnDeleteMultipleImages.setOnClickListener(v -> {
-            // mainController.getImageController().deleteSelectedImageAtHomeScreeen(selectedImageURLsTask, 1);
-            showDeleteConfirmationDialog();
-        });
     }
 
     private void handleInteractions(View view) {
@@ -118,17 +117,22 @@ public class BinFragment extends Fragment {
         if (activity != null) {
             options = ActivityOptionsCompat.makeSceneTransitionAnimation(activity, view, "image");
         }
-        long id = mainController.getImageController().getIdByRef(uri);
-        intent.putExtra("id", id);
-        intent.putExtra("position", position);
-        Log.v("ImageAdapter", "Image selected: " + view);
-        if (options != null) {
-            startActivity(intent, options.toBundle());
+        if (imageURIs.contains(uri)) {
+            Log.v("BinFragment", "Image found: " + uri);
+            long id = mainController.getImageController().getIdByRef(uri);
+            intent.putExtra("id", id);
+            intent.putExtra("position", position);
+            if (options != null) {
+                startActivityForResult(intent, REQUEST_CODE_DETAIL_IMAGE, options.toBundle());
+            }
+        } else {
+            Log.v("HomeScreenFragment", "Image not found: " + uri);
         }
     }
+
     private void showDeleteConfirmationDialog() {
         Log.d("size of image urls before delete", String.valueOf(selectedImageURLsTask.size()));
-        for (Task taskImageURL : selectedImageURLsTask){
+        for (Task taskImageURL : selectedImageURLsTask) {
             String imageURL = taskImageURL.getResult().toString();
             Log.d("image url", imageURL);
         }
@@ -145,6 +149,7 @@ public class BinFragment extends Fragment {
         builder.setNegativeButton("Cancel", null);
         builder.show();
     }
+
     @SuppressLint("SetTextI18n")
     public void getSelectedItemsCount(int count) {
         Log.v("SelectedItems", count + " items selected");
@@ -162,6 +167,7 @@ public class BinFragment extends Fragment {
             selectedImageURLs.add(imageURIs.get(i));
         }
     }
+
     public void updateUI() {
         imageURIs.clear();
 //        imageURIs.addAll(mainController.getImageController().getAllImageURLs());
@@ -171,5 +177,29 @@ public class BinFragment extends Fragment {
         recyclerView.setLayoutManager(new GridLayoutManager(getContext(), 3));
         recyclerView.setAdapter(imageAdapter);
         imageAdapter.notifyDataSetChanged();
+    }
+
+    public boolean toggleMultipleChoice() {
+        int length = imageAdapter.getSelectedItems().size(); // get the number of selected items
+        fragToActivityListener.onFragmentAction("ShowMultipleChoice", length);
+
+        // if no items are selected, clear the selected items and return false
+        if (length == 0) {
+            Log.v("HomeScreenFragment", "No items selected");
+            imageAdapter.clearSelectedItems();
+            return false;
+        }
+        return true;
+    }
+
+    public void ActivityToFragListener(String action) {
+        switch (action) {
+            case "Delete":
+                showDeleteConfirmationDialog();
+                onPause();
+                break;
+            case "Restore":
+                break;
+        }
     }
 }

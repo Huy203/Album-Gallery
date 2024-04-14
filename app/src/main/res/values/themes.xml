@@ -25,13 +25,22 @@
     </style>
 
     <style name="AppButton" parent="@style/Widget.Material3.Button.IconButton">
-        <item name="backgroundTint">@color/white</item>
+        <item name="backgroundTint">@color/none</item>
         <item name="android:textColor">@color/black</item>
         <item name="iconTint">@color/black</item>
     </style>
 
+    <style name="AppImageButton" parent="@style/Widget.Material3.Button.IconButton">
+        <item name="android:textColor">@color/black</item>
+        <item name="tint">@color/black</item>
+    </style>
+
+    <style name="AppEditText" parent="@style/Widget.Material3.Button.IconButton">
+        <item name="android:textColor">@color/black</item>
+    </style>
+
     <style name="AppBottomNavigationView" parent="@style/Widget.Material3.BottomNavigationView">
-        <item name="android:background">@color/white</item>
+        <item name="android:background">@color/none</item>
         <item name="itemTextColor">@color/black</item>
         <item name="itemIconTint">@color/black</item>
     </style>
