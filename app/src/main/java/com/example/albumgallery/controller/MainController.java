@@ -26,7 +26,4 @@ public class MainController {
     public ImageAlbumController getImageAlbumController() {
         return imageAlbumController;
     }
-    public List<String> getImagePaths() {
-        return imageController.getImagePaths();
-    }
 }

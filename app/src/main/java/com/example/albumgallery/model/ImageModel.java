@@ -113,7 +113,7 @@ public class ImageModel implements Model {
         this.remain_time = remain_time;
     }
 
-    public boolean isIs_deleted() {
+    public boolean getIs_deleted() {
         return is_deleted;
     }
 
