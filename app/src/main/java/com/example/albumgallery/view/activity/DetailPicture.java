@@ -80,7 +80,7 @@ public class DetailPicture extends AppCompatActivity implements ImageInfoListene
 
     private void initializeViews() {
         mainController = new MainController(this);
-        imagePaths = mainController.getImageController().getAllImageURLsUndeleted();
+        imagePaths = mainController.getImageController().getAllImageURLsSortByDate();
         currentPosition = getIntent().getIntExtra("position", 0);
 
         imageView = findViewById(R.id.memeImageView);
