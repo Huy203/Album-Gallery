@@ -5,7 +5,6 @@ import static com.example.albumgallery.utils.Utilities.convertFromBitmapToUri;
 
 import android.annotation.SuppressLint;
 import android.app.WallpaperManager;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.ColorStateList;
@@ -34,6 +33,7 @@ import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.target.Target;
 import com.example.albumgallery.R;
 import com.example.albumgallery.controller.MainController;
+import com.example.albumgallery.helper.SharePreferenceHelper;
 import com.example.albumgallery.model.ImageModel;
 import com.example.albumgallery.view.fragment.ImageInfo;
 import com.example.albumgallery.view.listeners.ImageInfoListener;
@@ -80,7 +80,7 @@ public class DetailPicture extends AppCompatActivity implements ImageInfoListene
 
     private void initializeViews() {
         mainController = new MainController(this);
-        imagePaths = mainController.getImageController().getAllImageURLs();
+        imagePaths = mainController.getImageController().getAllImageURLsUndeleted();
         currentPosition = getIntent().getIntExtra("position", 0);
 
         imageView = findViewById(R.id.memeImageView);
@@ -114,7 +114,9 @@ public class DetailPicture extends AppCompatActivity implements ImageInfoListene
     }
 
     private void setIconTintButton(MaterialButton button, boolean temp) {
-        button.setIconTint(ColorStateList.valueOf(getResources().getColor(temp ? R.color.blue_500 : R.color.black)));
+        button.setIconTint(ColorStateList.valueOf(getResources().getColor(temp ? R.color.blue_500 :
+                SharePreferenceHelper.isDarkModeEnabled(this) ? R.color.white : // white
+                        R.color.black)));
     }
 
     public void setAsWallpaper(String imagePath) {
@@ -251,9 +253,6 @@ public class DetailPicture extends AppCompatActivity implements ImageInfoListene
                 // Call deleteSelectedImage() method from ImageController
                 // mainController.getImageController().deleteSelectedImage(uri);
                 finish();
-
-                Log.d("update delete successfully 1", "ok");
-
                 long id = mainController.getImageController().getIdByRef(uri);
                 isDeleted = mainController.getImageController().isDeleteImage(id);
                 toggleDeleteImage(id);
@@ -269,7 +268,7 @@ public class DetailPicture extends AppCompatActivity implements ImageInfoListene
         View dialogView = inflater.inflate(R.layout.albums_dialog, null);
         RadioGroup albumGroup = dialogView.findViewById(R.id.albumDialog);
 
-        for(String a: albumNames) {
+        for (String a : albumNames) {
             RadioButton albumBtn = new RadioButton(DetailPicture.this);
             albumBtn.setText(a);
             albumGroup.addView(albumBtn);
@@ -283,7 +282,7 @@ public class DetailPicture extends AppCompatActivity implements ImageInfoListene
                     public void onClick(DialogInterface dialogInterface, int i) {
                         int selectedRadioButtonId = albumGroup.getCheckedRadioButtonId();
                         RadioButton selectedRadioBtn = dialogView.findViewById(selectedRadioButtonId);
-                        if(selectedRadioBtn != null) {
+                        if (selectedRadioBtn != null) {
                             String selectedAlbum = selectedRadioBtn.getText().toString();
                             long album_id = mainController.getAlbumController().getAlbumIdByName(selectedAlbum);
                             long image_id = mainController.getImageController().getIdByRef(imagePaths.get(currentPosition));

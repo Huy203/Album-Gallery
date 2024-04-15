@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <com.google.android.material.bottomappbar.BottomAppBar
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:fabAlignmentMode="center">
+
+        <com.google.android.flexbox.FlexboxLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:alignItems="center"
+            app:justifyContent="space_around">
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/action_share"
+                style="@style/AppButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:onClick="shareAction"
+                app:icon="@drawable/restore" />
+
+            <TextView
+                android:id="@+id/numberOfSelectedImages2"
+                android:layout_width="200dp"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/action_delete"
+                style="@style/AppButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:onClick="deleteAction"
+                app:icon="@drawable/trash" />
+
+        </com.google.android.flexbox.FlexboxLayout>
+
+    </com.google.android.material.bottomappbar.BottomAppBar>
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

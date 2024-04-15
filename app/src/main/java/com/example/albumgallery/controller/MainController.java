@@ -8,11 +8,13 @@ public class MainController {
     private final AlbumController albumController;
     private final ImageController imageController;
     private final ImageAlbumController imageAlbumController;
+    private final UserController userController;
 
     public MainController(Activity activity) {
         albumController = new AlbumController(activity);
         imageController = new ImageController(activity);
         imageAlbumController = new ImageAlbumController(activity);
+        userController = new UserController(activity);
     }
 
     public AlbumController getAlbumController() {
@@ -26,7 +28,8 @@ public class MainController {
     public ImageAlbumController getImageAlbumController() {
         return imageAlbumController;
     }
-    public List<String> getImagePaths() {
-        return imageController.getImagePaths();
+
+    public UserController getUserController() {
+        return userController;
     }
 }

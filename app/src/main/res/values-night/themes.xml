@@ -21,13 +21,28 @@
     </style>
 
     <style name="AppButton" parent="@style/Widget.Material3.Button.IconButton">
-        <item name="backgroundTint">@color/white</item>
+        <item name="backgroundTint">@color/none</item>
         <item name="android:textColor">@color/white</item>
         <item name="iconTint">@color/white</item>
     </style>
 
+    <style name="AppTonalButton" parent="@style/Widget.Material3.Button.IconButton">
+        <item name="backgroundTint">@color/white</item>
+        <item name="android:textColor">@color/black</item>
+    </style>
+
+    <style name="AppImageButton">
+        <item name="android:textColor">@color/white</item>
+        <item name="tint">@color/white</item>
+    </style>
+
+    <style name="AppEditText" parent="@style/Widget.Material3.Button.IconButton">
+        <item name="android:textColor">@color/white</item>
+    </style>
+
+
     <style name="AppBottomNavigationView" parent="@style/Widget.Material3.BottomNavigationView">
-        <item name="android:background">@color/black</item>
+        <item name="android:background">@color/none</item>
         <item name="itemTextColor">@color/white</item>
         <item name="itemIconTint">@color/white</item>
     </style>
@@ -35,6 +50,11 @@
     <style name="AppCheckbox" parent="@style/Widget.Material3.CompoundButton.CheckBox">
         <item name="buttonIconTint">@color/white</item>
         <item name="buttonTint">@color/blue_500</item>
+    </style>
+
+    <style name="AppSwitch" parent="@style/Widget.Material3.CompoundButton.Switch">
+        <item name="trackTint">#B1B1B1</item>
+        <item name="thumbTint">@drawable/selector_switch_dark</item>
     </style>
 
     <style name="HeartShapeAppearance">

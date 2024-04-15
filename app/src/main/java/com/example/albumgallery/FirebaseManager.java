@@ -55,6 +55,10 @@ public class FirebaseManager {
         return storage;
     }
 
+    public FirebaseAuth getFirebaseAuth() {
+        return firebaseAuth;
+    }
+
     private void signInAnonymously() {
         FirebaseAuth.getInstance().signInAnonymously()
                 .addOnCompleteListener(task -> {
