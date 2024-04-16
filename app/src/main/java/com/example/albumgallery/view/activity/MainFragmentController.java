@@ -195,7 +195,7 @@ public class MainFragmentController extends AppCompatActivity implements Backgro
 
     }
 
-    /**
+    /** 
      * This method is used to toggle multiple choice mode in the fragment
      */
     @Override
