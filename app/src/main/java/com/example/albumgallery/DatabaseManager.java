@@ -15,6 +15,10 @@ public class DatabaseManager {
         context = ctx;
     }
 
+    public DatabaseHelper getDbHelper() {
+        return dbHelper;
+    }
+
     public void open() throws SQLiteException {
         dbHelper = new DatabaseHelper(context);
         SQLiteDatabase database = dbHelper.getWritableDatabase();

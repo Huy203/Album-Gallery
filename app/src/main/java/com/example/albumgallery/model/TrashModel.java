@@ -5,7 +5,7 @@ import android.content.Context;
 import com.example.albumgallery.helper.DatabaseHelper;
 
 public class TrashModel implements Model{
-    private int id;
+    private String id;
     private int capacity;
     private DatabaseHelper dbHelper;
 
@@ -20,11 +20,11 @@ public class TrashModel implements Model{
     public void setDbHelper(DatabaseHelper dbHelper) {
         this.dbHelper = dbHelper;
     }
-    public int getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(String id) {
         this.id = id;
     }
 
@@ -36,7 +36,7 @@ public class TrashModel implements Model{
         this.capacity = capacity;
     }
 
-    public TrashModel(int id, int capacity){
+    public TrashModel(String id, int capacity){
         this.id = id;
         this.capacity = capacity;
     }

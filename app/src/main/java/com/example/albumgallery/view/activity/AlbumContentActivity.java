@@ -106,7 +106,7 @@ public class AlbumContentActivity extends AppCompatActivity implements ImageAdap
 
     public AlbumModel getAlbumModel() {
         Log.d("album content id", String.valueOf(album_id));
-        return mainController.getAlbumController().getAlbumById(album_id);
+        return mainController.getAlbumController().getAlbumById(String.valueOf(album_id));
     }
 
     private void handleInteractions() {
@@ -155,7 +155,7 @@ public class AlbumContentActivity extends AppCompatActivity implements ImageAdap
     public void handleImagePick(View itemView, String uri, int position) {
         Intent intent = new Intent(this, DetailPicture.class);
         ActivityOptionsCompat options = ActivityOptionsCompat.makeSceneTransitionAnimation(this, itemView, "image");
-        long id = mainController.getImageController().getIdByRef(uri);
+        String id = mainController.getImageController().getIdByRef(uri);
         intent.putExtra("id", id);
         intent.putExtra("position", position);
         Log.v("ImageAdapter", "Image selected: " + itemView);

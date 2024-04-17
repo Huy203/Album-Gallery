@@ -119,7 +119,7 @@ public class BinFragment extends Fragment {
         }
         if (imageURIs.contains(uri)) {
             Log.v("BinFragment", "Image found: " + uri);
-            long id = mainController.getImageController().getIdByRef(uri);
+            String id = mainController.getImageController().getIdByRef(uri);
             intent.putExtra("id", id);
             intent.putExtra("position", position);
             if (options != null) {

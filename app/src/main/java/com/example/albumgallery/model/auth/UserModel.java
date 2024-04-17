@@ -1,82 +1,105 @@
-    package com.example.albumgallery.model.auth;
+package com.example.albumgallery.model.auth;
 
-    import com.example.albumgallery.model.Model;
+import com.example.albumgallery.model.Model;
 
-    public class UserModel implements Model {
-        // User class for authentication
+public class UserModel implements Model {
+    // User class for authentication
+    private String id;
+    private String username;
+    private String email;
+    private String phone;
+    private String created_at;
+    private String birth;
+    private String picture;
 
-        private String username;
-        private String password;
-        private String email;
-        private String phone;
-        private String address;
+    public UserModel() {
+    }
 
-        public UserModel() {
-            // Constructor không đối số
+    public UserModel(String... args) {
+        this.id = args[0];
+        this.username = args[1];
+        this.email = args[2];
+        this.phone = args[3];
+        this.created_at = args[4];
+        this.birth = args[5];
+        if(args.length > 6) {
+            this.picture = args[6];
         }
-        public UserModel(String username, String password, String email, String phone, String address) {
-            this.username = username;
-            this.password = password;
-            this.email = email;
-            this.phone = phone;
-            this.address = address;
-        }
-
-        public String getUsername() {
-            return username;
-        }
-
-        public String getPassword() {
-            return password;
-        }
-
-        public String getEmail() {
-            return email;
-        }
-
-        public String getPhone() {
-            return phone;
-        }
-
-        public String getAddress() {
-            return address;
-        }
-
-        public void setUsername(String username) {
-            this.username = username;
-        }
-
-        public void setPassword(String password) {
-            this.password = password;
-        }
-
-        public void setEmail(String email) {
-            this.email = email;
-        }
-
-        public void setPhone(String phone) {
-            this.phone = phone;
-        }
-
-        public void setAddress(String address) {
-            this.address = address;
-        }
-
-
-        public String insert() {
-            return "INSERT INTO users (username, password, email, phone, address) VALUES ('" + username + "', '" + password + "', '" + email + "', '" + phone + "', '" + address + "')";
-        }
-
-        public void delete() {
-            // Delete the user
-        }
-
-        public void update() {
-            // Update the user
-        }
-
-        @Override
-        public void select() {
-
+        else{
+            this.picture = "";
         }
     }
+
+    public String getId() {
+        return id;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public String getPhone() {
+        return phone;
+    }
+
+    public String getCreated_at() {
+        return created_at;
+    }
+
+    public String getBirth() {
+        return birth;
+    }
+
+    public String getPicture() {
+        return picture;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public void setPhone(String phone) {
+        this.phone = phone;
+    }
+
+    public void setCreated_at(String created_at) {
+        this.created_at = created_at;
+    }
+
+    public void setBirth(String birth) {
+        this.birth = birth;
+    }
+
+    public void setPicture(String urlPicture) {
+        this.picture = urlPicture;
+    }
+
+    public String insert() {
+        return "INSERT INTO User (id, username, email, phone, created_at, birth, picture) VALUES ('" + id + "', '" + username + "', '" + email + "', '" + phone + "', '" + created_at + "', '" + birth + "', '" + picture + "')";
+    }
+
+    public void delete() {
+        // Delete the user
+    }
+
+    public void update() {
+        // Update the user
+    }
+
+    @Override
+    public void select() {
+
+    }
+}

@@ -28,7 +28,7 @@ public class ImageAlbumController implements Controller {
         List<ImageAlbumModel> ImageAlbumModels = new ArrayList<>();
         for (String s : data) {
             String[] temp = s.split(",");
-            ImageAlbumModels.add(new ImageAlbumModel(Integer.parseInt(temp[0]), Integer.parseInt(temp[1])));
+            ImageAlbumModels.add(new ImageAlbumModel(temp[0], Integer.parseInt(temp[1])));
         }
         return ImageAlbumModels;
     }
@@ -51,7 +51,7 @@ public class ImageAlbumController implements Controller {
         dbHelper.close();
     }
 
-    public void addImageAlbum(int id_image, int id_album) {
+    public void addImageAlbum(String id_image, int id_album) {
         // Add an ImageAlbum
         ImageAlbumModel imageAlbumModel = new ImageAlbumModel(id_image, id_album);
         this.insert((imageAlbumModel));
