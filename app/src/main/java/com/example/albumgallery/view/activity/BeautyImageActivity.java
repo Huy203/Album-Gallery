@@ -68,7 +68,7 @@ public class BeautyImageActivity extends AppCompatActivity {
 
         appBarAction();
 
-        long id = getIntent().getLongExtra("id", 0);
+        String id = getIntent().getStringExtra("id");
         String imageURL = mainController.getImageController().getImageById(id).getRef();
         Glide.with(this)
                 .asBitmap()
