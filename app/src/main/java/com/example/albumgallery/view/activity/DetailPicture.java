@@ -15,6 +15,7 @@ import android.os.Handler;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
@@ -80,7 +81,7 @@ public class DetailPicture extends AppCompatActivity implements ImageInfoListene
 
     private void initializeViews() {
         mainController = new MainController(this);
-        imagePaths = mainController.getImageController().getAllImageURLsUndeleted();
+        imagePaths = mainController.getImageController().getAllImageURLsSortByDate();
         currentPosition = getIntent().getIntExtra("position", 0);
 
         imageView = findViewById(R.id.memeImageView);
@@ -153,7 +154,7 @@ public class DetailPicture extends AppCompatActivity implements ImageInfoListene
     private void showOptionsDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Options");
-        builder.setItems(new CharSequence[]{"Add to album", "Set as Wallpaper", "Start referencing", "Detail"}, new DialogInterface.OnClickListener() {
+        builder.setItems(new CharSequence[]{"Add to album", "Set as Wallpaper"}, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 // Xử lý khi người dùng chọn một tùy chọn
@@ -165,12 +166,6 @@ public class DetailPicture extends AppCompatActivity implements ImageInfoListene
                     case 1:
                         // Xử lý khi người dùng chọn "Set as Wallpaper"
                         setAsWallpaper(imagePaths.get(currentPosition));
-                        break;
-                    case 2:
-                        // Xử lý khi người dùng chọn "Start referencing"
-                        break;
-                    case 3:
-                        // Xử lý khi người dùng chọn "Detail"
                         break;
                 }
             }
@@ -357,30 +352,31 @@ public class DetailPicture extends AppCompatActivity implements ImageInfoListene
 
     public void menuAction(View view) {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("Options");
-        builder.setItems(new CharSequence[]{"Add to album", "Set as Wallpaper", "Start referencing", "Detail"}, new DialogInterface.OnClickListener() {
+        View dialogView = getLayoutInflater().inflate(R.layout.custom_options_dialog, null);
+        builder.setView(dialogView);
+        AlertDialog optionsDialog = builder.create();
+
+        // Khởi tạo các button trong menu dialog
+        Button buttonAddToAlbum = dialogView.findViewById(R.id.buttonAddToAlbum);
+        Button buttonSetAsWallpaper = dialogView.findViewById(R.id.buttonSetAsWallpaper);
+
+        // Xử lý sự kiện khi click vào từng button
+        buttonAddToAlbum.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(DialogInterface dialog, int which) {
-                // Xử lý khi người dùng chọn một tùy chọn
-                switch (which) {
-                    case 0:
-                        // Xử lý khi người dùng chọn "Add to album"
-                        break;
-                    case 1:
-                        // Xử lý khi người dùng chọn "Set as Wallpaper"
-                        setAsWallpaper(imagePaths.get(currentPosition));
-                        break;
-                    case 2:
-                        // Xử lý khi người dùng chọn "Start referencing"
-                        break;
-                    case 3:
-                        // Xử lý khi người dùng chọn "Detail"
-                        break;
-                }
+            public void onClick(View v) {
+                addToAlbumBtnHandler();
+                optionsDialog.dismiss();
             }
         });
 
-        optionsDialog = builder.create();
+        buttonSetAsWallpaper.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                setAsWallpaper(imagePaths.get(currentPosition));
+                optionsDialog.dismiss();
+            }
+        });
+
         optionsDialog.show();
     }
 

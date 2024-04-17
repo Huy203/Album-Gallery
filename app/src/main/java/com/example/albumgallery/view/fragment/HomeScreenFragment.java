@@ -114,11 +114,12 @@ public class HomeScreenFragment extends Fragment {
                 tickBtn.setIconTint(ColorStateList.valueOf(getResources().getColor(R.color.black)));
                 tickBtn.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(R.color.none)));
             }
-            imageAdapter.setMultipleChoiceEnabled(isSelectAll);
-            imageAdapter.setSelectedItems(selectedItems);
-            fragToActivityListener.onFragmentAction("SelectAll", true);
-            imageAdapter.notifyDataSetChanged();
+
         }
+        imageAdapter.setMultipleChoiceEnabled(isSelectAll);
+        imageAdapter.setSelectedItems(selectedItems);
+        fragToActivityListener.onFragmentAction("SelectAll", true);
+        imageAdapter.notifyDataSetChanged();
     }
 
     public boolean toggleMultipleChoice() {
@@ -182,9 +183,9 @@ public class HomeScreenFragment extends Fragment {
         Log.v("HomeScreenFragment", "updateUI");
         imageURIs.clear();
         // lấy ảnh sort theo date (mới nhất xếp trước).
-//        imageURIs.addAll(mainController.getImageController().getAllImageURLsSortByDate());
+        imageURIs.addAll(mainController.getImageController().getAllImageURLsSortByDate());
         List<String> imageURLsFavourited = mainController.getImageController().getAllImageURLsFavourited();
-        imageURIs.addAll(mainController.getImageController().getAllImageURLsUndeleted());
+        //imageURIs.addAll(mainController.getImageController().getAllImageURLsUndeleted());
 
         imageAdapter = new ImageAdapter(getActivity(), imageURIs);
         imageAdapter.setImageURLsFavourite(imageURLsFavourited);
