@@ -234,6 +234,40 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return data;
     }
 
+    public List<String> selectImagesByNotice(String notice) {
+        List<String> imagePaths = new ArrayList<>();
+        SQLiteDatabase db = getWritableDatabase();
+        Cursor cursor = null;
+
+        try {
+            // Define the query to select image paths by notice
+            String query = "SELECT ref FROM " + IMAGE_TABLE + " WHERE notice = ?";
+
+            // Execute the query
+            cursor = db.rawQuery(query, new String[]{notice});
+
+            // Iterate through the cursor to retrieve the image paths
+            if (cursor != null && cursor.moveToFirst()) {
+                do {
+                    // Get the image path from the cursor
+                    String imagePath = cursor.getString(cursor.getColumnIndex("ref"));
+                    imagePaths.add(imagePath);
+                } while (cursor.moveToNext());
+            }
+        } catch (Exception e) {
+            Log.e("DatabaseHelper", "Error selecting images by notice: " + e.getMessage());
+        } finally {
+            // Close the cursor and database connection
+            if (cursor != null) {
+                cursor.close();
+            }
+            db.close();
+        }
+
+        return imagePaths;
+    }
+
+
     public List<String> selectImagesSortByDateAtBin(String table, String column, String order) {
         List<String> data = new ArrayList<>();
         SQLiteDatabase db = getWritableDatabase();

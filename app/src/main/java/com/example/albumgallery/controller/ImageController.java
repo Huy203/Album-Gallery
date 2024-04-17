@@ -516,5 +516,7 @@ public class ImageController implements Controller {
         }
         return null;
     }
-
+    public List<String> selectImagesByNotice(String notice){
+        return dbHelper.selectImagesByNotice(notice);
+    }
 }

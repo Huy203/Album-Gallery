@@ -14,6 +14,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import androidx.appcompat.widget.SearchView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -50,6 +51,7 @@ public class HomeScreenFragment extends Fragment {
     List<String> selectedImageURLs;
     List<Task> selectedImageURLsTask;
     private View view;
+    private SearchView searchView;
 
     public HomeScreenFragment() {
         // Required empty public constructor
@@ -106,6 +108,25 @@ public class HomeScreenFragment extends Fragment {
         view.findViewById(R.id.btnPickImageFromDevice).setOnClickListener(v -> pickImagesFromDevice());
         view.findViewById(R.id.btnDeleteMultipleImages).setOnClickListener(v -> showDeleteConfirmationDialog());
         view.findViewById(R.id.btnPickMultipleImages).setOnClickListener(v -> toggleMultipleChoiceImages(view.findViewById(R.id.btnPickMultipleImages)));
+
+        searchView = view.findViewById(R.id.searchView);
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                // Perform search when the user submits the query (e.g., presses Enter)
+                searchImages(query);
+                Log.d("query seach", query);
+                return true;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                // Perform search as the user types
+//                searchImages(newText);
+//                Log.d("new text seach", newText);
+                return true;
+            }
+        });
     }
 
     private void pickImagesFromDevice() {
@@ -221,5 +242,14 @@ public class HomeScreenFragment extends Fragment {
         super.onDestroy();
         mainController = null;
         Log.v("HomeScreenFragment", "onDestroy");
+    }
+
+    public void searchImages(String query){
+        imageURIs.clear();
+        imageURIs.addAll(mainController.getImageController().selectImagesByNotice(query));
+        imageAdapter = new ImageAdapter(getActivity(), imageURIs);
+        recyclerMediaView.setLayoutManager(new GridLayoutManager(getContext(), 3));
+        recyclerMediaView.setAdapter(imageAdapter);
+        imageAdapter.notifyDataSetChanged();
     }
 }

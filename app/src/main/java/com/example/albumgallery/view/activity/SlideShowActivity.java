@@ -44,9 +44,6 @@ public class SlideShowActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 // Start the MainFragmentController activity
-                Intent mainFragment = new Intent(SlideShowActivity.this, MainFragmentController.class);
-                mainFragment.putExtra("fragmentToLoad", "AlbumMain");
-                startActivity(mainFragment);
                 finish();
             }
         });
