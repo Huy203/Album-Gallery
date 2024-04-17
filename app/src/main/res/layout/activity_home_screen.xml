@@ -32,7 +32,7 @@
             android:contentDescription="camera"
             android:padding="8dp"
             android:scaleType="fitCenter"
-            android:src="@drawable/camera_icon" />
+            android:src="@drawable/camera_black" />
     </LinearLayout>
 
 
@@ -164,6 +164,12 @@
                 android:layout_height="wrap_content"
                 android:padding="8dp"
                 android:text="Delete" />
+            <Button
+                android:id="@+id/btnLogOut"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:padding="8dp"
+                android:text="LogOut" />
 
         </LinearLayout>
     </RelativeLayout>

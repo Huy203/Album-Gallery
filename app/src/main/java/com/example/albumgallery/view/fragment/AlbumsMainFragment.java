@@ -2,19 +2,16 @@ package com.example.albumgallery.view.fragment;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ImageButton;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-
-import android.util.Log;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.EditText;
-import android.widget.ImageButton;
 
 import com.example.albumgallery.R;
 import com.example.albumgallery.controller.MainController;
@@ -23,8 +20,6 @@ import com.example.albumgallery.view.activity.CreateAlbumActivity;
 import com.example.albumgallery.view.activity.PasswordAlbumActivity;
 import com.example.albumgallery.view.adapter.AlbumAdapter;
 import com.example.albumgallery.view.adapter.AlbumAdapterListener;
-import com.google.android.material.dialog.MaterialAlertDialogBuilder;
-import com.google.android.material.snackbar.Snackbar;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -40,6 +35,7 @@ public class AlbumsMainFragment extends Fragment implements AlbumAdapterListener
     public AlbumsMainFragment() {
         // Required empty public constructor
     }
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -89,7 +85,7 @@ public class AlbumsMainFragment extends Fragment implements AlbumAdapterListener
         Intent intent = new Intent(getContext(), AlbumContentActivity.class);
         intent.putExtra("albumName", albumName);
         String password = mainController.getAlbumController().getPasswordByAlbumName(albumName);
-        if(!password.isEmpty()) {
+        if (!password.isEmpty()) {
             Intent confirmPassword = new Intent(getContext(), PasswordAlbumActivity.class);
             confirmPassword.putExtra("albumName", albumName);
             startActivity(confirmPassword);

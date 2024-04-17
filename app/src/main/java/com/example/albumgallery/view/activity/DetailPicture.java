@@ -1,6 +1,7 @@
 package com.example.albumgallery.view.activity;
 
 import static com.example.albumgallery.utils.Constant.REQUEST_CODE_EDIT_IMAGE;
+import static com.example.albumgallery.utils.Utilities.convertFromBitmapToUri;
 
 import android.annotation.SuppressLint;
 import android.app.WallpaperManager;
@@ -12,8 +13,12 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -29,11 +34,13 @@ import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.target.Target;
 import com.example.albumgallery.R;
 import com.example.albumgallery.controller.MainController;
+import com.example.albumgallery.helper.SharePreferenceHelper;
 import com.example.albumgallery.model.ImageModel;
 import com.example.albumgallery.view.fragment.ImageInfo;
 import com.example.albumgallery.view.listeners.ImageInfoListener;
 import com.example.albumgallery.view.listeners.OnSwipeTouchListener;
 import com.google.android.material.button.MaterialButton;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
 import java.io.IOException;
 import java.util.List;
@@ -68,11 +75,13 @@ public class DetailPicture extends AppCompatActivity implements ImageInfoListene
     protected void onResume() {
         super.onResume();
         update();
+
+        setIconTintButton(findViewById(R.id.action_like), imageModel.getIs_favourited());
     }
 
     private void initializeViews() {
         mainController = new MainController(this);
-        imagePaths = mainController.getImageController().getAllImageURLs();
+        imagePaths = mainController.getImageController().getAllImageURLsSortByDate();
         currentPosition = getIntent().getIntExtra("position", 0);
 
         imageView = findViewById(R.id.memeImageView);
@@ -103,75 +112,15 @@ public class DetailPicture extends AppCompatActivity implements ImageInfoListene
                 }
             }
         });
-        appBarAction();
-    }
-
-    @SuppressLint("UseCompatTextViewDrawableApis")
-    private void appBarAction() {
-        int[] buttonIds = {R.id.action_edit, R.id.action_menu, R.id.action_share, R.id.action_like, R.id.action_info, R.id.action_delete, R.id.action_back};
-
-        for (int buttonId : buttonIds) {
-            MaterialButton button = findViewById(buttonId);
-
-            if (buttonId == buttonIds[0]) {
-                button.setOnClickListener(v -> launchEditImageActivity());
-            } else if (buttonId == buttonIds[1]) {
-                button.setOnClickListener(v -> showOptionsDialog());
-            } else if (buttonId == buttonIds[2]) {
-                button.setOnClickListener(v -> {
-                    share();
-                });
-            } else if (buttonId == buttonIds[3]) {
-                setIconTintButton(button, imageModel.getIs_favourited());
-                button.setOnClickListener(v -> {
-                    toggleFavoriteImage();
-                    update();
-                    setIconTintButton(button, imageModel.getIs_favourited());
-                });
-            } else if (buttonId == buttonIds[4]) {
-                button.setOnClickListener(v -> {
-                    toggleImageInfo();
-                    setIconTintButton(button, isImageInfoVisible);
-                });
-            } else if (buttonId == buttonIds[5]) {
-                button.setOnClickListener(v -> deleteImage());
-            } else if (buttonId == buttonIds[6]) {
-                button.setOnClickListener(v -> {
-                    Intent intent = new Intent();
-                    intent.putExtra("updateUI", false);
-                    setResult(RESULT_OK, intent);
-                    supportFinishAfterTransition();
-                });
-            }
-        }
     }
 
     private void setIconTintButton(MaterialButton button, boolean temp) {
-        button.setIconTint(ColorStateList.valueOf(getResources().getColor(temp ? R.color.blue_500 : R.color.black)));
+        button.setIconTint(ColorStateList.valueOf(getResources().getColor(temp ? R.color.blue_500 :
+                SharePreferenceHelper.isDarkModeEnabled(this) ? R.color.white : // white
+                        R.color.black)));
     }
 
-    private void share() {
-        Glide.with(this)
-                .asBitmap()
-                .load(Uri.parse(imagePaths.get(currentPosition)))
-                .addListener(new RequestListener<Bitmap>() {
-                    @Override
-                    public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Bitmap> target, boolean isFirstResource) {
-                        Log.e("DetailPicture", "Failed to load image: " + e.getMessage());
-                        Toast.makeText(DetailPicture.this, "Failed to share image", Toast.LENGTH_SHORT).show();
-                        return false;
-                    }
-
-                    @Override
-                    public boolean onResourceReady(Bitmap resource, Object model, Target<Bitmap> target, DataSource dataSource, boolean isFirstResource) {
-                        shareImageAndText(resource);
-                        return false;
-                    }
-                })
-                .submit();
-    }
-
-    private void setAsWallpaper(String imagePath) {
+    public void setAsWallpaper(String imagePath) {
         Glide.with(this)
                 .asBitmap()
                 .load(Uri.parse(imagePath))
@@ -205,34 +154,27 @@ public class DetailPicture extends AppCompatActivity implements ImageInfoListene
     private void showOptionsDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Options");
-        builder.setItems(new CharSequence[]{"Add to album", "Set as Wallpaper", "Start referencing", "Detail"}, new DialogInterface.OnClickListener() {
+        builder.setItems(new CharSequence[]{"Add to album", "Set as Wallpaper"}, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 // Xử lý khi người dùng chọn một tùy chọn
                 switch (which) {
                     case 0:
                         // Xử lý khi người dùng chọn "Add to album"
+                        addToAlbumBtnHandler();
                         break;
                     case 1:
                         // Xử lý khi người dùng chọn "Set as Wallpaper"
                         setAsWallpaper(imagePaths.get(currentPosition));
                         break;
-                    case 2:
-                        // Xử lý khi người dùng chọn "Start referencing"
-                        break;
-                    case 3:
-                        // Xử lý khi người dùng chọn "Detail"
-                        break;
                 }
             }
         });
 
-        optionsDialog = builder.create();
-        optionsDialog.show();
     }
 
     protected void loadImage(int position) {
-        Glide.with(this).load(Uri.parse(imagePaths.get(position))).into(imageView);
+        Glide.with(this).load(Uri.parse(imageModel.getRef())).into(imageView);
     }
 
     private void loadImageInfo() {
@@ -253,26 +195,16 @@ public class DetailPicture extends AppCompatActivity implements ImageInfoListene
         String qrCodeData = mainController.getImageController().recognizeQRCode(uri);
         if (qrCodeData != null) {
             qrLink.setText(qrCodeData);
-            new Handler().postDelayed(() -> qrLink.setText(""), 5000);
+            new Handler().postDelayed(() -> qrLink.setText(""), 3000);
         } else {
             Log.v("DetailPicture", "No QR Code data found");
         }
     }
 
     private void launchEditImageActivity() {
-        Intent intent = new Intent(DetailPicture.this, EditImageActivity.class);
-        long id = mainController.getImageController().getIdByRef(imagePaths.get(currentPosition));
-        intent.putExtra("id", id);
-        startActivityForResult(intent, REQUEST_CODE_EDIT_IMAGE);
     }
 
     private void deleteImage() {
-        String uri = imageModel.getRef();
-        if (uri != null) {
-            showDeleteConfirmationDialog(uri);
-        } else {
-            Toast.makeText(this, "No image to delete", Toast.LENGTH_SHORT).show();
-        }
     }
 
     protected void toggleImageInfo() {
@@ -287,7 +219,7 @@ public class DetailPicture extends AppCompatActivity implements ImageInfoListene
     }
 
     private void shareImageAndText(Bitmap bitmap) {
-        Uri uri = mainController.getImageController().convertFromBitmapToURI(this, bitmap);
+        Uri uri = convertFromBitmapToUri(this, bitmap);
         Intent intent = new Intent(Intent.ACTION_SEND);
 
         // putting uri of image to be shared
@@ -313,22 +245,57 @@ public class DetailPicture extends AppCompatActivity implements ImageInfoListene
         builder.setPositiveButton("Delete", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                // Call deleteSelectedImage() method from ImageController
-                // mainController.getImageController().deleteSelectedImage(uri);
-
-                Log.d("update delete successfully 1", "ok");
-
-                long id = mainController.getImageController().getIdByRef(uri);
-                isDeleted = mainController.getImageController().isDeleteImage(id);
-                toggleDeleteImage(id);
+                finish();
+                Log.v("DetailPicture", "Image deleted successfully");
+                isDeleted = mainController.getImageController().isDeleteImage(imageModel.getId());
+                toggleDeleteImage(imageModel.getId());
             }
         });
         builder.setNegativeButton("Cancel", null);
         builder.show();
     }
 
+    private void addToAlbumBtnHandler() {
+        List<String> albumNames = mainController.getAlbumController().getAlbumNames();
+        LayoutInflater inflater = DetailPicture.this.getLayoutInflater();
+        View dialogView = inflater.inflate(R.layout.albums_dialog, null);
+        RadioGroup albumGroup = dialogView.findViewById(R.id.albumDialog);
+
+        for (String a : albumNames) {
+            RadioButton albumBtn = new RadioButton(DetailPicture.this);
+            albumBtn.setText(a);
+            albumGroup.addView(albumBtn);
+        }
+
+        MaterialAlertDialogBuilder albumsDialog = new MaterialAlertDialogBuilder(DetailPicture.this);
+        albumsDialog.setView(dialogView)
+                .setTitle("Choose an album")
+                .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        int selectedRadioButtonId = albumGroup.getCheckedRadioButtonId();
+                        RadioButton selectedRadioBtn = dialogView.findViewById(selectedRadioButtonId);
+                        if (selectedRadioBtn != null) {
+                            String selectedAlbum = selectedRadioBtn.getText().toString();
+                            long album_id = mainController.getAlbumController().getAlbumIdByName(selectedAlbum);
+                            String image_id = mainController.getImageController().getIdByRef(imagePaths.get(currentPosition));
+                            Log.d("add to album", Long.toString(album_id) + " " + image_id);
+                            mainController.getImageAlbumController().addImageAlbum(image_id, (int) album_id);
+                        }
+                    }
+                })
+                .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        dialogInterface.dismiss();
+                    }
+                });
+        albumsDialog.show();
+    }
+
     private void update() {
-        long id = getIntent().getLongExtra("id", 0);
+        String id = getIntent().getStringExtra("id");
+        Log.v("DetailPicture", "id: " + id);
         imageModel = mainController.getImageController().getImageById(id);
     }
 
@@ -343,12 +310,8 @@ public class DetailPicture extends AppCompatActivity implements ImageInfoListene
 
     @Override
     public void onNoticePassed(String data) {
-        String where = "id = " + getIntent().getLongExtra("id", 0);
+        String where = "id = '" + getIntent().getStringExtra("id") + "'";
         mainController.getImageController().update("notice", data, where);
-    }
-
-    private boolean toggleFavoriteImage() {
-        return mainController.getImageController().toggleFavoriteImage(imageModel.getId());
     }
 
     @Override
@@ -371,13 +334,108 @@ public class DetailPicture extends AppCompatActivity implements ImageInfoListene
         imageInfoFragment = null;
         optionsDialog = null;
     }
-    private void toggleDeleteImage(long id) {
+
+    public void backAction(View view) {
+        Intent intent = new Intent();
+        intent.putExtra("update", false);
+        setResult(RESULT_OK, intent);
+        supportFinishAfterTransition();
+    }
+
+    public void editAction(View view) {
+        Intent intent = new Intent(DetailPicture.this, EditImageActivity.class);
+        String id = getIntent().getStringExtra("id");
+        intent.putExtra("id", id);
+        startActivityForResult(intent, REQUEST_CODE_EDIT_IMAGE);
+    }
+
+    public void menuAction(View view) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        View dialogView = getLayoutInflater().inflate(R.layout.custom_options_dialog, null);
+        builder.setView(dialogView);
+        AlertDialog optionsDialog = builder.create();
+
+        // Khởi tạo các button trong menu dialog
+        Button buttonAddToAlbum = dialogView.findViewById(R.id.buttonAddToAlbum);
+        Button buttonSetAsWallpaper = dialogView.findViewById(R.id.buttonSetAsWallpaper);
+
+        // Xử lý sự kiện khi click vào từng button
+        buttonAddToAlbum.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                addToAlbumBtnHandler();
+                optionsDialog.dismiss();
+            }
+        });
+
+        buttonSetAsWallpaper.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                setAsWallpaper(imagePaths.get(currentPosition));
+                optionsDialog.dismiss();
+            }
+        });
+
+        optionsDialog.show();
+    }
+
+    public void shareAction(View view) {
+        Glide.with(this)
+                .asBitmap()
+                .load(Uri.parse(imagePaths.get(currentPosition)))
+                .addListener(new RequestListener<Bitmap>() {
+                    @Override
+                    public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Bitmap> target, boolean isFirstResource) {
+                        Log.e("DetailPicture", "Failed to load image: " + e.getMessage());
+                        Toast.makeText(DetailPicture.this, "Failed to share image", Toast.LENGTH_SHORT).show();
+                        return false;
+                    }
+
+                    @Override
+                    public boolean onResourceReady(Bitmap resource, Object model, Target<Bitmap> target, DataSource dataSource, boolean isFirstResource) {
+                        shareImageAndText(resource);
+                        return false;
+                    }
+                })
+                .submit();
+    }
+
+    public void likeAction(View view) {
+        mainController.getImageController().toggleFavoriteImage((imageModel.getId()));
+        update();
+        setIconTintButton((MaterialButton) view, imageModel.getIs_favourited());
+    }
+
+    public void infoAction(View view) {
+        isImageInfoVisible = !isImageInfoVisible;
+        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+        if (isImageInfoVisible) {
+            imageInfoView.setVisibility(View.VISIBLE);
+        } else {
+            imageInfoView.setVisibility(View.GONE);
+        }
+        transaction.commit();
+
+        setIconTintButton((MaterialButton) view, isImageInfoVisible);
+    }
+
+    public void deleteAction(View view) {
+        String uri = imageModel.getRef();
+        if (uri != null) {
+            showDeleteConfirmationDialog(uri);
+        } else {
+            Toast.makeText(this, "No image to delete", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void toggleDeleteImage(String id) {
         Log.d("update delete successfully 2", "ok");
         isDeleted = !isDeleted;
         mainController.getImageController().setDelete(id, isDeleted);
     }
+
     protected ImageModel getImageModel() {
-        long id = getIntent().getLongExtra("id", 0);
+        String id = getIntent().getStringExtra("id");
         Log.d("image content id", String.valueOf(id));
         return mainController.getImageController().getImageById(id);
     }

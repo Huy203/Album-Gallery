@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <com.google.android.material.bottomappbar.BottomAppBar
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:fabAlignmentMode="center">
+
+        <com.google.android.flexbox.FlexboxLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:alignItems="center"
+            app:justifyContent="space_around">
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/action_share"
+                style="@style/AppButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:onClick="shareAction"
+                app:icon="@drawable/share_black"
+                />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/action_add"
+                style="@style/AppButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:onClick="addAction"
+                app:icon="@drawable/baseline_add_50"
+                />
+
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/action_like"
+                style="@style/AppButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:onClick="likeAction"
+                app:icon="@drawable/heart"
+                />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/action_info"
+                style="@style/AppButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:onClick="infoAction"
+                app:icon="@drawable/info_black"
+                />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/action_delete"
+                style="@style/AppButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:onClick="deleteAction"
+                app:icon="@drawable/delete_black"
+                />
+
+        </com.google.android.flexbox.FlexboxLayout>
+
+    </com.google.android.material.bottomappbar.BottomAppBar>
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

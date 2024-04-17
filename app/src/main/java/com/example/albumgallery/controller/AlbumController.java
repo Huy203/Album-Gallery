@@ -30,7 +30,7 @@ public class AlbumController implements Controller {
         List<AlbumModel> albumModels = new ArrayList<>();
         for (String s : data) {
             String[] temp = s.split(",");
-            albumModels.add(new AlbumModel(Integer.parseInt(temp[0]), temp[1], Integer.parseInt(temp[2]), temp[4], temp[5], Integer.parseInt(temp[7])));
+            albumModels.add(new AlbumModel(temp[0], temp[1], Integer.parseInt(temp[2]), temp[4], temp[5], Integer.parseInt(temp[7])));
         }
         return albumModels;
     }
@@ -95,6 +95,10 @@ public class AlbumController implements Controller {
         dbHelper.close();
     }
 
+    public void removeAlbumPasswordByName(String albumName) {
+        dbHelper.removeAlbumPasswordByName(albumName);
+    }
+
     public void editAlbum() {
         // Edit an album
     }
@@ -115,11 +119,11 @@ public class AlbumController implements Controller {
         // Unfavourite an album
     }
 
-    public AlbumModel getAlbumById(long id) {
+    public AlbumModel getAlbumById(String id) {
         String data = dbHelper.getById("Album", id);
         String[] temp = data.split(",");
         Log.d("temp data", Arrays.toString(temp));
-        return new AlbumModel(Integer.parseInt(temp[0]), temp[1], Integer.parseInt(temp[2]), temp[4], temp[5], Integer.parseInt(temp[7]));
+        return new AlbumModel(temp[0], temp[1], Integer.parseInt(temp[2]), temp[4], temp[5], Integer.parseInt(temp[7]));
     }
 
 }

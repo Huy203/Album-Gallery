@@ -3,21 +3,24 @@ package com.example.albumgallery;
 import android.app.Activity;
 import android.util.Log;
 
+import com.example.albumgallery.helper.FirebaseHelper;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.analytics.FirebaseAnalytics;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
 
 public class FirebaseManager {
 
     private static FirebaseManager instance;
-    private DatabaseReference databaseRef;
+    private FirebaseDatabase database;
     private FirebaseAnalytics mFirebaseAnalytics;
     private FirebaseStorage storage;
+    private FirebaseFirestore firestore;
     private FirebaseAuth firebaseAuth;
+    private FirebaseHelper firebaseHelper;
 
     private FirebaseManager(Activity activity) {
         firebaseAuth = FirebaseAuth.getInstance();
@@ -30,14 +33,14 @@ public class FirebaseManager {
         FirebaseUser user = firebaseAuth.getCurrentUser();
         if (user != null) {
             Log.v("Firebase", "User is signed in");
-        } else {
-            signInAnonymously();
+            signInUser(user);
         }
 
-        Log.v("Firebase", "Firebase initialized");
         mFirebaseAnalytics = FirebaseAnalytics.getInstance(activity);
-        databaseRef = FirebaseDatabase.getInstance().getReference("message");
+        database = FirebaseDatabase.getInstance();
         storage = FirebaseStorage.getInstance("gs://album-gallery-70d05.appspot.com");
+        firestore = FirebaseFirestore.getInstance();
+        firebaseHelper = new FirebaseHelper();
     }
 
     public static synchronized FirebaseManager getInstance(Activity activity) {
@@ -47,12 +50,24 @@ public class FirebaseManager {
         return instance;
     }
 
-    public void getDatabaseRef() {
-        databaseRef.child("message").setValue("Hello, World!");
+    public FirebaseDatabase getDatabase() {
+        return database;
     }
 
     public FirebaseStorage getStorage() {
         return storage;
+    }
+
+    public FirebaseAuth getFirebaseAuth() {
+        return firebaseAuth;
+    }
+
+    public FirebaseFirestore getFirestore() {
+        return firestore;
+    }
+
+    public FirebaseHelper getFirebaseHelper() {
+        return firebaseHelper;
     }
 
     private void signInAnonymously() {
@@ -64,5 +79,9 @@ public class FirebaseManager {
                         Log.e("Firebase", "signInAnonymously:failure", task.getException());
                     }
                 });
+    }
+
+    private void signInUser(FirebaseUser user) {
+        Log.v("Firebase", "User: " + user.getEmail());
     }
 }

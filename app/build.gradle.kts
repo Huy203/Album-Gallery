@@ -54,6 +54,33 @@ android {
     kotlinOptions {
         jvmTarget = "19"
     }
+    sourceSets {
+        getByName("main").java.srcDirs("src/main/java")
+        getByName("main").res.srcDirs(
+            "src/main/res",
+            "src/main/res/drawable",
+            "src/main/res/drawable-v24",
+            "src/main/res/layout/activity/user",
+            "src/main/res/layout/activity/albums",
+            "src/main/res/layout/activity/album_detail",
+            "src/main/res/layout/activity/images",
+            "src/main/res/layout/activity/image_detail",
+            "src/main/res/layout/activity/images",
+            "src/main/res/layout/activity/auth",
+            "src/main/res/layout/activity",
+            "src/main/res/layout/fragment",
+            "src/main/res/menu",
+            "src/main/res/mipmap-anydpi-v26",
+            "src/main/res/mipmap-hdpi",
+            "src/main/res/mipmap-mdpi",
+            "src/main/res/mipmap-xhdpi",
+            "src/main/res/mipmap-xxhdpi",
+            "src/main/res/mipmap-xxxhdpi",
+            "src/main/res/values",
+            "src/main/res/values-night",
+            "src/main/res/xml"
+        )
+    }
 
 }
 
@@ -69,6 +96,8 @@ dependencies {
     implementation("androidx.compose.ui:ui-tooling-preview")
     implementation(platform("androidx.compose:compose-bom:2023.08.00"))
     implementation("androidx.compose.animation:animation-core-android:1.6.4")
+    implementation("androidx.legacy:legacy-support-v4:1.0.0")
+    implementation("androidx.recyclerview:recyclerview")
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
@@ -79,13 +108,16 @@ dependencies {
     implementation("com.google.firebase:firebase-auth")
     implementation("com.google.firebase:firebase-storage")
 //    Database
-    implementation("com.google.firebase:firebase-database:20.3.0")
+    implementation("com.google.firebase:firebase-database")
+//    Firestore
+    implementation("com.google.firebase:firebase-firestore")
 //    Google Play services location APIs
     implementation("com.google.android.gms:play-services-location:21.1.0")
 //    Google Play services Places SDK
     implementation("com.google.android.gms:play-services-places:17.0.0")
 //    Google Play services Auth SDK
     implementation("com.google.android.gms:play-services-auth:21.0.0")
+    implementation("com.google.android.gms:play-services-vision:20.1.3")
     androidTestImplementation(platform("androidx.compose:compose-bom:2023.08.00"))
     androidTestImplementation("androidx.compose.ui:ui-test-junit4")
     androidTestImplementation(platform("androidx.compose:compose-bom:2023.08.00"))
@@ -94,10 +126,9 @@ dependencies {
 
     implementation("com.github.bumptech.glide:glide:4.16.0")
 
-    implementation("com.google.android.gms:play-services-vision:20.1.3")
     // Image Cropper
     implementation("com.theartofdev.edmodo:android-image-cropper:2.8.0")
     // QR Code Scanner
     implementation("com.google.zxing:core:3.4.1")
     implementation ("com.github.denzcoskun:ImageSlideshow:0.1.0")
-}    
+}

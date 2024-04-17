@@ -1,5 +1,8 @@
 package com.example.albumgallery.view.activity;
 
+import static android.content.Intent.getIntent;
+
+import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
@@ -7,14 +10,11 @@ import android.os.Bundle;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.Toast;
-
-import androidx.appcompat.app.AlertDialog;
-
-import com.bumptech.glide.Glide;
 import com.example.albumgallery.R;
 import com.example.albumgallery.controller.MainController;
 import com.example.albumgallery.view.fragment.ImageInfo;
 import com.example.albumgallery.view.listeners.OnSwipeTouchListener;
+import com.bumptech.glide.Glide;
 
 public class DetailDeletedPicture extends DetailPicture {
     @Override
@@ -23,7 +23,7 @@ public class DetailDeletedPicture extends DetailPicture {
         setContentView(R.layout.activity_detail_deleted_image);
 
         mainController = new MainController(this);
-        imagePaths = mainController.getImagePaths();
+        imagePaths = mainController.getImageController().getImagePaths();
         currentPosition = getIntent().getIntExtra("position", 0);
 
         imageView = findViewById(R.id.memeImageView);

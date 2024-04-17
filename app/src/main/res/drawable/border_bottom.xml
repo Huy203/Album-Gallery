@@ -1,0 +1,15 @@
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Background color for the view (optional) -->
+    <item android:drawable="@android:color/white" />
+
+    <!-- Bottom border -->
+    <item
+        android:bottom="1dp"
+        android:left="-1dp"
+        android:right="-1dp"
+        android:top="-1dp">
+        <shape android:shape="rectangle">
+        </shape>
+    </item>
+</layer-list>
+
