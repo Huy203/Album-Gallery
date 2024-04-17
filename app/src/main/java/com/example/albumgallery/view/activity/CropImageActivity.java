@@ -60,7 +60,7 @@ public class CropImageActivity extends AppCompatActivity {
         Button buttonSave = findViewById(R.id.buttonSave);
         buttonSave.setOnClickListener(v -> goBack(true));
 
-        ImageView buttonBack = findViewById(R.id.backButton);
+        View buttonBack = findViewById(R.id.action_back);
         buttonBack.setOnClickListener(v -> goBack(false));
 
         Button buttonCrop = findViewById(R.id.buttonCrop);

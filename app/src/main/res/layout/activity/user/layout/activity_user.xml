@@ -35,7 +35,7 @@
                 android:layout_marginTop="16dp"
                 android:scaleType="centerCrop"
                 android:src="@drawable/meme"
-                style="@style/CircleShapeAppearance" />
+                app:shapeAppearanceOverlay="@style/RoundedImageView" />
 
             <com.google.android.material.textview.MaterialTextView
                 android:id="@+id/usernameTextView"
