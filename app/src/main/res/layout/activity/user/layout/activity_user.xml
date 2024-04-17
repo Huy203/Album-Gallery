@@ -15,7 +15,6 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="60dp"
-        android:paddingBottom="100dp"
         android:fillViewport="true"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/top_nav_user">
@@ -36,13 +35,13 @@
                 android:layout_marginTop="16dp"
                 android:scaleType="centerCrop"
                 android:src="@drawable/blank_profile_picture"
-                style="@style/CircleShapeAppearance" />
+                app:shapeAppearanceOverlay="@style/RoundedImageView" />
 
             <com.google.android.material.textview.MaterialTextView
                 android:id="@+id/usernameTextView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:paddingTop="5dp"
+                android:text="@string/name"
                 android:textSize="26sp"
                 android:textStyle="bold" />
 

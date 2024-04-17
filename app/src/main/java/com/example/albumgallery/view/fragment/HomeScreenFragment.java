@@ -178,11 +178,10 @@ public class HomeScreenFragment extends Fragment {
     }
 
     public void updateUI() {
+        Log.v("HomeScreenFragment", "updateUI");
         imageURIs.clear();
         // lấy ảnh sort theo date (mới nhất xếp trước).
 //        imageURIs.addAll(mainController.getImageController().getAllImageURLsSortByDate());
-        List<String> allInDatabase = mainController.getImageController().getAllImageIds();
-        List<String> allInFirebase = mainController.getImageController().getAllImageURLs();
         List<String> imageURLsFavourited = mainController.getImageController().getAllImageURLsFavourited();
         imageURIs.addAll(mainController.getImageController().getAllImageURLsUndeleted());
 
@@ -239,7 +238,6 @@ public class HomeScreenFragment extends Fragment {
             String id = mainController.getImageController().getIdByRef(uri);
 //            intent.putExtra("id", id);
             intent.putExtra("position", position);
-            intent.putExtra("id", id);
             if (options != null) {
                 startActivityForResult(intent, REQUEST_CODE_DETAIL_IMAGE, options.toBundle());
             }

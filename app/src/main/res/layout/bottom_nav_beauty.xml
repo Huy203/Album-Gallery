@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <com.google.android.material.bottomappbar.BottomAppBar
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:fabAlignmentMode="center">
+
+
+        <com.google.android.flexbox.FlexboxLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:alignItems="center"
+            app:justifyContent="space_around">
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/action_pen"
+                style="@style/AppButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:icon="@drawable/pen" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/action_brightness"
+                style="@style/AppButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:icon="@drawable/brightness" />
+
+            <!-- com.google.android.material.button.MaterialButton Rotate -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/action_contrast"
+                style="@style/AppButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:icon="@drawable/contrast" />
+
+            <!-- com.google.android.material.button.MaterialButton Cut -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/action_filter"
+                style="@style/AppButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:icon="@drawable/filter" />
+
+            <!-- com.google.android.material.button.MaterialButton Beautify -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/action_beautify"
+                style="@style/AppButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:icon="@drawable/beautiful" />
+
+        </com.google.android.flexbox.FlexboxLayout>
+
+    </com.google.android.material.bottomappbar.BottomAppBar>
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

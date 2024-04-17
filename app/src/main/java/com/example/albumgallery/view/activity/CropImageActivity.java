@@ -133,5 +133,4 @@ public class CropImageActivity extends AppCompatActivity {
         setResult(RESULT_OK, intent);
         finish();
     }
-
 }
