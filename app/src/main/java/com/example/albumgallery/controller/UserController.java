@@ -4,16 +4,16 @@ import android.app.Activity;
 import android.net.Uri;
 import android.util.Log;
 
-import androidx.annotation.NonNull;
-
 import com.example.albumgallery.FirebaseManager;
 import com.example.albumgallery.helper.DatabaseHelper;
 import com.example.albumgallery.model.Model;
 import com.example.albumgallery.model.auth.UserModel;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.UserProfileChangeRequest;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class UserController implements Controller {
     private final Activity activity;
@@ -28,17 +28,28 @@ public class UserController implements Controller {
 
     @Override
     public void insert(Model model) {
-
+        firebaseManager.getFirebaseHelper().addDocument("User", model);
+        dbHelper.insert("User", model);
     }
 
     @Override
     public void update(String column, String value, String where) {
+        dbHelper.update("User", column, value, where);
+        dbHelper.close();
 
+        Map<String, Object> data = new HashMap<>();
+        data.put(column, value);
+        int start = where.indexOf("'") + 1;
+        int end = where.lastIndexOf("'");
+        String id = where.substring(start, end);
+        Log.v("User", "Updating document with ID: " + id + " " + data.toString());
+        firebaseManager.getFirebaseHelper().update("User", data, id, firebaseManager.getFirebaseAuth().getCurrentUser().getUid());
     }
 
     @Override
     public void delete(String where) {
-
+        dbHelper.delete("User", where);
+        dbHelper.close();
     }
 
     private DatabaseHelper getDbHelper() {
@@ -53,14 +64,21 @@ public class UserController implements Controller {
         return firebaseManager;
     }
 
-    public UserModel getUserById(long id) {
-        String data = dbHelper.getById("User", id);
+    public UserModel getUser() {
+        String uid = firebaseManager.getFirebaseAuth().getCurrentUser().getUid();
+        String data = dbHelper.getById("User", uid);
+        Log.v("UserActivity", "Data: " + data);
         String[] temp = data.split(",");
-        Log.v("UserController", "getUserById: " + data);
-        return new UserModel(temp[1], temp[2], temp[3], temp[4], temp[5]);
+        for (int i = 0; i < temp.length; i++) {
+            Log.v("UserActivity", "Temp: " + temp[i]);
+            if (temp[i].equals("null")) {
+                temp[i] = "";
+            }
+        }
+        return new UserModel(temp[0], temp[1], temp[2], temp[3], temp[4], temp[5]);
     }
 
-    public void updateUser(){
+    public void updateUser() {
         FirebaseUser user = firebaseManager.getFirebaseAuth().getCurrentUser();
 
         UserProfileChangeRequest profileUpdates = new UserProfileChangeRequest.Builder()
@@ -69,13 +87,37 @@ public class UserController implements Controller {
                 .build();
 
         user.updateProfile(profileUpdates)
-                .addOnCompleteListener(new OnCompleteListener<Void>() {
-                    @Override
-                    public void onComplete(@NonNull Task<Void> task) {
-                        if (task.isSuccessful()) {
-                            Log.d("UserActivity", "User profile updated.");
-                        }
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        Log.d("UserActivity", "User profile updated.");
+                        dbHelper.update("User", "username", "Jane Q. User", "id = '" + user.getUid() + "'");
                     }
                 });
     }
+
+    public List<String> getAllImageIds() {
+        return dbHelper.getFromImage("id");
+    }
+
+    public void loadFromFirestore() {
+        String uid = firebaseManager.getFirebaseAuth().getCurrentUser().getUid();
+        String user = dbHelper.getById("User", uid);
+        if (user == null) {
+            firebaseManager.getFirebaseHelper().getById("User", uid, uid)
+                    .addOnSuccessListener(documentSnapshot -> {
+                        if (documentSnapshot != null) {
+                            Log.v("Image", "User added" + " " + documentSnapshot.getData());
+                            dbHelper.insert("User", new UserModel(
+                                    documentSnapshot.get("id").toString(),
+                                    documentSnapshot.get("username").toString(),
+                                    documentSnapshot.get("email").toString(),
+                                    documentSnapshot.get("phone").toString(),
+                                    documentSnapshot.get("created_at").toString(),
+                                    documentSnapshot.get("birth").toString(),
+                                    documentSnapshot.get("picture").toString()));
+                        }
+                    });
+        }
+    }
+
 }

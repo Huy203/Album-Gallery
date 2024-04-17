@@ -50,7 +50,7 @@ public class DetailDeletedPicture extends AppCompatActivity implements ImageInfo
     }
 
     private void update() {
-        long id = getIntent().getLongExtra("id", 0);
+        String id = getIntent().getStringExtra("id");
         imageModel = mainController.getImageController().getImageById(id);
     }
 

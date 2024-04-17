@@ -10,7 +10,6 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.ImageView;
 import android.widget.Spinner;
 
 import androidx.annotation.NonNull;
@@ -39,7 +38,8 @@ public class CropImageActivity extends AppCompatActivity {
 
         mainController = new MainController(this);
 
-        long id = getIntent().getLongExtra("id", -1);
+        String id = getIntent().getStringExtra("id");
+        Log.v("CropImageActivity", "Image ID: " + id);
         String imageURL = mainController.getImageController().getImageById(id).getRef();
         try {
             Glide.with(this)
@@ -56,12 +56,6 @@ public class CropImageActivity extends AppCompatActivity {
         }
 
         setupAspectRatioSpinner();
-
-        Button buttonSave = findViewById(R.id.buttonSave);
-        buttonSave.setOnClickListener(v -> goBack(true));
-
-        View buttonBack = findViewById(R.id.action_back);
-        buttonBack.setOnClickListener(v -> goBack(false));
 
         Button buttonCrop = findViewById(R.id.buttonCrop);
         buttonCrop.setOnClickListener(v -> {
@@ -125,16 +119,18 @@ public class CropImageActivity extends AppCompatActivity {
 //        }
 //    }
 
-    private void goBack(boolean acceptChanges) {
-        if (acceptChanges) {
-            Bitmap croppedImage = cropImageView.getCroppedImage();
+    public void cropAction(View view) {
+        hasChanges = true;
+        Bitmap croppedImage = cropImageView.getCroppedImage();
+        cropImageView.setImageBitmap(croppedImage);
+    }
 
-            Intent intent = new Intent(this, EditImageActivity.class);
-            intent.putExtra("imageByteArray", bitmapToByteArray(croppedImage));
-            setResult(RESULT_OK, intent);
-        } else {
-            setResult(RESULT_CANCELED);
-        }
+    public void saveAction(View view) {
+        Bitmap croppedImage = cropImageView.getCroppedImage();
+
+        Intent intent = new Intent(this, EditImageActivity.class);
+        intent.putExtra("imageByteArray", bitmapToByteArray(croppedImage));
+        setResult(RESULT_OK, intent);
         finish();
     }
 }

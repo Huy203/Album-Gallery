@@ -15,6 +15,9 @@ import android.util.SparseBooleanArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import androidx.appcompat.widget.SearchView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -49,6 +52,8 @@ public class HomeScreenFragment extends Fragment {
     private MainController mainController; //controller contains other controllers
     List<String> selectedImageURLs;
     List<Task> selectedImageURLsTask;
+    private View view;
+    private SearchView searchView;
     private FragToActivityListener fragToActivityListener;
     private boolean isSelectAll = false;
 
@@ -114,7 +119,6 @@ public class HomeScreenFragment extends Fragment {
                 tickBtn.setIconTint(ColorStateList.valueOf(getResources().getColor(R.color.black)));
                 tickBtn.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(R.color.none)));
             }
-
         }
         imageAdapter.setMultipleChoiceEnabled(isSelectAll);
         imageAdapter.setSelectedItems(selectedItems);
@@ -173,7 +177,6 @@ public class HomeScreenFragment extends Fragment {
             if (isUpdate) {
                 updateUI();
             }
-
         } else {
             mainController.getImageController().onActivityResult(requestCode, resultCode, data);
         }
@@ -183,9 +186,9 @@ public class HomeScreenFragment extends Fragment {
         Log.v("HomeScreenFragment", "updateUI");
         imageURIs.clear();
         // lấy ảnh sort theo date (mới nhất xếp trước).
-        imageURIs.addAll(mainController.getImageController().getAllImageURLsSortByDate());
+//        imageURIs.addAll(mainController.getImageController().getAllImageURLsSortByDate());
         List<String> imageURLsFavourited = mainController.getImageController().getAllImageURLsFavourited();
-        //imageURIs.addAll(mainController.getImageController().getAllImageURLsUndeleted());
+        imageURIs.addAll(mainController.getImageController().getAllImageURLsUndeleted());
 
         imageAdapter = new ImageAdapter(getActivity(), imageURIs);
         imageAdapter.setImageURLsFavourite(imageURLsFavourited);
@@ -208,8 +211,10 @@ public class HomeScreenFragment extends Fragment {
 
                     builder.setPositiveButton("Delete", (dialog, which) -> {
                         for (String uri : imageAdapter.getSelectedImageURLs()) {
-                            long id = mainController.getImageController().getIdByRef(uri);
-                            mainController.getImageController().setDelete(id, true);
+                            String id = mainController.getImageController().getIdByRef(uri);
+                            if (id != null) {
+                                mainController.getImageController().setDelete(id, true);
+                            }
                         }
                         imageAdapter.clearSelectedItems();
                         onResume();
@@ -235,7 +240,7 @@ public class HomeScreenFragment extends Fragment {
         }
         if (imageURIs.contains(uri)) {
             Log.v("HomeScreenFragment", "Image selected: " + uri);
-            long id = mainController.getImageController().getIdByRef(uri);
+            String id = mainController.getImageController().getIdByRef(uri);
             intent.putExtra("id", id);
             intent.putExtra("position", position);
             if (options != null) {
@@ -297,7 +302,7 @@ public class HomeScreenFragment extends Fragment {
                 break;
             case "Like":
                 for (String url : imageAdapter.getSelectedImageURLs()) {
-                    long id = mainController.getImageController().getIdByRef(url);
+                    String id = mainController.getImageController().getIdByRef(url);
                     mainController.getImageController().toggleFavoriteImage(id);
                 }
                 imageAdapter.clearSelectedItems();
@@ -307,5 +312,14 @@ public class HomeScreenFragment extends Fragment {
             case "Add":
                 break;
         }
+    }
+
+    public void searchImages(String query){
+        imageURIs.clear();
+        imageURIs.addAll(mainController.getImageController().selectImagesByNotice(query));
+        imageAdapter = new ImageAdapter(getActivity(), imageURIs);
+        recyclerMediaView.setLayoutManager(new GridLayoutManager(getContext(), 3));
+        recyclerMediaView.setAdapter(imageAdapter);
+        imageAdapter.notifyDataSetChanged();
     }
 }

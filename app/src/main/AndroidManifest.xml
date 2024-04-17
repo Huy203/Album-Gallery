@@ -19,37 +19,30 @@
         android:theme="@style/Theme.AlbumGallery"
         android:usesCleartextTraffic="true"
         tools:targetApi="31">
-
-        <activity
-            android:name=".MainActivity">
-<!--            android:exported="true"-->
-<!--            android:label="AlbumGallery"-->
-<!--            android:windowSoftInputMode="adjustResize">-->
-<!--            <intent-filter>-->
-<!--                <action android:name="android.intent.action.MAIN" />-->
-
-<!--                <category android:name="android.intent.category.LAUNCHER" />-->
-<!--            </intent-filter>-->
-        </activity>
         <activity
             android:name=".view.activity.MainFragmentController"
             android:exported="true"
             android:windowSoftInputMode="adjustResize" />
-        <activity android:name=".view.activity.EditImageActivity" />
-        <activity android:name=".view.activity.DetailPicture" />
-        <activity android:name=".presentations.bin.DetailDeletedPicture" />
-
-        <activity android:name=".view.activity.LoginScreen"
-                android:exported="true"
-                android:label="AlbumGallery"
-                android:windowSoftInputMode="adjustResize">
+        <activity android:name=".view.activity.AlbumMain" />
+        <activity
+            android:name=".MainActivity"
+            android:exported="true"
+            android:label="AlbumGallery"
+            android:windowSoftInputMode="adjustResize">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".view.activity.RegisterScreen" />
+        <activity
+            android:name=".view.activity.MainFragmentController"
+            android:exported="true"
+            android:windowSoftInputMode="adjustResize" />
+        <activity android:name=".view.activity.Auth"/>
+        <activity android:name=".view.activity.EditImageActivity" />
+        <activity android:name=".view.activity.DetailPicture" />
+        <activity android:name=".presentations.bin.DetailDeletedPicture" />
         <activity android:name=".view.activity.CreateAlbumActivity" />
         <activity android:name=".view.activity.SelectImageActivity" />
         <activity android:name=".view.activity.CropImageActivity" />
@@ -58,6 +51,7 @@
             android:windowSoftInputMode="adjustPan"/>
         <activity android:name=".view.activity.PasswordAlbumActivity" />
         <activity android:name=".presentations.user.UserActivity" />
+        <activity android:name=".view.activity.SlideShowActivity" />
 
         <provider
             android:name="androidx.core.content.FileProvider"

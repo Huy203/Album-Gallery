@@ -11,7 +11,7 @@ import java.util.List;
 public class AlbumModel implements Model{
     // AlbumModel class is used to store the data of the album.
     private DatabaseHelper dbHelper;
-    private int id; // id of the album
+    private String id; // id of the album
     private String name; // name of the album
     private int capacity; // capacity of the album
     private String created_at; // created date of the album
@@ -30,11 +30,11 @@ public class AlbumModel implements Model{
         this.dbHelper = dbHelper;
     }
 
-    public int getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(String id) {
         this.id = id;
     }
 
@@ -106,17 +106,7 @@ public class AlbumModel implements Model{
         dbHelper = new DatabaseHelper(context);
     }
 
-    public AlbumModel(int id, String name, int capacity) {
-        this.id = id;
-        this.name = name;
-        this.capacity = capacity;
-        this.created_at = (Calendar.getInstance().getTime()).toString();
-        this.notice = "";
-        this.is_deleted = 0;
-        this.thumbnail = "";
-    }
-
-    public AlbumModel(int id, String name, int capacity, String notice, String ref, int num_of_images) {
+    public AlbumModel(String id, String name, int capacity, String notice, String ref, int num_of_images) {
         this.id = id;
         this.name = name;
         this.capacity = capacity;

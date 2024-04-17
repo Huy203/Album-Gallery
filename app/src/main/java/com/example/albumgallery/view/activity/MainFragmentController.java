@@ -23,6 +23,7 @@ import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
 import com.example.albumgallery.R;
+import com.example.albumgallery.controller.MainController;
 import com.example.albumgallery.databinding.ActivityFragmentControllerBinding;
 import com.example.albumgallery.helper.SharePreferenceHelper;
 import com.example.albumgallery.presentations.bin.BinFragment;
@@ -66,8 +67,12 @@ public class MainFragmentController extends AppCompatActivity implements Backgro
         String fragmentToLoad = getIntent().getStringExtra("fragmentToLoad");
         if (fragmentToLoad != null && fragmentToLoad.equals("AlbumMain")) {
             replaceFragment(fragments.get(1));
-        } else if (fragmentToLoad != null && fragmentToLoad.equals("HomeScreen")) {
+        }
+        else if (fragmentToLoad != null && fragmentToLoad.equals("HomeScreen")) {
             replaceFragment(fragments.get(0));
+        }
+        else if (fragmentToLoad != null && fragmentToLoad.equals("Bin")) {
+            replaceFragment(fragments.get(3));
         }
 
 
@@ -84,6 +89,9 @@ public class MainFragmentController extends AppCompatActivity implements Backgro
             }
             return true;
         });
+        MainController mainController = new MainController(this);
+        mainController.getImageController().loadFromFirestore();
+        mainController.getUserController().loadFromFirestore();
     }
 
     @SuppressLint("NotifyDataSetChanged")
