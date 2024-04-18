@@ -54,4 +54,8 @@
     <string name="save">Lưu</string>
     <string name="en" translatable="false">en</string>
     <string name="vi" translatable="false">vi</string>
+    <string name="square_grid">Lưới ảnh vuông</string>
+    <string name="ratio_grid">Lưới ảnh theo tỉ lệ</string>
+    <string name="full_screen_grid">Toàn màn hình</string>
+
 </resources>

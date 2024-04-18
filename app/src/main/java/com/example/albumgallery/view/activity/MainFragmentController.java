@@ -238,7 +238,6 @@ public class MainFragmentController extends AppCompatActivity implements Backgro
     public void toggleMultipleChoice() {
         Fragment fragment = getSupportFragmentManager().findFragmentById(R.id.fragment_container);
         if (fragment instanceof HomeScreenFragment) {
-            Log.v("MainFragmentController", "Toggle multiple choice");
             changeBottomMenu(((HomeScreenFragment) fragment).toggleMultipleChoice());
         } else if (fragment instanceof BinFragment) {
             changeBottomMenu(((BinFragment) fragment).toggleMultipleChoice());

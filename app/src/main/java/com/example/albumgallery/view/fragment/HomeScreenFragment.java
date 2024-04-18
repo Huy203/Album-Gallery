@@ -13,8 +13,10 @@ import android.provider.MediaStore;
 import android.util.Log;
 import android.util.SparseBooleanArray;
 import android.view.LayoutInflater;
+import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.PopupMenu;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -25,6 +27,7 @@ import androidx.core.app.ActivityOptionsCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.albumgallery.R;
@@ -93,9 +96,38 @@ public class HomeScreenFragment extends Fragment {
         recyclerMediaView = view.findViewById(R.id.recyclerMediaView);
 
         MaterialButton changeGridViewBtn = view.findViewById(R.id.changeGridViewBtn);
-        changeGridViewBtn.setOnClickListener(this::changeGridView);
+        changeGridViewBtn.setOnClickListener(this::changeViewAction);
         MaterialButton tickBtn = view.findViewById(R.id.tickBtn);
         tickBtn.setOnClickListener(this::choiceAll);
+    }
+
+    private void changeViewAction(View view) {
+        PopupMenu popupMenu = new PopupMenu(getActivity(), view);
+        popupMenu.getMenu().add(Menu.NONE, 0, 0, getResources().getString(R.string.square_grid));
+        popupMenu.getMenu().add(Menu.NONE, 1, 1, getResources().getString(R.string.ratio_grid));
+        popupMenu.getMenu().add(Menu.NONE, 2, 2, getResources().getString(R.string.full_screen_grid));
+        popupMenu.setOnMenuItemClickListener(item -> {
+            switch (item.getItemId()) {
+                case 0:
+                    // default grid view
+                    SharePreferenceHelper.setGridLayoutEnabled(requireContext(), "default");
+                    updateUI();
+                    return true;
+                case 1:
+                    // ratio grid view
+                    SharePreferenceHelper.setGridLayoutEnabled(requireContext(), "ratio");
+                    updateUI();
+                    return true;
+                case 2:
+                    // full screen grid view
+                    SharePreferenceHelper.setGridLayoutEnabled(requireContext(), "full");
+                    updateUI();
+                    return true;
+                default:
+                    return false;
+            }
+        });
+        popupMenu.show();
     }
 
     private void choiceAll(View view) {
@@ -121,7 +153,7 @@ public class HomeScreenFragment extends Fragment {
         imageAdapter.setMultipleChoiceEnabled(isSelectAll);
         imageAdapter.setSelectedItems(selectedItems);
         fragToActivityListener.onFragmentAction("SelectAll", true);
-        imageAdapter.notifyDataSetChanged();
+        imageAdapter.notifyItemRangeChanged(0, imageURIs.size());
     }
 
     public boolean toggleMultipleChoice() {
@@ -191,9 +223,13 @@ public class HomeScreenFragment extends Fragment {
         imageAdapter = new ImageAdapter(getActivity(), imageURIs);
         imageAdapter.setImageURLsFavourite(imageURLsFavourited);
         // Switch to list display
-        recyclerMediaView.setLayoutManager(new GridLayoutManager(getContext(), 4));
+        if (SharePreferenceHelper.isGridLayoutEnabled(getActivity()).equals("full")) {
+            recyclerMediaView.setLayoutManager(new LinearLayoutManager(getContext()));
+        } else {
+            recyclerMediaView.setLayoutManager(new GridLayoutManager(getContext(), 4));
+        }
         recyclerMediaView.setAdapter(imageAdapter);
-        imageAdapter.notifyDataSetChanged();
+        imageAdapter.toggleAll();
     }
 
     public void showDeleteConfirmationDialog() {
@@ -254,11 +290,6 @@ public class HomeScreenFragment extends Fragment {
         if (intent.resolveActivity(getActivity().getPackageManager()) != null) {
             startActivityForResult(intent, CAMERA_REQUEST_CODE);
         }
-    }
-
-    public void changeGridView(View view) {
-        SharePreferenceHelper.setGridLayoutEnabled(requireContext(), !SharePreferenceHelper.isGridLayoutEnabled(requireContext()));
-        imageAdapter.notifyDataSetChanged();
     }
 
     @Override
