@@ -15,14 +15,12 @@ import android.util.SparseBooleanArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
-import androidx.appcompat.widget.SearchView;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.widget.SearchView;
 import androidx.core.app.ActivityOptionsCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
@@ -314,7 +312,7 @@ public class HomeScreenFragment extends Fragment {
         }
     }
 
-    public void searchImages(String query){
+    public void searchImages(String query) {
         imageURIs.clear();
         imageURIs.addAll(mainController.getImageController().selectImagesByNotice(query));
         imageAdapter = new ImageAdapter(getActivity(), imageURIs);

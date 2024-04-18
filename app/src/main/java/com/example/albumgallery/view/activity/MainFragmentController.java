@@ -1,10 +1,8 @@
 package com.example.albumgallery.view.activity;
 
 import static com.example.albumgallery.utils.Constant.REQUEST_CODE_PICK_MULTIPLE_IMAGES;
-import static com.example.albumgallery.utils.Utilities.convertFromBitmapToUri;
 
 import android.annotation.SuppressLint;
-import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
@@ -15,6 +13,7 @@ import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
@@ -22,6 +21,10 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.GlideException;
+import com.bumptech.glide.request.RequestListener;
+import com.bumptech.glide.request.target.Target;
 import com.example.albumgallery.R;
 import com.example.albumgallery.controller.MainController;
 import com.example.albumgallery.databinding.ActivityFragmentControllerBinding;
@@ -34,6 +37,7 @@ import com.example.albumgallery.view.fragment.HomeScreenFragment;
 import com.example.albumgallery.view.listeners.BackgroundProcessingCallback;
 import com.example.albumgallery.view.listeners.FragToActivityListener;
 import com.example.albumgallery.view.listeners.ImageAdapterListener;
+import com.google.android.material.imageview.ShapeableImageView;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -49,13 +53,8 @@ public class MainFragmentController extends AppCompatActivity implements Backgro
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        boolean isDarkMode = SharePreferenceHelper.isDarkModeEnabled(this);
-        if (isDarkMode) {
-            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
-        } else {
-            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
-        }
-        HomeScreenFragment fragment = new HomeScreenFragment();
+        darkMode();
+
         getSupportFragmentManager().beginTransaction()
                 .add(R.id.fragment_container, fragments.get(0))
                 .commit();
@@ -67,14 +66,11 @@ public class MainFragmentController extends AppCompatActivity implements Backgro
         String fragmentToLoad = getIntent().getStringExtra("fragmentToLoad");
         if (fragmentToLoad != null && fragmentToLoad.equals("AlbumMain")) {
             replaceFragment(fragments.get(1));
-        }
-        else if (fragmentToLoad != null && fragmentToLoad.equals("HomeScreen")) {
+        } else if (fragmentToLoad != null && fragmentToLoad.equals("HomeScreen")) {
             replaceFragment(fragments.get(0));
-        }
-        else if (fragmentToLoad != null && fragmentToLoad.equals("Bin")) {
+        } else if (fragmentToLoad != null && fragmentToLoad.equals("Bin")) {
             replaceFragment(fragments.get(3));
         }
-
 
         binding.bottomNavigationView.setOnItemSelectedListener(item -> {
             int itemId = item.getItemId();
@@ -89,9 +85,41 @@ public class MainFragmentController extends AppCompatActivity implements Backgro
             }
             return true;
         });
+
         MainController mainController = new MainController(this);
         mainController.getImageController().loadFromFirestore();
         mainController.getUserController().loadFromFirestore();
+        initiateVariable(mainController.getUserController().getUser().getPicture());
+    }
+
+    private void initiateVariable(String picture) {
+        ShapeableImageView avatar = findViewById(R.id.action_user);
+        if (picture != null) {
+            Log.v("UserActivity", "Picture: " + picture);
+            Glide.with(this).asBitmap()
+                    .load(picture)
+                    .addListener(new RequestListener<Bitmap>() {
+                        @Override
+                        public boolean onLoadFailed(@Nullable GlideException e, @Nullable Object model, @NonNull Target<Bitmap> target, boolean isFirstResource) {
+                            return false;
+                        }
+
+                        @Override
+                        public boolean onResourceReady(Bitmap resource, Object model, com.bumptech.glide.request.target.Target<Bitmap> target, com.bumptech.glide.load.DataSource dataSource, boolean isFirstResource) {
+                            avatar.setImageBitmap(resource);
+                            return false;
+                        }
+                    }).submit();
+        }
+    }
+
+    private void darkMode() {
+        boolean isDarkMode = SharePreferenceHelper.isDarkModeEnabled(this);
+        if (isDarkMode) {
+            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
+        } else {
+            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
+        }
     }
 
     @SuppressLint("NotifyDataSetChanged")
@@ -219,7 +247,7 @@ public class MainFragmentController extends AppCompatActivity implements Backgro
 
     private void changeBottomMenu(boolean isMultipleChoiceEnabled) {
         Fragment fragment = getSupportFragmentManager().findFragmentById(R.id.fragment_container);
-        Log.v("MainFragmentController", "Change bottom menu" +fragment);
+        Log.v("MainFragmentController", "Change bottom menu" + fragment);
         if (isMultipleChoiceEnabled) {
             if (fragment instanceof HomeScreenFragment) {
                 Log.v("MainFragmentController", "HomeScreenFragment");
@@ -234,6 +262,8 @@ public class MainFragmentController extends AppCompatActivity implements Backgro
             }
         } else {
             binding.bottomNavigationView.setVisibility(View.VISIBLE);
+            findViewById(R.id.bottomMenuMain1).setVisibility(View.GONE);
+            findViewById(R.id.bottomMenuMain2).setVisibility(View.GONE);
         }
     }
 
@@ -243,26 +273,6 @@ public class MainFragmentController extends AppCompatActivity implements Backgro
             fragment.ActivityToFragListener("Share");
         } else {
             Log.e("MainFragmentController", "Fragment is null or not added");
-//        }
-//        Glide.with(this)
-//                .asBitmap()
-//                .load(Uri.parse(imagePaths.get(currentPosition)))
-//                .addListener(new RequestListener<Bitmap>() {
-//                    @Override
-//                    public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Bitmap> target, boolean isFirstResource) {
-//                        Log.e("DetailPicture", "Failed to load image: " + e.getMessage());
-//                        Toast.makeText(MainFragmentController.this, "Failed to share image", Toast.LENGTH_SHORT).show();
-//                        return false;
-//                    }
-//
-//                    @Override
-//                    public boolean onResourceReady(Bitmap resource, Object model, Target<Bitmap> target, DataSource dataSource, boolean isFirstResource) {
-//                        shareImageAndText(resource);
-//                        return false;
-//                    }
-//                })
-//                .submit();
-//    }
         }
     }
 
@@ -341,11 +351,11 @@ public class MainFragmentController extends AppCompatActivity implements Backgro
                 }
                 break;
             case "ShowMultipleChoice":
-                int count = (int) data;
-                if(fragment instanceof HomeScreenFragment || fragment instanceof FavoriteFragment)
-                    ((TextView) findViewById(R.id.numberOfSelectedImages)).setText(count + " items selected");
-                else if(fragment instanceof BinFragment){
-                    ((TextView) findViewById(R.id.numberOfSelectedImages2)).setText(count + " items selected");
+                String count = data.toString();
+                if (fragment instanceof HomeScreenFragment || fragment instanceof FavoriteFragment)
+                    ((TextView) findViewById(R.id.numberOfSelectedImages)).setText(count);
+                else if (fragment instanceof BinFragment) {
+                    ((TextView) findViewById(R.id.numberOfSelectedImages2)).setText(count);
                 }
                 break;
             case "SelectAll":
@@ -359,26 +369,6 @@ public class MainFragmentController extends AppCompatActivity implements Backgro
         intent.putParcelableArrayListExtra(Intent.EXTRA_STREAM, imageUris);
         intent.setType("image/*");
         startActivity(Intent.createChooser(intent, "Share images"));
-    }
-
-    private void shareImageAndText(Bitmap bitmap, Context context) {
-        Uri uri = convertFromBitmapToUri(this, bitmap);
-        Intent intent = new Intent(Intent.ACTION_SEND);
-
-        // putting uri of image to be shared
-        intent.putExtra(Intent.EXTRA_STREAM, uri);
-
-        // adding text to share
-        intent.putExtra(Intent.EXTRA_TEXT, "Sharing Image");
-
-        // Add subject Here
-        intent.putExtra(Intent.EXTRA_SUBJECT, "Subject Here");
-
-        // setting type to image
-        intent.setType("image/png");
-
-        // calling startactivity() to share
-        startActivity(Intent.createChooser(intent, "Share Via"));
     }
 
     public void onPointerCaptureChanged(boolean hasCapture) {

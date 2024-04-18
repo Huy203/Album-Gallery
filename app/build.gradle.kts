@@ -25,6 +25,10 @@ android {
         }
     }
 
+    androidResources {
+        generateLocaleConfig = true
+    }
+
     buildTypes {
         release {
             isMinifyEnabled = false
@@ -38,8 +42,6 @@ android {
     buildFeatures {
         viewBinding = true
     }
-
-
 
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_1_8
@@ -81,7 +83,6 @@ android {
             "src/main/res/xml"
         )
     }
-
 }
 
 dependencies {
@@ -103,7 +104,7 @@ dependencies {
     androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
 
     implementation(platform("com.google.firebase:firebase-bom:32.7.1"))
-    implementation("com.google.firebase:firebase-analytics:21.5.1")
+    implementation("com.google.firebase:firebase-analytics")
 //    don't specify the version when using the BoM
     implementation("com.google.firebase:firebase-auth")
     implementation("com.google.firebase:firebase-storage")
@@ -118,17 +119,16 @@ dependencies {
 //    Google Play services Auth SDK
     implementation("com.google.android.gms:play-services-auth:21.0.0")
     implementation("com.google.android.gms:play-services-vision:20.1.3")
-    androidTestImplementation(platform("androidx.compose:compose-bom:2023.08.00"))
-    androidTestImplementation("androidx.compose.ui:ui-test-junit4")
-    androidTestImplementation(platform("androidx.compose:compose-bom:2023.08.00"))
+//    androidTestImplementation(platform("androidx.compose:compose-bom:2023.08.00"))
+//    androidTestImplementation("androidx.compose.ui:ui-test-junit4")
+//    androidTestImplementation(platform("androidx.compose:compose-bom:2023.08.00"))
     debugImplementation("androidx.compose.ui:ui-tooling")
     debugImplementation("androidx.compose.ui:ui-test-manifest")
 
     implementation("com.github.bumptech.glide:glide:4.16.0")
-
     // Image Cropper
     implementation("com.theartofdev.edmodo:android-image-cropper:2.8.0")
     // QR Code Scanner
     implementation("com.google.zxing:core:3.4.1")
-    implementation ("com.github.denzcoskun:ImageSlideshow:0.1.0")
+    implementation("com.github.denzcoskun:ImageSlideshow:0.1.0")
 }

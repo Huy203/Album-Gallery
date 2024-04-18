@@ -1,5 +1,7 @@
 package com.example.albumgallery.model.auth;
 
+import android.util.Log;
+
 import com.example.albumgallery.model.Model;
 
 public class UserModel implements Model {
@@ -87,6 +89,7 @@ public class UserModel implements Model {
     }
 
     public String insert() {
+        Log.v("UserModel", "INSERT INTO User (id, username, email, phone, created_at, birth, picture) VALUES ('" + id + "', '" + username + "', '" + email + "', '" + phone + "', '" + created_at + "', '" + birth + "', '" + picture + "')");
         return "INSERT INTO User (id, username, email, phone, created_at, birth, picture) VALUES ('" + id + "', '" + username + "', '" + email + "', '" + phone + "', '" + created_at + "', '" + birth + "', '" + picture + "')";
     }
 

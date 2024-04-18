@@ -242,9 +242,9 @@ public class ImageController implements Controller {
                         Log.v("Image", "Image uploaded" + " " + uriImage + " " + idSelectedImages.get(uploadTasks.indexOf(task)));
                         this.update("ref", uriImage.toString(), "id = '" + idSelectedImages.get(uploadTasks.indexOf(task)) + "'");
 //                        if (allTasksCompleted(uploadTasks)) {
-                            activity.runOnUiThread(() -> {
-                                ((MainFragmentController) activity).onBackgroundTaskCompleted();
-                            });
+                        activity.runOnUiThread(() -> {
+                            ((MainFragmentController) activity).onBackgroundTaskCompleted();
+                        });
 //                        }
                     } catch (Exception e) {
                         e.printStackTrace();
@@ -308,7 +308,7 @@ public class ImageController implements Controller {
         insert(currentModel);
     }
 
-    private Task<Uri> uploadImage(Uri uri) {
+    public Task<Uri> uploadImage(Uri uri) {
         Log.v("Image", "Uploading image" + " " + uri);
         String extensionName = getExtensionName(uri);
 
@@ -316,21 +316,13 @@ public class ImageController implements Controller {
         // Set extension of the file is "jpg"
         StorageMetadata metadata = new StorageMetadata.Builder().setContentType("image/jpg").build();
         // Upload file and metadata to the path 'images/image+filepath'
-        StorageReference imageRef = firebaseManager.getStorage().getReference().child("/image" + uri.getLastPathSegment() + "." + (imageExtensions.contains(extensionName) ? extensionName : "jpg"));
+        StorageReference imageRef = firebaseManager.getStorage().getReference().child("/" + firebaseManager.getFirebaseAuth().getCurrentUser().getUid() + "/IMAGE" + uri.getLastPathSegment() + "." + (imageExtensions.contains(extensionName) ? extensionName : "jpg"));
         UploadTask uploadTask = imageRef.putFile(uri, metadata);
 
         // Register observers to listen for when the download is done or if it fails
-        uploadTask.addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception exception) {
-                // Handle unsuccessful uploads
-            }
-        }).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-            @Override
-            public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                taskSnapshot.getMetadata();
-            }
-        });
+        uploadTask.addOnFailureListener(exception -> {
+            // Handle unsuccessful uploads
+        }).addOnSuccessListener(taskSnapshot -> taskSnapshot.getMetadata());
         return uploadTask.continueWithTask(task -> {
             if (!task.isSuccessful()) {
                 throw Objects.requireNonNull(task.getException());
@@ -340,15 +332,6 @@ public class ImageController implements Controller {
             Log.v("Image", "Image uploaded" + " " + imageRef.getDownloadUrl());
             return imageRef.getDownloadUrl();
         });
-    }
-
-    private boolean allTasksCompleted(List<Task<Uri>> tasks) {
-        for (Task<Uri> task : tasks) {
-            if (!task.isSuccessful()) {
-                return false;
-            }
-        }
-        return true;
     }
 
     private boolean allTasksCompletedGeneric(List<Task> tasks) {
@@ -481,6 +464,7 @@ public class ImageController implements Controller {
             Toast.makeText(activity, "Image deleted failed", Toast.LENGTH_SHORT).show();
         });
     }
+
     public void restoreSelectedImage(String imageURL) {
         String imageID = dbHelper.getImageIdByURL(imageURL);
         dbHelper.setDelete(imageID, false);
@@ -490,6 +474,7 @@ public class ImageController implements Controller {
         activity.startActivity(intent);
         activity.finish();
     }
+
     public String checkExistURL(String longImageURL) {
         String[] parts = longImageURL.split("/");
         String imageURL = parts[parts.length - 1];
@@ -515,7 +500,7 @@ public class ImageController implements Controller {
         return getAllImageURLs();
     }
 
-    public void deleteSelectedImageAtBin(List<Task> imageURLs){
+    public void deleteSelectedImageAtBin(List<Task> imageURLs) {
         FirebaseStorage storage = FirebaseStorage.getInstance();
         // Create a storage reference from our app
         StorageReference storageRef = storage.getReference();
@@ -618,7 +603,8 @@ public class ImageController implements Controller {
         }
         return null;
     }
-    public List<String> selectImagesByNotice(String notice){
+
+    public List<String> selectImagesByNotice(String notice) {
         return dbHelper.selectImagesByNotice(notice);
     }
 }

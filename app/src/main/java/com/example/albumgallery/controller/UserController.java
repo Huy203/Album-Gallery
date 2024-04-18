@@ -11,9 +11,14 @@ import com.example.albumgallery.model.auth.UserModel;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.UserProfileChangeRequest;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
+import java.util.TimeZone;
 
 public class UserController implements Controller {
     private final Activity activity;
@@ -75,7 +80,7 @@ public class UserController implements Controller {
                 temp[i] = "";
             }
         }
-        return new UserModel(temp[0], temp[1], temp[2], temp[3], temp[4], temp[5]);
+        return new UserModel(temp[0], temp[1], temp[2], temp[3], temp[4], temp[5], temp[6]);
     }
 
     public void updateUser() {
@@ -107,12 +112,14 @@ public class UserController implements Controller {
                     .addOnSuccessListener(documentSnapshot -> {
                         if (documentSnapshot != null) {
                             Log.v("Image", "User added" + " " + documentSnapshot.getData());
+                            String created_at = new Date().toString();
+                            Log.v("Image", "Created at: " + created_at);
                             dbHelper.insert("User", new UserModel(
                                     documentSnapshot.get("id").toString(),
                                     documentSnapshot.get("username").toString(),
                                     documentSnapshot.get("email").toString(),
                                     documentSnapshot.get("phone").toString(),
-                                    documentSnapshot.get("created_at").toString(),
+                                    convertDateTime(documentSnapshot.get("created_at").toString()).toString(),
                                     documentSnapshot.get("birth").toString(),
                                     documentSnapshot.get("picture").toString()));
                         }
@@ -120,4 +127,21 @@ public class UserController implements Controller {
         }
     }
 
+    public String convertDateTime(String datetime) {
+        SimpleDateFormat inputFormat = new SimpleDateFormat("EEE MMM dd HH:mm:ss 'GMT'Z yyyy");
+        inputFormat.setTimeZone(TimeZone.getTimeZone("GMT")); // Set input timezone
+
+        SimpleDateFormat outputFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        outputFormat.setTimeZone(TimeZone.getTimeZone("GMT+7")); // Set output timezone
+
+        try {
+            Date date = inputFormat.parse(datetime);
+            String outputDate = outputFormat.format(date);
+            System.out.println("Converted date: " + outputDate);
+            return outputDate;
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return datetime;
+    }
 }
