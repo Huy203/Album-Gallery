@@ -184,6 +184,7 @@ public class HomeScreenFragment extends Fragment {
             Log.v("HomeScreenFragment", "No items selected");
             imageAdapter.clearSelectedItems();
             unChooseBtn.setVisibility(View.GONE);
+            isSelectAll = false;
             return false;
         }
         return true;
