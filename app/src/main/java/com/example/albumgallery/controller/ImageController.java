@@ -604,6 +604,16 @@ public class ImageController implements Controller {
         return null;
     }
 
+    public Bitmap createQRCodeFromImage(String uri) {
+        QRCodeRecognization qrCodeRecognization = new QRCodeRecognization();
+        try {
+            return qrCodeRecognization.generateQRCodeFromImage(uri);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
     public List<String> selectImagesByNotice(String notice) {
         return dbHelper.selectImagesByNotice(notice);
     }

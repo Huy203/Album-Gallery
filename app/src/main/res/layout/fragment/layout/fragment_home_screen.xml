@@ -14,31 +14,51 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
-        <LinearLayout
+        <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:gravity="end"
-            android:orientation="horizontal">
+            app:alignItems="center"
+            app:justifyContent="space_between"
+            android:gravity="end">
 
             <com.google.android.material.button.MaterialButton
-                android:id="@+id/tickBtn"
+                android:id="@+id/unChooseBtn"
                 style="@style/AppButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:checkable="false"
-                android:clickable="true"
-                android:minHeight="0dp"
-                android:padding="0dp"
-                app:icon="@drawable/tick_black"
-                app:toggleCheckedStateOnClick="false" />
+                android:visibility="gone"
+                app:icon="@android:drawable/ic_menu_close_clear_cancel"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintStart_toStartOf="parent" />
 
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/changeGridViewBtn"
-                style="@style/AppButton"
+
+            <LinearLayout
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                app:icon="@drawable/grid_black" />
-        </LinearLayout>
+                android:layout_height="match_parent"
+                android:gravity="end"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintEnd_toEndOf="parent">
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/tickBtn"
+                    style="@style/AppButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:checkable="false"
+                    android:clickable="true"
+                    android:minHeight="0dp"
+                    android:padding="0dp"
+                    app:icon="@drawable/tick_black"
+                    app:toggleCheckedStateOnClick="false" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/changeGridViewBtn"
+                    style="@style/AppButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:icon="@drawable/grid_black" />
+            </LinearLayout>
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/recyclerMediaView"

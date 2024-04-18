@@ -94,11 +94,26 @@ public class HomeScreenFragment extends Fragment {
         selectedImageURLsTask = new ArrayList<>();
         imageAdapter = new ImageAdapter(getActivity(), imageURIs);
         recyclerMediaView = view.findViewById(R.id.recyclerMediaView);
+        this.view = view;
 
         MaterialButton changeGridViewBtn = view.findViewById(R.id.changeGridViewBtn);
-        changeGridViewBtn.setOnClickListener(this::changeViewAction);
+        MaterialButton unChooseBtn = view.findViewById(R.id.unChooseBtn);
         MaterialButton tickBtn = view.findViewById(R.id.tickBtn);
-        tickBtn.setOnClickListener(this::choiceAll);
+
+        changeGridViewBtn.setOnClickListener(this::changeViewAction);
+        tickBtn.setOnClickListener(view1 -> {
+            choiceAll(view);
+            if (imageAdapter.getMultipleChoiceEnabled()) {
+                unChooseBtn.setVisibility(View.VISIBLE);
+            } else {
+                unChooseBtn.setVisibility(View.GONE);
+            }
+        });
+        unChooseBtn.setOnClickListener(view1 -> {
+            choiceAll(view);
+            unChooseBtn.setVisibility(View.GONE);
+        });
+
     }
 
     private void changeViewAction(View view) {
@@ -135,7 +150,6 @@ public class HomeScreenFragment extends Fragment {
         MaterialButton tickBtn = view.findViewById(R.id.tickBtn);
         SparseBooleanArray selectedItems = new SparseBooleanArray();
         if (isSelectAll) {
-            imageAdapter.setMultipleChoiceEnabled(isSelectAll);
             tickBtn.setIconTint(ColorStateList.valueOf(getResources().getColor(R.color.white)));
             tickBtn.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(R.color.blue_200)));
             for (int i = 0; i < imageURIs.size(); i++) {
@@ -160,10 +174,16 @@ public class HomeScreenFragment extends Fragment {
         int length = imageAdapter.getSelectedItems().size(); // get the number of selected items
         fragToActivityListener.onFragmentAction("ShowMultipleChoice", length);
 
+        MaterialButton unChooseBtn = view.findViewById(R.id.unChooseBtn);
+        if (imageAdapter.getMultipleChoiceEnabled()) {
+            unChooseBtn.setVisibility(View.VISIBLE);
+            isSelectAll = true;
+        }
         // if no items are selected, clear the selected items and return false
         if (length == 0) {
             Log.v("HomeScreenFragment", "No items selected");
             imageAdapter.clearSelectedItems();
+            unChooseBtn.setVisibility(View.GONE);
             return false;
         }
         return true;
