@@ -7,7 +7,7 @@
 
     <androidx.appcompat.widget.SearchView
         android:id="@+id/searchView"
-        android:layout_width="301dp"
+        android:layout_width="400dp"
         android:layout_height="wrap_content"
         android:layout_margin="8dp"
         android:background="@drawable/search_view_bg"

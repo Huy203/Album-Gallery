@@ -34,6 +34,7 @@ import com.example.albumgallery.presentations.user.UserActivity;
 import com.example.albumgallery.view.fragment.AlbumsMainFragment;
 import com.example.albumgallery.view.fragment.FavoriteFragment;
 import com.example.albumgallery.view.fragment.HomeScreenFragment;
+import com.example.albumgallery.view.fragment.SearchFragment;
 import com.example.albumgallery.view.listeners.BackgroundProcessingCallback;
 import com.example.albumgallery.view.listeners.FragToActivityListener;
 import com.example.albumgallery.view.listeners.ImageAdapterListener;
@@ -47,7 +48,7 @@ public class MainFragmentController extends AppCompatActivity implements Backgro
     private static final int CAMERA_REQUEST_CODE = 1000;
     ActivityFragmentControllerBinding binding;
     private boolean isBackgroundTaskCompleted = true;
-    private ArrayList<Fragment> fragments = new ArrayList<>(Arrays.asList(new HomeScreenFragment(), new AlbumsMainFragment(), new FavoriteFragment(), new BinFragment()));
+    private ArrayList<Fragment> fragments = new ArrayList<>(Arrays.asList(new HomeScreenFragment(), new AlbumsMainFragment(), new FavoriteFragment(), new BinFragment(), new SearchFragment()));
     private Fragment currentFragment;
 
     @Override
@@ -71,6 +72,9 @@ public class MainFragmentController extends AppCompatActivity implements Backgro
         } else if (fragmentToLoad != null && fragmentToLoad.equals("Bin")) {
             replaceFragment(fragments.get(3));
         }
+        else if (fragmentToLoad != null && fragmentToLoad.equals("Search")) {
+            replaceFragment(fragments.get(4));
+        }
 
         binding.bottomNavigationView.setOnItemSelectedListener(item -> {
             int itemId = item.getItemId();
@@ -82,6 +86,9 @@ public class MainFragmentController extends AppCompatActivity implements Backgro
                 replaceFragment(fragments.get(2));
             } else if (itemId == R.id.bin) {
                 replaceFragment(fragments.get(3));
+            }
+            else if (itemId == R.id.search) {
+                replaceFragment(fragments.get(4));
             }
             return true;
         });
@@ -139,6 +146,10 @@ public class MainFragmentController extends AppCompatActivity implements Backgro
             if (isBackgroundTaskCompleted)
                 ((BinFragment) currentFragment).updateUI();
         }
+        else if (currentFragment instanceof SearchFragment) {
+            if (isBackgroundTaskCompleted)
+                ((SearchFragment) currentFragment).updateUI();
+        }
     }
 
     @Override
@@ -151,8 +162,15 @@ public class MainFragmentController extends AppCompatActivity implements Backgro
                 Log.d("Check data", "is not null");
             }
         }
-        HomeScreenFragment fragment = (HomeScreenFragment) getSupportFragmentManager().findFragmentById(R.id.fragment_container);
-        if (fragment != null) {
+//        HomeScreenFragment fragment = (HomeScreenFragment) getSupportFragmentManager().findFragmentById(R.id.fragment_container);
+//        if (fragment != null) {
+//            fragment.onActivityResult(requestCode, resultCode, data);
+//        }
+
+        Fragment fragment = getSupportFragmentManager().findFragmentById(R.id.fragment_container);
+        if (fragment instanceof HomeScreenFragment && fragment != null) {
+            fragment.onActivityResult(requestCode, resultCode, data);
+        } else {
             fragment.onActivityResult(requestCode, resultCode, data);
         }
     }
@@ -224,6 +242,12 @@ public class MainFragmentController extends AppCompatActivity implements Backgro
                 binFragment.handleDeletedImagePick(itemView, uri, position);
             }
         }
+        else if (currentFragment instanceof SearchFragment) {
+            SearchFragment searchFragment = (SearchFragment) getSupportFragmentManager().findFragmentById(R.id.fragment_container);
+            if (searchFragment != null) {
+                searchFragment.handleImagePick(itemView, uri, position);
+            }
+        }
     }
 
     @Override
@@ -242,6 +266,9 @@ public class MainFragmentController extends AppCompatActivity implements Backgro
         } else if (fragment instanceof BinFragment) {
             changeBottomMenu(((BinFragment) fragment).toggleMultipleChoice());
         }
+        else if (fragment instanceof SearchFragment) {
+            changeBottomMenu(((SearchFragment) fragment).toggleMultipleChoice());
+        }
     }
 
     private void changeBottomMenu(boolean isMultipleChoiceEnabled) {
@@ -259,6 +286,12 @@ public class MainFragmentController extends AppCompatActivity implements Backgro
                 findViewById(R.id.bottomMenuMain1).setVisibility(View.GONE);
                 findViewById(R.id.bottomMenuMain2).setVisibility(View.VISIBLE);
             }
+            else if (fragment instanceof SearchFragment) {
+                Log.v("MainFragmentController", "SearchFragment");
+                binding.bottomNavigationView.setVisibility(View.GONE);
+                findViewById(R.id.bottomMenuMain1).setVisibility(View.GONE);
+                findViewById(R.id.bottomMenuMain2).setVisibility(View.VISIBLE);
+            }
         } else {
             binding.bottomNavigationView.setVisibility(View.VISIBLE);
             findViewById(R.id.bottomMenuMain1).setVisibility(View.GONE);
@@ -267,11 +300,18 @@ public class MainFragmentController extends AppCompatActivity implements Backgro
     }
 
     public void shareAction(View view) {
-        HomeScreenFragment fragment = (HomeScreenFragment) getSupportFragmentManager().findFragmentById(R.id.fragment_container);
-        if (fragment != null && fragment.isAdded()) {
-            fragment.ActivityToFragListener("Share");
+//        HomeScreenFragment fragment = (HomeScreenFragment) getSupportFragmentManager().findFragmentById(R.id.fragment_container);
+//        if (fragment != null && fragment.isAdded()) {
+//            fragment.ActivityToFragListener("Share");
+//        } else {
+//            Log.e("MainFragmentController", "Fragment is null or not added");
+//        }
+
+        Fragment fragment = getSupportFragmentManager().findFragmentById(R.id.fragment_container);
+        if (fragment instanceof HomeScreenFragment && fragment.isAdded()) {
+            ((HomeScreenFragment) fragment).ActivityToFragListener("Share");
         } else {
-            Log.e("MainFragmentController", "Fragment is null or not added");
+            ((SearchFragment) fragment).ActivityToFragListener("Share");
         }
     }
 
@@ -279,20 +319,34 @@ public class MainFragmentController extends AppCompatActivity implements Backgro
     }
 
     public void likeAction(View view) {
-        HomeScreenFragment fragment = (HomeScreenFragment) getSupportFragmentManager().findFragmentById(R.id.fragment_container);
-        if (fragment != null && fragment.isAdded()) {
-            fragment.ActivityToFragListener("Like");
+//        HomeScreenFragment fragment = (HomeScreenFragment) getSupportFragmentManager().findFragmentById(R.id.fragment_container);
+//        if (fragment != null && fragment.isAdded()) {
+//            fragment.ActivityToFragListener("Like");
+//        } else {
+//            Log.e("MainFragmentController", "Fragment is null or not added");
+//        }
+
+        Fragment fragment = getSupportFragmentManager().findFragmentById(R.id.fragment_container);
+        if (fragment instanceof HomeScreenFragment && fragment.isAdded()) {
+            ((HomeScreenFragment) fragment).ActivityToFragListener("Like");
         } else {
-            Log.e("MainFragmentController", "Fragment is null or not added");
+            ((SearchFragment) fragment).ActivityToFragListener("Like");
         }
     }
 
     public void deleteAction(View view) {
+//        Fragment fragment = getSupportFragmentManager().findFragmentById(R.id.fragment_container);
+//        if (fragment instanceof HomeScreenFragment) {
+//            ((HomeScreenFragment) fragment).ActivityToFragListener("Delete");
+//        } else {
+//            ((BinFragment) fragment).ActivityToFragListener("Delete");
+//        }
+
         Fragment fragment = getSupportFragmentManager().findFragmentById(R.id.fragment_container);
-        if (fragment instanceof HomeScreenFragment) {
+        if (fragment instanceof HomeScreenFragment && fragment.isAdded()) {
             ((HomeScreenFragment) fragment).ActivityToFragListener("Delete");
         } else {
-            ((BinFragment) fragment).ActivityToFragListener("Delete");
+            ((SearchFragment) fragment).ActivityToFragListener("Delete");
         }
     }
 
