@@ -26,6 +26,7 @@
                     style="@style/AppButton"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:onClick="backAction"
                     app:icon="@drawable/back_black" />
 
             </LinearLayout>

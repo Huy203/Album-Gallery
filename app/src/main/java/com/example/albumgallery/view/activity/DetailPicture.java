@@ -15,6 +15,7 @@ import android.os.Handler;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
@@ -80,7 +81,7 @@ public class DetailPicture extends AppCompatActivity implements ImageInfoListene
 
     private void initializeViews() {
         mainController = new MainController(this);
-        imagePaths = mainController.getImageController().getAllImageURLsUndeleted();
+        imagePaths = mainController.getImageController().getAllImageURLsSortByDate();
         currentPosition = getIntent().getIntExtra("position", 0);
 
         imageView = findViewById(R.id.memeImageView);
@@ -153,7 +154,7 @@ public class DetailPicture extends AppCompatActivity implements ImageInfoListene
     private void showOptionsDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Options");
-        builder.setItems(new CharSequence[]{"Add to album", "Set as Wallpaper", "Start referencing", "Detail"}, new DialogInterface.OnClickListener() {
+        builder.setItems(new CharSequence[]{"Add to album", "Set as Wallpaper"}, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 // Xử lý khi người dùng chọn một tùy chọn
@@ -166,12 +167,6 @@ public class DetailPicture extends AppCompatActivity implements ImageInfoListene
                         // Xử lý khi người dùng chọn "Set as Wallpaper"
                         setAsWallpaper(imagePaths.get(currentPosition));
                         break;
-                    case 2:
-                        // Xử lý khi người dùng chọn "Start referencing"
-                        break;
-                    case 3:
-                        // Xử lý khi người dùng chọn "Detail"
-                        break;
                 }
             }
         });
@@ -179,7 +174,7 @@ public class DetailPicture extends AppCompatActivity implements ImageInfoListene
     }
 
     protected void loadImage(int position) {
-        Glide.with(this).load(Uri.parse(imagePaths.get(position))).into(imageView);
+        Glide.with(this).load(Uri.parse(imageModel.getRef())).into(imageView);
     }
 
     private void loadImageInfo() {
@@ -250,12 +245,10 @@ public class DetailPicture extends AppCompatActivity implements ImageInfoListene
         builder.setPositiveButton("Delete", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                // Call deleteSelectedImage() method from ImageController
-                // mainController.getImageController().deleteSelectedImage(uri);
                 finish();
-                long id = mainController.getImageController().getIdByRef(uri);
-                isDeleted = mainController.getImageController().isDeleteImage(id);
-                toggleDeleteImage(id);
+                Log.v("DetailPicture", "Image deleted successfully");
+                isDeleted = mainController.getImageController().isDeleteImage(imageModel.getId());
+                toggleDeleteImage(imageModel.getId());
             }
         });
         builder.setNegativeButton("Cancel", null);
@@ -285,9 +278,9 @@ public class DetailPicture extends AppCompatActivity implements ImageInfoListene
                         if (selectedRadioBtn != null) {
                             String selectedAlbum = selectedRadioBtn.getText().toString();
                             long album_id = mainController.getAlbumController().getAlbumIdByName(selectedAlbum);
-                            long image_id = mainController.getImageController().getIdByRef(imagePaths.get(currentPosition));
-                            Log.d("add to album", Long.toString(album_id) + " " + Long.toString(image_id));
-                            mainController.getImageAlbumController().addImageAlbum((int) image_id, (int) album_id);
+                            String image_id = mainController.getImageController().getIdByRef(imagePaths.get(currentPosition));
+                            Log.d("add to album", Long.toString(album_id) + " " + image_id);
+                            mainController.getImageAlbumController().addImageAlbum(image_id, (int) album_id);
                         }
                     }
                 })
@@ -301,7 +294,8 @@ public class DetailPicture extends AppCompatActivity implements ImageInfoListene
     }
 
     private void update() {
-        long id = getIntent().getLongExtra("id", 0);
+        String id = getIntent().getStringExtra("id");
+        Log.v("DetailPicture", "id: " + id);
         imageModel = mainController.getImageController().getImageById(id);
     }
 
@@ -316,7 +310,7 @@ public class DetailPicture extends AppCompatActivity implements ImageInfoListene
 
     @Override
     public void onNoticePassed(String data) {
-        String where = "id = " + getIntent().getLongExtra("id", 0);
+        String where = "id = '" + getIntent().getStringExtra("id") + "'";
         mainController.getImageController().update("notice", data, where);
     }
 
@@ -350,37 +344,38 @@ public class DetailPicture extends AppCompatActivity implements ImageInfoListene
 
     public void editAction(View view) {
         Intent intent = new Intent(DetailPicture.this, EditImageActivity.class);
-        long id = mainController.getImageController().getIdByRef(imagePaths.get(currentPosition));
+        String id = getIntent().getStringExtra("id");
         intent.putExtra("id", id);
         startActivityForResult(intent, REQUEST_CODE_EDIT_IMAGE);
     }
 
     public void menuAction(View view) {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("Options");
-        builder.setItems(new CharSequence[]{"Add to album", "Set as Wallpaper", "Start referencing", "Detail"}, new DialogInterface.OnClickListener() {
+        View dialogView = getLayoutInflater().inflate(R.layout.custom_options_dialog, null);
+        builder.setView(dialogView);
+        AlertDialog optionsDialog = builder.create();
+
+        // Khởi tạo các button trong menu dialog
+        Button buttonAddToAlbum = dialogView.findViewById(R.id.buttonAddToAlbum);
+        Button buttonSetAsWallpaper = dialogView.findViewById(R.id.buttonSetAsWallpaper);
+
+        // Xử lý sự kiện khi click vào từng button
+        buttonAddToAlbum.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(DialogInterface dialog, int which) {
-                // Xử lý khi người dùng chọn một tùy chọn
-                switch (which) {
-                    case 0:
-                        // Xử lý khi người dùng chọn "Add to album"
-                        break;
-                    case 1:
-                        // Xử lý khi người dùng chọn "Set as Wallpaper"
-                        setAsWallpaper(imagePaths.get(currentPosition));
-                        break;
-                    case 2:
-                        // Xử lý khi người dùng chọn "Start referencing"
-                        break;
-                    case 3:
-                        // Xử lý khi người dùng chọn "Detail"
-                        break;
-                }
+            public void onClick(View v) {
+                addToAlbumBtnHandler();
+                optionsDialog.dismiss();
             }
         });
 
-        optionsDialog = builder.create();
+        buttonSetAsWallpaper.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                setAsWallpaper(imagePaths.get(currentPosition));
+                optionsDialog.dismiss();
+            }
+        });
+
         optionsDialog.show();
     }
 
@@ -406,7 +401,7 @@ public class DetailPicture extends AppCompatActivity implements ImageInfoListene
     }
 
     public void likeAction(View view) {
-        mainController.getImageController().toggleFavoriteImage(imageModel.getId());
+        mainController.getImageController().toggleFavoriteImage((imageModel.getId()));
         update();
         setIconTintButton((MaterialButton) view, imageModel.getIs_favourited());
     }
@@ -433,14 +428,14 @@ public class DetailPicture extends AppCompatActivity implements ImageInfoListene
         }
     }
 
-    private void toggleDeleteImage(long id) {
+    private void toggleDeleteImage(String id) {
         Log.d("update delete successfully 2", "ok");
         isDeleted = !isDeleted;
         mainController.getImageController().setDelete(id, isDeleted);
     }
 
     protected ImageModel getImageModel() {
-        long id = getIntent().getLongExtra("id", 0);
+        String id = getIntent().getStringExtra("id");
         Log.d("image content id", String.valueOf(id));
         return mainController.getImageController().getImageById(id);
     }

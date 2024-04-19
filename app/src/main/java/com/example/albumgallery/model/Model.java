@@ -8,4 +8,6 @@ public interface Model {
     void update();
 
     void select();
+
+    String getId();
 }

@@ -70,6 +70,8 @@ public class AlbumContentActivity extends AppCompatActivity implements ImageAdap
 
         AlbumInfo albumInfoFragment = new AlbumInfo();
         Button AlbumInfo = findViewById(R.id.AlbumInfo);
+        SlideShowActivity slideShowActivity = new SlideShowActivity();
+        Button SlideShow = findViewById(R.id.SlideShow);
         view = findViewById(R.id.albumInfo);
 
         album_id = (int) mainController.getAlbumController().getAlbumIdByName(albumName);
@@ -95,6 +97,13 @@ public class AlbumContentActivity extends AppCompatActivity implements ImageAdap
             toggleAlbumInfo();
         });
 
+        SlideShow.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startSlideShow();
+            }
+        });
+
         albumInfoFragment.setAlbumInfo(getAlbumModel());
 
         // Add ImageInfo fragment to activity
@@ -106,7 +115,7 @@ public class AlbumContentActivity extends AppCompatActivity implements ImageAdap
 
     public AlbumModel getAlbumModel() {
         Log.d("album content id", String.valueOf(album_id));
-        return mainController.getAlbumController().getAlbumById(album_id);
+        return mainController.getAlbumController().getAlbumById(String.valueOf(album_id));
     }
 
     private void handleInteractions() {
@@ -155,7 +164,7 @@ public class AlbumContentActivity extends AppCompatActivity implements ImageAdap
     public void handleImagePick(View itemView, String uri, int position) {
         Intent intent = new Intent(this, DetailPicture.class);
         ActivityOptionsCompat options = ActivityOptionsCompat.makeSceneTransitionAnimation(this, itemView, "image");
-        long id = mainController.getImageController().getIdByRef(uri);
+        String id = mainController.getImageController().getIdByRef(uri);
         intent.putExtra("id", id);
         intent.putExtra("position", position);
         Log.v("ImageAdapter", "Image selected: " + itemView);
@@ -289,5 +298,10 @@ public class AlbumContentActivity extends AppCompatActivity implements ImageAdap
     @Override
     public void onPointerCaptureChanged(boolean hasCapture) {
         super.onPointerCaptureChanged(hasCapture);
+    }
+    private void startSlideShow() {
+        Intent intent = new Intent(this, SlideShowActivity.class);
+        intent.putStringArrayListExtra("imageURIs", new ArrayList<>(imageURIs));
+        startActivity(intent);
     }
 }

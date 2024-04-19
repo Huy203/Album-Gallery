@@ -106,17 +106,6 @@
 
     </LinearLayout>
 
-    <TextView
-        android:id="@+id/imageLocation"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="10dp"
-        android:gravity="center"
-        android:onClick="addLocation"
-        android:padding="8dp"
-        android:text="@string/add_location"
-        android:textSize="20sp" />
-
 </LinearLayout>
 
 

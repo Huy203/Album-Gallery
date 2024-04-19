@@ -116,7 +116,7 @@ public class SelectImageActivity extends AppCompatActivity implements ImageAdapt
     public void handleImagePick(View itemView, String uri, int position) {
         Intent intent = new Intent(this, DetailPicture.class);
         ActivityOptionsCompat options = ActivityOptionsCompat.makeSceneTransitionAnimation(this, itemView, "image");
-        long id = mainController.getImageController().getIdByRef(uri);
+        String id = mainController.getImageController().getIdByRef(uri);
         intent.putExtra("id", id);
         intent.putExtra("position", position);
         Log.v("ImageAdapter", "Image selected: " + itemView);
@@ -143,6 +143,4 @@ public class SelectImageActivity extends AppCompatActivity implements ImageAdapt
     public void toggleMultipleChoice() {
 
     }
-
-    
 }

@@ -88,7 +88,7 @@ public class EditImageActivity extends AppCompatActivity {
             mImageView = findViewById(R.id.imageView);
             mImageView.setImageBitmap(croppedImage);
         } else {
-            long id = getIntent().getLongExtra("id", 0);
+            String id = getIntent().getStringExtra("id");
             String imageURL = mainController.getImageController().getImageById(id).getRef();
             Glide.with(this).load(Uri.parse(imageURL)).into(mImageView);
         }
@@ -103,7 +103,7 @@ public class EditImageActivity extends AppCompatActivity {
     }
 
     private void appBarAction() {
-        int[] buttonIds = {R.id.action_zoom_in, R.id.action_zoom_out, R.id.action_rotate, R.id.action_crop, R.id.action_back};
+        int[] buttonIds = {R.id.action_zoom_in, R.id.action_zoom_out, R.id.action_rotate, R.id.action_crop, R.id.action_beautify,  R.id.action_back};
 
         for (int buttonId : buttonIds) {
             Button button = findViewById(buttonId);
@@ -123,6 +123,8 @@ public class EditImageActivity extends AppCompatActivity {
                 } else if (buttonId == buttonIds[3]) {
                     startImageCropActivity();
                 } else if (buttonId == buttonIds[4]) {
+                    startImageBeautyActivity();
+                } else if (buttonId == buttonIds[5]) {
                     Intent intent = new Intent();
                     intent.putExtra("update", true);
                     setResult(RESULT_OK, intent);
@@ -175,7 +177,15 @@ public class EditImageActivity extends AppCompatActivity {
 
     private void startImageCropActivity() {
         Intent intent = new Intent(EditImageActivity.this, CropImageActivity.class);
-        long id = getIntent().getLongExtra("id", -1);
+        String id = getIntent().getStringExtra("id");
+        Log.v("EditImageActivity", "id: " + id);
+        intent.putExtra("id", id);
+        startActivityForResult(intent, 100);
+    }
+
+    private void startImageBeautyActivity() {
+        Intent intent = new Intent(EditImageActivity.this, BeautyImageActivity.class);
+        String id = getIntent().getStringExtra("id");
         intent.putExtra("id", id);
         startActivityForResult(intent, 100);
     }

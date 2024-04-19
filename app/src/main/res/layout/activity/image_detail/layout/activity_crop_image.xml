@@ -16,8 +16,10 @@
         android:id="@+id/cropImageView"
         android:layout_width="match_parent"
         android:layout_height="0dp"
+        android:layout_weight="1"
         app:layout_constraintBottom_toTopOf="@id/progressLayout"
-        app:layout_constraintTop_toBottomOf="@id/top_nav_crop" />
+        app:layout_constraintTop_toBottomOf="@id/top_nav_crop"
+        android:src="@drawable/meme"/>
 
     <FrameLayout
         android:id="@+id/progressLayout"
@@ -39,12 +41,14 @@
                 android:id="@+id/buttonSave"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:onClick="saveAction"
                 android:text="Save" />
 
             <Button
                 android:id="@+id/buttonCrop"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:onClick="cropAction"
                 android:text="Crop" />
 
             <Spinner
