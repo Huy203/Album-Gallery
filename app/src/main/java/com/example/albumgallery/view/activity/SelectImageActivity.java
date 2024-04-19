@@ -127,6 +127,12 @@ public class SelectImageActivity extends AppCompatActivity implements ImageAdapt
     public void getInteractedURIs(String uri) {
         if(!selectedImageURIs.contains(uri)) {
             selectedImageURIs.add(uri);
+            numberOfImagesSelected.setText(selectedImageURIs.size() + " images selected");
+            Log.d("justadded", uri );
+        } else {
+            selectedImageURIs.remove(uri);
+            numberOfImagesSelected.setText(selectedImageURIs.size() + " images selected");
+            Log.d("justremove", uri);
         }
 //        for(String u: selectedImageURIs) {
 //            Log.d("current uris", u);

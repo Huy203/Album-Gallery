@@ -174,6 +174,7 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> 
                 } else {
                     toggleSelection();
                     listener.toggleMultipleChoice();
+                    listener.getInteractedURIs(imageURL);
                 }
             });
 
@@ -181,9 +182,9 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> 
                 isMultipleChoice = true;
                 toggleSelection();
                 listener.toggleMultipleChoice();
+                listener.getInteractedURIs(imageURL);
                 return true;
             });
-            listener.getInteractedURIs(imageURL);
         }
 
         private void toggleSelection() {
