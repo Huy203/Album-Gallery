@@ -43,6 +43,10 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
+
+
 
 public class BeautyImageActivity extends AppCompatActivity {
     private MainController mainController;
@@ -55,9 +59,13 @@ public class BeautyImageActivity extends AppCompatActivity {
     private boolean isDrawingEnabled = false;
     private boolean isBrightnessActionClicked = false;
     private boolean isContrastActionClicked = false;
+    private boolean isWarmActionClicked = false;
+    private boolean isTonesActionClicked = false;
     Bitmap adjustedBitmap;
     SeekBar seekBarBrightness;
     SeekBar seekBarContrast;
+    SeekBar seekBarWarm;
+    SeekBar seekBarTones;
     @SuppressLint("ClickableViewAccessibility")
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -161,6 +169,41 @@ public class BeautyImageActivity extends AppCompatActivity {
             }
         });
 
+        seekBarWarm = findViewById(R.id.seekBarWarm);
+        seekBarWarm.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                updateWarm(progress);
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+                // Không cần thực hiện gì khi bắt đầu theo dõi
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+                // Không cần thực hiện gì khi kết thúc theo dõi
+            }
+        });
+
+        seekBarTones = findViewById(R.id.seekBarTones);
+        seekBarTones.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                updateTones(progress);
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+                // Không cần thực hiện gì khi bắt đầu theo dõi
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+                // Không cần thực hiện gì khi kết thúc theo dõi
+            }
+        });
     }
 
     @Override
@@ -169,40 +212,117 @@ public class BeautyImageActivity extends AppCompatActivity {
     }
 
     private void appBarAction() {
-        int[] buttonIds = {R.id.action_pen,R.id.action_brightness, R.id.action_contrast, R.id.action_filter, R.id.action_back};
+        int[] buttonIds = {R.id.action_pen,R.id.action_brightness, R.id.action_contrast, R.id.action_warm, R.id.action_tones, R.id.action_back};
 
         for (int buttonId : buttonIds) {
             Button button = findViewById(buttonId);
             button.setOnClickListener(v -> {
                 if (buttonId == buttonIds[0]) {
                     toggleDrawingMode();
+
                     isBrightnessActionClicked = false;
+                    isContrastActionClicked = false;
+                    isWarmActionClicked = false;
+                    isTonesActionClicked = false;
+
                     seekBarBrightness.setVisibility(View.GONE);
                     seekBarContrast.setVisibility(View.GONE);
+                    seekBarWarm.setVisibility(View.GONE);
+                    seekBarTones.setVisibility(View.GONE);
                 } else if (buttonId == buttonIds[1]) {
                     toggleBrightnessMode();
+
                     isDrawingEnabled = false;
+                    isContrastActionClicked = false;
+                    isWarmActionClicked = false;
+                    isTonesActionClicked = false;
+
                     seekBarContrast.setVisibility(View.GONE);
+                    seekBarWarm.setVisibility(View.GONE);
+                    seekBarTones.setVisibility(View.GONE);
                 } else if (buttonId == buttonIds[2]) {
                     toggleContrastMode();
+
                     isDrawingEnabled = false;
                     isBrightnessActionClicked = false;
+                    isWarmActionClicked = false;
+                    isTonesActionClicked = false;
+
                     seekBarBrightness.setVisibility(View.GONE);
+                    seekBarWarm.setVisibility(View.GONE);
+                    seekBarTones.setVisibility(View.GONE);
                 } else if (buttonId == buttonIds[3]) {
+                    toggleWarmMode();
+
                     isDrawingEnabled = false;
                     isBrightnessActionClicked = false;
+                    isContrastActionClicked=false;
+                    isTonesActionClicked = false;
+
                     seekBarBrightness.setVisibility(View.GONE);
                     seekBarContrast.setVisibility(View.GONE);
-                } else if (buttonId == buttonIds[4]) {
-                    Intent intent = new Intent();
-                    intent.putExtra("update", true);
-                    setResult(RESULT_OK, intent);
-                    finish();
+                    seekBarTones.setVisibility(View.GONE);
+                }else if (buttonId == buttonIds[4]) {
+                    toggleTonesMode();
+
+                    isDrawingEnabled = false;
+                    isBrightnessActionClicked = false;
+                    isContrastActionClicked=false;
+                    isWarmActionClicked = false;
+
+                    seekBarBrightness.setVisibility(View.GONE);
+                    seekBarContrast.setVisibility(View.GONE);
+                    seekBarWarm.setVisibility(View.GONE);
+                } else if (buttonId == buttonIds[5]) {
+//                    Intent intent = new Intent();
+//                    intent.putExtra("update", true);
+//                    setResult(RESULT_OK, intent);
+//                    finish();
+                    showSaveChangesDialog();
                 }
             });
         }
 
 
+    }
+    @Override
+    public void onBackPressed() {
+        showSaveChangesDialog();
+    }
+
+    private void showSaveChangesDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Save Changes");
+        builder.setMessage("Do you want to save changes before going back?");
+        builder.setPositiveButton("Save", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                // Save changes here
+                Intent intent = new Intent();
+                intent.putExtra("update", true);
+                intent.putExtra("adjustedBitmap", adjustedBitmap);
+                setResult(RESULT_OK, intent);
+                finish();
+            }
+        });
+        builder.setNegativeButton("Discard", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                // Discard changes and go back
+                Intent intent = new Intent();
+                intent.putExtra("update", true);
+                setResult(RESULT_OK, intent);
+                finish();
+            }
+        });
+        builder.setNeutralButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                // Do nothing, just dismiss the dialog
+                dialog.dismiss();
+            }
+        });
+        builder.show();
     }
     private void toggleDrawingMode() {
         isDrawingEnabled = !isDrawingEnabled;
@@ -231,10 +351,30 @@ public class BeautyImageActivity extends AppCompatActivity {
         isContrastActionClicked = !isContrastActionClicked;
         if (isContrastActionClicked) {
             seekBarContrast.setVisibility(View.VISIBLE);
-            Toast.makeText(this, "Brightness mode enabled", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Contrast mode enabled", Toast.LENGTH_SHORT).show();
         } else {
             seekBarContrast.setVisibility(View.GONE);
-            Toast.makeText(this, "Brightness mode disabled", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Contrast mode disabled", Toast.LENGTH_SHORT).show();
+        }
+    }
+    private void toggleWarmMode() {
+        isWarmActionClicked = !isWarmActionClicked;
+        if (isWarmActionClicked) {
+            seekBarWarm.setVisibility(View.VISIBLE);
+            Toast.makeText(this, "Warm mode enabled", Toast.LENGTH_SHORT).show();
+        } else {
+            seekBarWarm.setVisibility(View.GONE);
+            Toast.makeText(this, "Warm mode disabled", Toast.LENGTH_SHORT).show();
+        }
+    }
+    private void toggleTonesMode() {
+        isTonesActionClicked = !isTonesActionClicked;
+        if (isTonesActionClicked) {
+            seekBarTones.setVisibility(View.VISIBLE);
+            Toast.makeText(this, "Tones mode enabled", Toast.LENGTH_SHORT).show();
+        } else {
+            seekBarTones.setVisibility(View.GONE);
+            Toast.makeText(this, "Tones mode disabled", Toast.LENGTH_SHORT).show();
         }
     }
     private void touchStart(float x, float y) {
@@ -314,6 +454,74 @@ public class BeautyImageActivity extends AppCompatActivity {
         canvas.drawBitmap(mBitmap, 0, 0, paint);
 
         // Hiển thị Bitmap đã được điều chỉnh lên ImageView
+        mImageView.setImageBitmap(adjustedBitmap);
+    }
+    private void updateWarm(int progress) {
+        // Chuyển đổi giá trị progress từ khoảng [0, 100] thành mức độ warmth phù hợp
+        float warmthLevel = progress / 50f; // Điều chỉnh giá trị từ 0 đến 2
+
+        if (adjustedBitmap == null) {
+            adjustedBitmap = Bitmap.createBitmap(mBitmap.getWidth(), mBitmap.getHeight(), mBitmap.getConfig());
+        }
+        // Tạo một Canvas mới với Bitmap được điều chỉnh
+        Canvas canvas = new Canvas(adjustedBitmap);
+
+        // Tạo một Paint để vẽ lên Canvas
+        Paint paint = new Paint();
+
+        // Thiết lập sự thay đổi warmth thông qua ColorMatrix
+        ColorMatrix colorMatrix = new ColorMatrix();
+        colorMatrix.set(new float[] {
+                warmthLevel, 0, 0, 0, 0,
+                0, warmthLevel, 0, 0, 0,
+                0, 0, warmthLevel, 0, 0,
+                0, 0, 0, 1, 0
+        });
+
+        // Áp dụng sự thay đổi độ ẩm thông qua ColorMatrix
+        ColorMatrix saturationMatrix = new ColorMatrix();
+        saturationMatrix.setSaturation(1 - warmthLevel); // Giảm độ bão hòa (saturation) tương ứng với việc tăng độ ẩm
+
+        // Kết hợp hai ma trận màu lại với nhau
+        colorMatrix.postConcat(saturationMatrix);
+
+        ColorMatrixColorFilter colorMatrixFilter = new ColorMatrixColorFilter(colorMatrix);
+        paint.setColorFilter(colorMatrixFilter);
+
+        // Vẽ Bitmap gốc lên Canvas với Paint đã được điều chỉnh
+        canvas.drawBitmap(mBitmap, 0, 0, paint);
+
+        // Hiển thị Bitmap đã được điều chỉnh lên ImageView
+        mImageView.setImageBitmap(adjustedBitmap);
+    }
+
+    private void updateTones(int progress) {
+        // Convert the progress value from [0, 100] range to a suitable range for tone adjustment
+        float toneLevel = (progress - 50) / 50f; // Adjust the value from -1 to 1
+
+        if (adjustedBitmap == null) {
+            adjustedBitmap = Bitmap.createBitmap(mBitmap.getWidth(), mBitmap.getHeight(), mBitmap.getConfig());
+        }
+        // Create a new Canvas with the adjusted Bitmap
+        Canvas canvas = new Canvas(adjustedBitmap);
+
+        // Create a Paint to draw on the Canvas
+        Paint paint = new Paint();
+
+        // Set up the color matrix for adjusting color tones
+        ColorMatrix colorMatrix = new ColorMatrix();
+        // Apply adjustments to the hue and saturation channels
+        colorMatrix.setRotate(0, toneLevel * 180); // Rotate the hue channel
+        colorMatrix.setRotate(1, toneLevel * 180); // Rotate the saturation channel
+
+        // Apply the color matrix to a ColorMatrixColorFilter
+        ColorMatrixColorFilter colorMatrixFilter = new ColorMatrixColorFilter(colorMatrix);
+        paint.setColorFilter(colorMatrixFilter);
+
+        // Draw the original Bitmap onto the Canvas with the adjusted Paint
+        canvas.drawBitmap(mBitmap, 0, 0, paint);
+
+        // Display the adjusted Bitmap on the ImageView
         mImageView.setImageBitmap(adjustedBitmap);
     }
 
