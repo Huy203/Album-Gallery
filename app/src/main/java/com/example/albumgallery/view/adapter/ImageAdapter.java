@@ -35,7 +35,7 @@ import java.util.List;
 public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> {
     private final Context context;
     private List<ViewHolder> holderList; // List to store ViewHolders
-    private final List<String> imageURLs;  // List of image URLs
+    private List<String> imageURLs;  // List of image URLs
     private List<String> imageURLsFavourited; // List of favourited image URLs
     private final SparseBooleanArray selectedItems; // SparseBooleanArray to store selected items
     private boolean isMultipleChoice = false; // Flag to determine if multiple choice is enabled
@@ -143,8 +143,11 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> 
         listener.toggleMultipleChoice();
     }
 
+    public void setImageURIs(List<String> imageURIs) {
+        this.imageURLs = imageURIs;
+    }
+
     public class ViewHolder extends RecyclerView.ViewHolder {
-        private final FrameLayout constraintLayout;
         private final ImageView imageView;
         private final ImageView isLiked;
         private final CheckBox checkbox;
@@ -152,7 +155,6 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> 
 
         public ViewHolder(View itemView) {
             super(itemView);
-            constraintLayout = itemView.findViewById(R.id.imageLayout);
             imageView = itemView.findViewById(R.id.imageView);
             isLiked = itemView.findViewById(R.id.isLiked);
             checkbox = itemView.findViewById(R.id.checkbox);

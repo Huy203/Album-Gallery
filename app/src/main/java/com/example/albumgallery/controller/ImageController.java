@@ -241,11 +241,11 @@ public class ImageController implements Controller {
                         Uri uriImage = task1.getResult(); // The uri with the location of the file in firebase
                         Log.v("Image", "Image uploaded" + " " + uriImage + " " + idSelectedImages.get(uploadTasks.indexOf(task)));
                         this.update("ref", uriImage.toString(), "id = '" + idSelectedImages.get(uploadTasks.indexOf(task)) + "'");
-//                        if (allTasksCompleted(uploadTasks)) {
-                        activity.runOnUiThread(() -> {
-                            ((MainFragmentController) activity).onBackgroundTaskCompleted();
-                        });
-//                        }
+                        if (allTasksCompleted(uploadTasks)) {
+                            activity.runOnUiThread(() -> {
+                                ((MainFragmentController) activity).onBackgroundTaskCompleted();
+                            });
+                        }
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
@@ -332,6 +332,15 @@ public class ImageController implements Controller {
             Log.v("Image", "Image uploaded" + " " + imageRef.getDownloadUrl());
             return imageRef.getDownloadUrl();
         });
+    }
+
+    private boolean allTasksCompleted(List<Task<Uri>> tasks) {
+        for (Task<Uri> task : tasks) {
+            if (!task.isSuccessful()) {
+                return false;
+            }
+        }
+        return true;
     }
 
     private boolean allTasksCompletedGeneric(List<Task> tasks) {

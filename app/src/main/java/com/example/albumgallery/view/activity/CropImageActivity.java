@@ -1,26 +1,30 @@
 package com.example.albumgallery.view.activity;
 
 import static com.example.albumgallery.utils.Utilities.bitmapToByteArray;
+import static com.example.albumgallery.utils.Utilities.convertFromUriToBitmap;
 
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
 import android.widget.Spinner;
+import android.widget.Toast;
 
-import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.bumptech.glide.Glide;
-import com.bumptech.glide.request.target.SimpleTarget;
+import com.bumptech.glide.load.DataSource;
+import com.bumptech.glide.load.engine.GlideException;
+import com.bumptech.glide.request.RequestListener;
+import com.bumptech.glide.request.target.Target;
+import com.canhub.cropper.CropImageView;
 import com.example.albumgallery.R;
 import com.example.albumgallery.controller.MainController;
-import com.theartofdev.edmodo.cropper.CropImageView;
 
 public class CropImageActivity extends AppCompatActivity {
     private MainController mainController;
@@ -39,30 +43,26 @@ public class CropImageActivity extends AppCompatActivity {
         mainController = new MainController(this);
 
         String id = getIntent().getStringExtra("id");
-        Log.v("CropImageActivity", "Image ID: " + id);
         String imageURL = mainController.getImageController().getImageById(id).getRef();
-        try {
-            Glide.with(this)
-                    .asBitmap()
-                    .load(imageURL)
-                    .into(new SimpleTarget<Bitmap>() {
-                        @Override
-                        public void onResourceReady(@NonNull Bitmap resource, @Nullable com.bumptech.glide.request.transition.Transition<? super Bitmap> transition) {
-                            cropImageView.setImageBitmap(resource);
-                        }
-                    });
-        } catch (Exception e) {
-            Log.e("CropImageActivity", "Error loading image: " + e.getMessage());
-        }
+        Glide.with(this)
+                .asBitmap()
+                .load(Uri.parse(imageURL))
+                .addListener(new RequestListener<Bitmap>() {
+                    @Override
+                    public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Bitmap> target, boolean isFirstResource) {
+
+                        return false;
+                    }
+
+                    @Override
+                    public boolean onResourceReady(Bitmap resource, Object model, Target<Bitmap> target, DataSource dataSource, boolean isFirstResource) {
+                        cropImageView.setImageBitmap(resource);
+                        return false;
+                    }
+                })
+                .submit();
 
         setupAspectRatioSpinner();
-
-        Button buttonCrop = findViewById(R.id.buttonCrop);
-        buttonCrop.setOnClickListener(v -> {
-            hasChanges = true;
-            Bitmap croppedImage = cropImageView.getCroppedImage();
-            cropImageView.setImageBitmap(croppedImage);
-        });
     }
 
     private void setupAspectRatioSpinner() {
@@ -131,6 +131,10 @@ public class CropImageActivity extends AppCompatActivity {
         Intent intent = new Intent(this, EditImageActivity.class);
         intent.putExtra("imageByteArray", bitmapToByteArray(croppedImage));
         setResult(RESULT_OK, intent);
+        finish();
+    }
+
+    public void backAction(View view) {
         finish();
     }
 }
