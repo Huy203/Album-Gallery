@@ -84,7 +84,7 @@ public class FavoriteFragment extends Fragment {
         if (activity != null) {
             options = ActivityOptionsCompat.makeSceneTransitionAnimation(activity, view, "image");
         }
-        long id = mainController.getImageController().getIdByRef(uri);
+        String id = mainController.getImageController().getIdByRef(uri);
         intent.putExtra("id", id);
         intent.putExtra("position", position);
         Log.v("ImageAdapter", "Image selected: " + view);

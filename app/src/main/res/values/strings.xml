@@ -4,7 +4,7 @@
     <string name="title_activity_album">AlbumActivity</string>
     <string name="title_activity_album_activity.java">AlbumActivity.java</string>
 
-    <string name="log_in">Log In</string>
+    <string name="sign_in">Sign In</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="sign_up">Sign Up</string>
@@ -15,13 +15,13 @@
     <string name="select">Select</string>
     <string name="cancel">Cancel</string>
     <string name="create_album">Create Album</string>
-    <string name="fab_content_desc">create album</string>
+    <string name="fab_content_desc" translatable="false">create album</string>
     <string name="select_image">Select Image</string>
     <string name="confirm_create_album">Create Album</string>
     <string name="private_album">Private Album</string>
     <string name="favorite">Favorite</string>
     <string name="remove_password">Remove password</string>
-    <string name="album_name">Album Name</string>
+    <string name="album_name">Album name</string>
     <string name="add_notice">Add notes</string>
     <string name="add_location">Add location</string>
     <string name="add_tag">Add tag</string>
@@ -31,7 +31,7 @@
     <string name="edit_time">Edit</string>
     <string name="image_created_at">Feb 20th, 2021</string>
     <string name="albums">Albums</string>
-    <string name="number_of_selected_images">0 images selected</string>
+    <string name="number_of_selected_images"> images selected</string>
     <string name="image_name">Image Name</string>
     <string name="photos">Photos</string>
     <string name="search">Search</string>
@@ -40,7 +40,7 @@
     <string name="enable_notifications">Enable Notifications</string>
     <string name="dark_mode">Dark mode</string>
     <string name="save_settings">Save Settings</string>
-    <string name="album_gallery">Album Gallery</string>
+    <string name="album_gallery" translatable="false">Album Gallery</string>
     <string name="sign_out">Sign Out</string>
     <string name="or">OR</string>
     <string name="phone">Phone</string>
@@ -52,4 +52,11 @@
     <string name="appearance">Appearance</string>
     <string name="edit_profile">Edit Profile</string>
     <string name="name" />
+    <string name="save">Save</string>
+    <string name="en" translatable="false">en</string>
+    <string name="vi" translatable="false">vi</string>
+    <string name="square_grid">Square photo grid</string>
+    <string name="ratio_grid">Ratio photo grid</string>
+    <string name="full_screen_grid">Full screen</string>
+    <string name="crop">Crop</string>
 </resources>

@@ -34,7 +34,8 @@
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal">
+                android:orientation="horizontal"
+                android:gravity="center">
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/action_select"
@@ -56,16 +57,15 @@
                     android:onClick="cameraAction"
                     app:icon="@drawable/camera_black" />
 
-                <ImageButton
+                <com.google.android.material.imageview.ShapeableImageView
                     android:id="@+id/action_user"
-                    android:layout_width="50dp"
-                    android:layout_height="50dp"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
                     android:background="?attr/selectableItemBackgroundBorderless"
-                    android:importantForAccessibility="no"
+                    app:shapeAppearanceOverlay="@style/RoundedImageView"
+                    android:src="@drawable/blank_profile_picture"
                     android:onClick="userAction"
-                    android:scaleType="fitCenter"
-                    android:src="@drawable/logo"
-                    app:cornerRadius="4dp" />
+                    android:scaleType="centerCrop" />
 
             </LinearLayout>
 

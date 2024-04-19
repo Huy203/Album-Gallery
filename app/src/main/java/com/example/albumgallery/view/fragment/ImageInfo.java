@@ -45,11 +45,6 @@ public class ImageInfo extends Fragment {
         TextView capacity = view.findViewById(R.id.imageCapacity);
         TextView created_at = view.findViewById(R.id.imageCreatedAt);
         EditText notice = view.findViewById(R.id.imageNotice);
-        TextView addLocation = view.findViewById(R.id.imageLocation);
-
-        addLocation.setOnClickListener(v -> {
-            Log.v("ImageInfo", "Add location");
-        });
 
         notice.setOnEditorActionListener((v, actionId, event) -> {
             Log.v("ImageInfo", "Action ID: " + actionId);

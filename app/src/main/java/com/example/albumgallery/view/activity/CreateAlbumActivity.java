@@ -134,12 +134,11 @@ public class CreateAlbumActivity extends AppCompatActivity {
                     selectedImageURLs = getIntent().getStringArrayListExtra("selectedImageURIs");
                     List<String> ids = new ArrayList<>();
                     for(String uri: selectedImageURLs) {
-                        ids.add(Long.toString(mainController.getImageController().getIdByRef(uri)));
+                        ids.add(mainController.getImageController().getIdByRef(uri));
                     }
                     mainController.getAlbumController().updateThumbnailByAlbumName(albumName, selectedImageURLs.get(0));
                     for(String id: ids) {
-                        int id_image = Integer.parseInt(id);
-                        mainController.getImageAlbumController().addImageAlbum(id_image, id_album);
+                        mainController.getImageAlbumController().addImageAlbum(id, id_album);
                     }
                     // navigate to album main after adding album
                     Intent albumFrag = new Intent(CreateAlbumActivity.this, MainFragmentController.class);

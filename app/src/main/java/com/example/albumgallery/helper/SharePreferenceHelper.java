@@ -2,7 +2,6 @@ package com.example.albumgallery.helper;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.util.Log;
 
 public class SharePreferenceHelper {
     private static final String PREF_NAME = "MyAppPrefs";
@@ -23,13 +22,13 @@ public class SharePreferenceHelper {
         editor.apply();
     }
 
-    public static boolean isGridLayoutEnabled(Context context) {
-        return getSharedPreferences(context).getBoolean(GRID_LAYOUT_KEY, false);
+    public static String isGridLayoutEnabled(Context context) {
+        return getSharedPreferences(context).getString(GRID_LAYOUT_KEY, "default");
     }
 
-    public static void setGridLayoutEnabled(Context context, boolean enabled) {
+    public static void setGridLayoutEnabled(Context context, String enabled) {
         SharedPreferences.Editor editor = getSharedPreferences(context).edit();
-        editor.putBoolean(GRID_LAYOUT_KEY, enabled);
+        editor.putString(GRID_LAYOUT_KEY, enabled);
         editor.apply();
     }
 }

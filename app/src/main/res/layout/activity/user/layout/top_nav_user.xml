@@ -27,24 +27,9 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:onClick="backAction"
-                    app:icon="@drawable/back_black"/>
-
-
+                    app:icon="@drawable/back_black" />
             </LinearLayout>
 
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal">
-
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/action_menu"
-                    style="@style/AppButton"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:onClick="menuAction"
-                    app:icon="@drawable/menu_black" />
-            </LinearLayout>
 
         </com.google.android.flexbox.FlexboxLayout>
     </com.google.android.material.appbar.AppBarLayout>

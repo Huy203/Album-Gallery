@@ -1,0 +1,61 @@
+<resources>
+    <string name="app_name">Thư viện Ảnh</string>
+    <string name="test">Chuỗi thử nghiệm</string>
+    <string name="title_activity_album">Hoạt động Album</string>
+    <string name="title_activity_album_activity.java">AlbumActivity.java</string>
+
+    <string name="sign_in">Đăng nhập</string>
+    <string name="hello_blank_fragment">Xin chào khung trống</string>
+    <string name="sign_up">Đăng ký</string>
+    <string name="forgot_password">Quên mật khẩu?</string>
+    <string name="email">Email</string>
+    <string name="password">Mật khẩu</string>
+    <string name="confirm_password">Xác nhận mật khẩu</string>
+    <string name="select">Chọn</string>
+    <string name="cancel">Hủy</string>
+    <string name="create_album">Tạo Album</string>
+    <string name="fab_content_desc">tạo album</string>
+    <string name="select_image">Chọn Ảnh</string>
+    <string name="confirm_create_album">Tạo Album</string>
+    <string name="private_album">Album Riêng tư</string>
+    <string name="favorite">Yêu thích</string>
+    <string name="remove_password">Xóa mật khẩu</string>
+    <string name="album_name">Tên Album</string>
+    <string name="add_notice">Thêm ghi chú</string>
+    <string name="add_location">Thêm địa điểm</string>
+    <string name="add_tag">Thêm thẻ</string>
+    <string name="capacity">X MP</string>
+    <string name="point_divider">•</string>
+    <string name="image_size">chiều rộng x chiều cao</string>
+    <string name="edit_time">Chỉnh sửa</string>
+    <string name="image_created_at">20 Thg 2, 2021</string>
+    <string name="albums">Albums</string>
+    <string name="number_of_selected_images"> ảnh đã chọn</string>
+    <string name="image_name">Tên Ảnh</string>
+    <string name="photos">Ảnh</string>
+    <string name="search">Tìm kiếm</string>
+    <string name="favorites">Yêu thích</string>
+    <string name="settings">Cài đặt</string>
+    <string name="enable_notifications">Bật Thông báo</string>
+    <string name="dark_mode">Chế độ Tối</string>
+    <string name="save_settings">Lưu Cài đặt</string>
+    <string name="album_gallery">Thư viện Album</string>
+    <string name="sign_out">Đăng xuất</string>
+    <string name="or">HOẶC</string>
+    <string name="phone">Điện thoại</string>
+    <string name="user_name">Tên người dùng</string>
+    <string name="email_or_username">Email hoặc Tên người dùng</string>
+    <string name="account_infomation">Thông tin Tài khoản</string>
+    <string name="date_of_birth">Ngày sinh</string>
+    <string name="language">Ngôn ngữ</string>
+    <string name="appearance">Giao diện</string>
+    <string name="edit_profile">Chỉnh sửa Hồ sơ</string>
+    <string name="name">Tên</string>
+    <string name="save">Lưu</string>
+    <string name="en" translatable="false">en</string>
+    <string name="vi" translatable="false">vi</string>
+    <string name="square_grid">Lưới ảnh vuông</string>
+    <string name="ratio_grid">Lưới ảnh theo tỉ lệ</string>
+    <string name="full_screen_grid">Toàn màn hình</string>
+
+</resources>

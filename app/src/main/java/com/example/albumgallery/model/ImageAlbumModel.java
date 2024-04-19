@@ -4,14 +4,13 @@ import android.content.Context;
 import android.util.Log;
 
 import com.example.albumgallery.helper.DatabaseHelper;
-import com.example.albumgallery.model.Model;
 
 public class ImageAlbumModel implements Model {
-    long image_id;
+    String image_id;
     long album_id;
     DatabaseHelper dbHelper;
 
-    public long getImage_id() {
+    public String getImage_id() {
         return image_id;
     }
 
@@ -22,7 +21,8 @@ public class ImageAlbumModel implements Model {
     public DatabaseHelper getDbHelper() {
         return dbHelper;
     }
-    public void setImage_id(long image_id) {
+
+    public void setImage_id(String image_id) {
         this.image_id = image_id;
     }
 
@@ -37,10 +37,12 @@ public class ImageAlbumModel implements Model {
     public ImageAlbumModel(Context context) {
         dbHelper = new DatabaseHelper(context);
     }
-    public ImageAlbumModel(long image_id, long album_id){
+
+    public ImageAlbumModel(String image_id, long album_id) {
         this.image_id = image_id;
         this.album_id = album_id;
     }
+
     @Override
     public String insert() {
         String query = "INSERT INTO Image_Album (image_id, album_id) VALUES (" + image_id + ", " + album_id + ")";
@@ -61,5 +63,10 @@ public class ImageAlbumModel implements Model {
     @Override
     public void select() {
 
+    }
+
+    @Override
+    public String getId() {
+        return ";";
     }
 }

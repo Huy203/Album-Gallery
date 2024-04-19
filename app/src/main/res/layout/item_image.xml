@@ -7,25 +7,25 @@
     android:layout_margin="2dp">
 
     <FrameLayout
-        android:id="@+id/frameLayout"
+        android:id="@+id/imageLayout"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
         <androidx.constraintlayout.widget.ConstraintLayout
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content">
 
             <ImageView
                 android:id="@+id/imageView"
-                android:layout_width="100dp"
-                android:layout_height="100dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 android:scaleType="centerCrop"
                 android:src="@drawable/ic_launcher_foreground"
                 android:transitionName="image"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
                 tools:ignore="ContentDescription" />
 
             <com.google.android.material.checkbox.MaterialCheckBox

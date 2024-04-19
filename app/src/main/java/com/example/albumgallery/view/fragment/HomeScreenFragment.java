@@ -13,17 +13,21 @@ import android.provider.MediaStore;
 import android.util.Log;
 import android.util.SparseBooleanArray;
 import android.view.LayoutInflater;
+import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.PopupMenu;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.widget.SearchView;
 import androidx.core.app.ActivityOptionsCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.albumgallery.R;
@@ -49,6 +53,8 @@ public class HomeScreenFragment extends Fragment {
     private MainController mainController; //controller contains other controllers
     List<String> selectedImageURLs;
     List<Task> selectedImageURLsTask;
+    private View view;
+    private SearchView searchView;
     private FragToActivityListener fragToActivityListener;
     private boolean isSelectAll = false;
 
@@ -88,11 +94,55 @@ public class HomeScreenFragment extends Fragment {
         selectedImageURLsTask = new ArrayList<>();
         imageAdapter = new ImageAdapter(getActivity(), imageURIs);
         recyclerMediaView = view.findViewById(R.id.recyclerMediaView);
+        this.view = view;
 
         MaterialButton changeGridViewBtn = view.findViewById(R.id.changeGridViewBtn);
-        changeGridViewBtn.setOnClickListener(this::changeGridView);
+        MaterialButton unChooseBtn = view.findViewById(R.id.unChooseBtn);
         MaterialButton tickBtn = view.findViewById(R.id.tickBtn);
-        tickBtn.setOnClickListener(this::choiceAll);
+
+        changeGridViewBtn.setOnClickListener(this::changeViewAction);
+        tickBtn.setOnClickListener(view1 -> {
+            choiceAll(view);
+            if (imageAdapter.getMultipleChoiceEnabled()) {
+                unChooseBtn.setVisibility(View.VISIBLE);
+            } else {
+                unChooseBtn.setVisibility(View.GONE);
+            }
+        });
+        unChooseBtn.setOnClickListener(view1 -> {
+            choiceAll(view);
+            unChooseBtn.setVisibility(View.GONE);
+        });
+
+    }
+
+    private void changeViewAction(View view) {
+        PopupMenu popupMenu = new PopupMenu(getActivity(), view);
+        popupMenu.getMenu().add(Menu.NONE, 0, 0, getResources().getString(R.string.square_grid));
+        popupMenu.getMenu().add(Menu.NONE, 1, 1, getResources().getString(R.string.ratio_grid));
+        popupMenu.getMenu().add(Menu.NONE, 2, 2, getResources().getString(R.string.full_screen_grid));
+        popupMenu.setOnMenuItemClickListener(item -> {
+            switch (item.getItemId()) {
+                case 0:
+                    // default grid view
+                    SharePreferenceHelper.setGridLayoutEnabled(requireContext(), "default");
+                    updateUI();
+                    return true;
+                case 1:
+                    // ratio grid view
+                    SharePreferenceHelper.setGridLayoutEnabled(requireContext(), "ratio");
+                    updateUI();
+                    return true;
+                case 2:
+                    // full screen grid view
+                    SharePreferenceHelper.setGridLayoutEnabled(requireContext(), "full");
+                    updateUI();
+                    return true;
+                default:
+                    return false;
+            }
+        });
+        popupMenu.show();
     }
 
     private void choiceAll(View view) {
@@ -100,36 +150,51 @@ public class HomeScreenFragment extends Fragment {
         MaterialButton tickBtn = view.findViewById(R.id.tickBtn);
         SparseBooleanArray selectedItems = new SparseBooleanArray();
         if (isSelectAll) {
-            imageAdapter.setMultipleChoiceEnabled(isSelectAll);
             tickBtn.setIconTint(ColorStateList.valueOf(getResources().getColor(R.color.white)));
             tickBtn.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(R.color.blue_200)));
             for (int i = 0; i < imageURIs.size(); i++) {
                 selectedItems.put(i, true);
             }
         } else {
-            if (SharePreferenceHelper.isDarkModeEnabled(requireContext())) {
-                tickBtn.setIconTint(ColorStateList.valueOf(getResources().getColor(R.color.white)));
-                tickBtn.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(R.color.none)));
-            } else {
-                tickBtn.setIconTint(ColorStateList.valueOf(getResources().getColor(R.color.black)));
-                tickBtn.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(R.color.none)));
-            }
-
+            changeColorChoiceAll(tickBtn);
         }
         imageAdapter.setMultipleChoiceEnabled(isSelectAll);
         imageAdapter.setSelectedItems(selectedItems);
         fragToActivityListener.onFragmentAction("SelectAll", true);
-        imageAdapter.notifyDataSetChanged();
+        imageAdapter.notifyItemRangeChanged(0, imageURIs.size());
+    }
+
+    private void changeColorChoiceAll(MaterialButton tickBtn) {
+        if (SharePreferenceHelper.isDarkModeEnabled(requireContext())) {
+            tickBtn.setIconTint(ColorStateList.valueOf(getResources().getColor(R.color.white)));
+            tickBtn.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(R.color.none)));
+        } else {
+            tickBtn.setIconTint(ColorStateList.valueOf(getResources().getColor(R.color.black)));
+            tickBtn.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(R.color.none)));
+        }
     }
 
     public boolean toggleMultipleChoice() {
         int length = imageAdapter.getSelectedItems().size(); // get the number of selected items
         fragToActivityListener.onFragmentAction("ShowMultipleChoice", length);
 
+        MaterialButton unChooseBtn = view.findViewById(R.id.unChooseBtn);
+        MaterialButton tickBtn = view.findViewById(R.id.tickBtn);
+        if (imageAdapter.getMultipleChoiceEnabled()) {
+            unChooseBtn.setVisibility(View.VISIBLE);
+            isSelectAll = true;
+        }
         // if no items are selected, clear the selected items and return false
         if (length == 0) {
             Log.v("HomeScreenFragment", "No items selected");
             imageAdapter.clearSelectedItems();
+            unChooseBtn.setVisibility(View.GONE);
+            changeColorChoiceAll(tickBtn);
+            isSelectAll = false;
+
+            if (mainController.getImageController().getAllImageURLsUndeleted().size() < imageURIs.size()) {
+                updateUI();
+            }
             return false;
         }
         return true;
@@ -173,7 +238,6 @@ public class HomeScreenFragment extends Fragment {
             if (isUpdate) {
                 updateUI();
             }
-
         } else {
             mainController.getImageController().onActivityResult(requestCode, resultCode, data);
         }
@@ -181,16 +245,40 @@ public class HomeScreenFragment extends Fragment {
 
     public void updateUI() {
         Log.v("HomeScreenFragment", "updateUI");
-        imageURIs.clear();
-        // lấy ảnh sort theo date (mới nhất xếp trước).
-        imageURIs.addAll(mainController.getImageController().getAllImageURLsSortByDate());
+        List<String> allImage = mainController.getImageController().getAllImageURLsUndeleted();
         List<String> imageURLsFavourited = mainController.getImageController().getAllImageURLsFavourited();
-        //imageURIs.addAll(mainController.getImageController().getAllImageURLsUndeleted());
 
-        imageAdapter = new ImageAdapter(getActivity(), imageURIs);
+        if (allImage.size() > imageURIs.size()) {
+            for (int i = 0; i < allImage.size(); i++) {
+                if (!imageURIs.contains(allImage.get(i))) {
+                    imageURIs.add(allImage.get(i));
+                    imageAdapter.setImageURIs(imageURIs);
+                    imageAdapter.notifyItemInserted(i);
+                }
+            }
+        } else if (allImage.size() < imageURIs.size()){
+            for (int i = 0; i < imageURIs.size(); i++) {
+                if (!allImage.contains(imageURIs.get(i))) {
+                    imageURIs.remove(i);
+                    imageAdapter.setImageURIs(imageURIs);
+                    imageAdapter.notifyItemRemoved(i);
+                }
+            }
+        }
+
+//        imageURIs.clear();
+//        // lấy ảnh sort theo date (mới nhất xếp trước).
+////        imageURIs.addAll(mainController.getImageController().getAllImageURLsSortByDate());
+//        imageURIs.addAll();
+//
+//        imageAdapter = new ImageAdapter(getActivity(), imageURIs);
         imageAdapter.setImageURLsFavourite(imageURLsFavourited);
         // Switch to list display
-        recyclerMediaView.setLayoutManager(new GridLayoutManager(getContext(), 4));
+        if (SharePreferenceHelper.isGridLayoutEnabled(getActivity()).equals("full")) {
+            recyclerMediaView.setLayoutManager(new LinearLayoutManager(getContext()));
+        } else {
+            recyclerMediaView.setLayoutManager(new GridLayoutManager(getContext(), 4));
+        }
         recyclerMediaView.setAdapter(imageAdapter);
         imageAdapter.notifyDataSetChanged();
     }
@@ -208,8 +296,10 @@ public class HomeScreenFragment extends Fragment {
 
                     builder.setPositiveButton("Delete", (dialog, which) -> {
                         for (String uri : imageAdapter.getSelectedImageURLs()) {
-                            long id = mainController.getImageController().getIdByRef(uri);
-                            mainController.getImageController().setDelete(id, true);
+                            String id = mainController.getImageController().getIdByRef(uri);
+                            if (id != null) {
+                                mainController.getImageController().setDelete(id, true);
+                            }
                         }
                         imageAdapter.clearSelectedItems();
                         onResume();
@@ -235,7 +325,7 @@ public class HomeScreenFragment extends Fragment {
         }
         if (imageURIs.contains(uri)) {
             Log.v("HomeScreenFragment", "Image selected: " + uri);
-            long id = mainController.getImageController().getIdByRef(uri);
+            String id = mainController.getImageController().getIdByRef(uri);
             intent.putExtra("id", id);
             intent.putExtra("position", position);
             if (options != null) {
@@ -251,11 +341,6 @@ public class HomeScreenFragment extends Fragment {
         if (intent.resolveActivity(getActivity().getPackageManager()) != null) {
             startActivityForResult(intent, CAMERA_REQUEST_CODE);
         }
-    }
-
-    public void changeGridView(View view) {
-        SharePreferenceHelper.setGridLayoutEnabled(requireContext(), !SharePreferenceHelper.isGridLayoutEnabled(requireContext()));
-        imageAdapter.notifyDataSetChanged();
     }
 
     @Override
@@ -297,7 +382,7 @@ public class HomeScreenFragment extends Fragment {
                 break;
             case "Like":
                 for (String url : imageAdapter.getSelectedImageURLs()) {
-                    long id = mainController.getImageController().getIdByRef(url);
+                    String id = mainController.getImageController().getIdByRef(url);
                     mainController.getImageController().toggleFavoriteImage(id);
                 }
                 imageAdapter.clearSelectedItems();
@@ -307,5 +392,14 @@ public class HomeScreenFragment extends Fragment {
             case "Add":
                 break;
         }
+    }
+
+    public void searchImages(String query) {
+        imageURIs.clear();
+        imageURIs.addAll(mainController.getImageController().selectImagesByNotice(query));
+        imageAdapter = new ImageAdapter(getActivity(), imageURIs);
+        recyclerMediaView.setLayoutManager(new GridLayoutManager(getContext(), 3));
+        recyclerMediaView.setAdapter(imageAdapter);
+        imageAdapter.notifyDataSetChanged();
     }
 }

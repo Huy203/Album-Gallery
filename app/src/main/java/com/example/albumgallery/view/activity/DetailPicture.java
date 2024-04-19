@@ -174,7 +174,7 @@ public class DetailPicture extends AppCompatActivity implements ImageInfoListene
     }
 
     protected void loadImage(int position) {
-        Glide.with(this).load(Uri.parse(imagePaths.get(position))).into(imageView);
+        Glide.with(this).load(Uri.parse(imageModel.getRef())).into(imageView);
     }
 
     private void loadImageInfo() {
@@ -245,12 +245,10 @@ public class DetailPicture extends AppCompatActivity implements ImageInfoListene
         builder.setPositiveButton("Delete", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                // Call deleteSelectedImage() method from ImageController
-                // mainController.getImageController().deleteSelectedImage(uri);
                 finish();
-                long id = mainController.getImageController().getIdByRef(uri);
-                isDeleted = mainController.getImageController().isDeleteImage(id);
-                toggleDeleteImage(id);
+                Log.v("DetailPicture", "Image deleted successfully");
+                isDeleted = mainController.getImageController().isDeleteImage(imageModel.getId());
+                toggleDeleteImage(imageModel.getId());
             }
         });
         builder.setNegativeButton("Cancel", null);
@@ -280,9 +278,9 @@ public class DetailPicture extends AppCompatActivity implements ImageInfoListene
                         if (selectedRadioBtn != null) {
                             String selectedAlbum = selectedRadioBtn.getText().toString();
                             long album_id = mainController.getAlbumController().getAlbumIdByName(selectedAlbum);
-                            long image_id = mainController.getImageController().getIdByRef(imagePaths.get(currentPosition));
-                            Log.d("add to album", Long.toString(album_id) + " " + Long.toString(image_id));
-                            mainController.getImageAlbumController().addImageAlbum((int) image_id, (int) album_id);
+                            String image_id = mainController.getImageController().getIdByRef(imagePaths.get(currentPosition));
+                            Log.d("add to album", Long.toString(album_id) + " " + image_id);
+                            mainController.getImageAlbumController().addImageAlbum(image_id, (int) album_id);
                         }
                     }
                 })
@@ -296,7 +294,8 @@ public class DetailPicture extends AppCompatActivity implements ImageInfoListene
     }
 
     private void update() {
-        long id = getIntent().getLongExtra("id", 0);
+        String id = getIntent().getStringExtra("id");
+        Log.v("DetailPicture", "id: " + id);
         imageModel = mainController.getImageController().getImageById(id);
     }
 
@@ -311,7 +310,7 @@ public class DetailPicture extends AppCompatActivity implements ImageInfoListene
 
     @Override
     public void onNoticePassed(String data) {
-        String where = "id = " + getIntent().getLongExtra("id", 0);
+        String where = "id = '" + getIntent().getStringExtra("id") + "'";
         mainController.getImageController().update("notice", data, where);
     }
 
@@ -345,7 +344,7 @@ public class DetailPicture extends AppCompatActivity implements ImageInfoListene
 
     public void editAction(View view) {
         Intent intent = new Intent(DetailPicture.this, EditImageActivity.class);
-        long id = mainController.getImageController().getIdByRef(imagePaths.get(currentPosition));
+        String id = getIntent().getStringExtra("id");
         intent.putExtra("id", id);
         startActivityForResult(intent, REQUEST_CODE_EDIT_IMAGE);
     }
@@ -402,7 +401,7 @@ public class DetailPicture extends AppCompatActivity implements ImageInfoListene
     }
 
     public void likeAction(View view) {
-        mainController.getImageController().toggleFavoriteImage(imageModel.getId());
+        mainController.getImageController().toggleFavoriteImage((imageModel.getId()));
         update();
         setIconTintButton((MaterialButton) view, imageModel.getIs_favourited());
     }
@@ -429,14 +428,14 @@ public class DetailPicture extends AppCompatActivity implements ImageInfoListene
         }
     }
 
-    private void toggleDeleteImage(long id) {
+    private void toggleDeleteImage(String id) {
         Log.d("update delete successfully 2", "ok");
         isDeleted = !isDeleted;
         mainController.getImageController().setDelete(id, isDeleted);
     }
 
     protected ImageModel getImageModel() {
-        long id = getIntent().getLongExtra("id", 0);
+        String id = getIntent().getStringExtra("id");
         Log.d("image content id", String.valueOf(id));
         return mainController.getImageController().getImageById(id);
     }

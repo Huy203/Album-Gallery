@@ -4,12 +4,15 @@ import android.app.Activity;
 import android.content.Context;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.util.SparseBooleanArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.CheckBox;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 
 import androidx.annotation.NonNull;
@@ -31,7 +34,8 @@ import java.util.List;
 
 public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> {
     private final Context context;
-    private final List<String> imageURLs;  // List of image URLs
+    private List<ViewHolder> holderList; // List to store ViewHolders
+    private List<String> imageURLs;  // List of image URLs
     private List<String> imageURLsFavourited; // List of favourited image URLs
     private final SparseBooleanArray selectedItems; // SparseBooleanArray to store selected items
     private boolean isMultipleChoice = false; // Flag to determine if multiple choice is enabled
@@ -42,7 +46,8 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> 
         this.imageURLs = imageURLs;
         this.selectedItems = new SparseBooleanArray();
         this.listener = (ImageAdapterListener) activity;
-        this.imageURLsFavourited =new ArrayList<>();
+        this.imageURLsFavourited = new ArrayList<>();
+        this.holderList = new ArrayList<>();
     }
 
     public void setImageURLsFavourite(List<String> imageURLsFavourited) {
@@ -62,6 +67,7 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> 
         holder.bind(imageURL);
         holder.isLiked.setVisibility(imageURLsFavourited.contains(imageURL) ? View.VISIBLE : View.GONE);
         holder.checkbox.setVisibility(isMultipleChoice ? View.VISIBLE : View.GONE); // Update visibility based on isMultipleChoice
+        holderList.add(holder);
     }
 
     @Override
@@ -89,6 +95,7 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> 
             this.selectedItems.put(key, selectedItems.get(key));
         }
     }
+
     public SparseBooleanArray getSelectedItems() {
         return selectedItems;
     }
@@ -123,8 +130,24 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> 
         isMultipleChoice = false;
     }
 
-    public class ViewHolder extends RecyclerView.ViewHolder {
+    public void setSizeImage(int width, int height) {
+        for (ViewHolder holder : holderList) {
+            holder.setImageSize(width, height);
+        }
+    }
 
+    public void toggleAll() {
+        for (ViewHolder holder : holderList) {
+            holder.toggleSelection();
+        }
+        listener.toggleMultipleChoice();
+    }
+
+    public void setImageURIs(List<String> imageURIs) {
+        this.imageURLs = imageURIs;
+    }
+
+    public class ViewHolder extends RecyclerView.ViewHolder {
         private final ImageView imageView;
         private final ImageView isLiked;
         private final CheckBox checkbox;
@@ -142,19 +165,24 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> 
         public void bind(String imageURL) {
             showImage(imageURL);
 
-            checkbox.setOnClickListener(view -> toggleSelection());
+            checkbox.setOnClickListener(view -> {
+                toggleSelection();
+                listener.toggleMultipleChoice();
+            });
 
             itemView.setOnClickListener(view -> {
                 if (!isMultipleChoice) {
                     listener.handleImagePick(imageView, imageURL, getAdapterPosition());
                 } else {
                     toggleSelection();
+                    listener.toggleMultipleChoice();
                 }
             });
 
             itemView.setOnLongClickListener(view -> {
                 isMultipleChoice = true;
                 toggleSelection();
+                listener.toggleMultipleChoice();
                 return true;
             });
             listener.getInteractedURIs(imageURL);
@@ -171,11 +199,10 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> 
                 checkbox.setVisibility(View.VISIBLE);
                 getSelectedItems().put(position, true);
             }
-            listener.toggleMultipleChoice();
         }
 
         private void showImage(String imageURL) {
-            if (SharePreferenceHelper.isGridLayoutEnabled(context)) {
+            if (SharePreferenceHelper.isGridLayoutEnabled(context).equals("ratio") || SharePreferenceHelper.isGridLayoutEnabled(context).equals("full")) {
                 Glide.with(context)
                         .load(Uri.parse(imageURL))
                         .override(Target.SIZE_ORIGINAL)
@@ -191,6 +218,24 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> 
                                 progressIndicator.setVisibility(View.GONE);
                                 imageView.setScaleType(ImageView.ScaleType.FIT_CENTER);
                                 imageView.setAdjustViewBounds(true);
+                                if (SharePreferenceHelper.isGridLayoutEnabled(context).equals("full")) {
+                                    WindowManager windowManager = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
+                                    DisplayMetrics displayMetrics = new DisplayMetrics();
+                                    if (windowManager != null) {
+                                        windowManager.getDefaultDisplay().getMetrics(displayMetrics);
+                                        int width = displayMetrics.widthPixels;
+                                        ViewGroup.LayoutParams params = imageView.getLayoutParams();
+                                        params.height = ViewGroup.LayoutParams.WRAP_CONTENT;
+                                        params.width = width;
+                                        imageView.setLayoutParams(params);
+                                    }
+                                } else {
+                                    ViewGroup.LayoutParams params = imageView.getLayoutParams();
+                                    int pixelValue = (int) (100 * 2.5);
+                                    params.height = pixelValue;
+                                    params.width = pixelValue;
+                                    imageView.setLayoutParams(params);
+                                }
                                 return false;
                             }
                         })
@@ -208,13 +253,26 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> 
                             @Override
                             public boolean onResourceReady(@NonNull Drawable resource, @NonNull Object model, Target<Drawable> target, @NonNull DataSource dataSource, boolean isFirstResource) {
                                 progressIndicator.setVisibility(View.GONE);
+                                ViewGroup.LayoutParams params = imageView.getLayoutParams();
+                                int pixelValue = (int) (100 * 2.5);
+                                params.height = pixelValue;
+                                params.width = pixelValue;
+                                imageView.setLayoutParams(params);
                                 imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
                                 imageView.setAdjustViewBounds(false);
+
                                 return false;
                             }
                         })
                         .into(imageView);
             }
+        }
+
+        public void setImageSize(int width, int height) {
+            ViewGroup.LayoutParams params = imageView.getLayoutParams();
+            params.height = height;
+            params.width = width;
+            imageView.setLayoutParams(params);
         }
     }
 }
