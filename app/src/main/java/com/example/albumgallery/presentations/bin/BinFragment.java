@@ -130,24 +130,54 @@ public class BinFragment extends Fragment {
         }
     }
 
-    private void showDeleteConfirmationDialog() {
-        Log.d("size of image urls before delete", String.valueOf(selectedImageURLsTask.size()));
-        for (Task taskImageURL : selectedImageURLsTask) {
-            String imageURL = taskImageURL.getResult().toString();
-            Log.d("image url", imageURL);
-        }
-        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-        builder.setTitle("Confirm Deletion");
-        builder.setMessage("Are you sure you want to delete this image forever?");
-        builder.setPositiveButton("Delete", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                // Call deleteSelectedImage() method from ImageController
-                mainController.getImageController().deleteSelectedImageAtBin(selectedImageURLsTask);
+//    private void showDeleteConfirmationDialog() {
+//        Log.d("size of image urls before delete", String.valueOf(selectedImageURLsTask.size()));
+//        for (Task taskImageURL : selectedImageURLsTask) {
+//            String imageURL = taskImageURL.getResult().toString();
+//            Log.d("image url", imageURL);
+//        }
+//        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+//        builder.setTitle("Confirm Deletion");
+//        builder.setMessage("Are you sure you want to delete this image forever?");
+//        builder.setPositiveButton("Delete", new DialogInterface.OnClickListener() {
+//            @Override
+//            public void onClick(DialogInterface dialog, int which) {
+//                // Call deleteSelectedImage() method from ImageController
+//                mainController.getImageController().deleteSelectedImageAtBin(selectedImageURLsTask);
+//            }
+//        });
+//        builder.setNegativeButton("Cancel", null);
+//        builder.show();
+//    }
+
+    public void showDeleteConfirmationDialog() {
+        if (isAdded() && getActivity() != null) {
+            if (!getActivity().isFinishing()) {
+                getActivity().runOnUiThread(() -> {
+
+                    AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+                    Log.v("HomeScreenFragment", "showDeleteConfirmationDialog" + getActivity());
+
+                    builder.setTitle("Confirm Deletion");
+                    builder.setMessage("Are you sure you want to delete this image forever?");
+
+                    builder.setPositiveButton("Delete", (dialog, which) -> {
+                        selectedImageURLsTask = imageAdapter.getSelectedImageURLsTask();
+
+                        mainController.getImageController().deleteSelectedImageAtBin(selectedImageURLsTask);
+
+                        imageAdapter.clearSelectedItems();
+                        onResume();
+                        fragToActivityListener.onFragmentAction("Delete", true);
+                        updateUI();
+//                        this.mainController.getImageController().deleteSelectedImageAtHomeScreeen(selectedImageURLsTask);
+                    });
+
+                    builder.setNegativeButton("Cancel", null);
+                    builder.show();
+                });
             }
-        });
-        builder.setNegativeButton("Cancel", null);
-        builder.show();
+        }
     }
 
     @SuppressLint("SetTextI18n")
@@ -184,6 +214,7 @@ public class BinFragment extends Fragment {
         fragToActivityListener.onFragmentAction("ShowMultipleChoice", length);
 
         // if no items are selected, clear the selected items and return false
+        Log.v("BinFragment", "Length " + length);
         if (length == 0) {
             Log.v("HomeScreenFragment", "No items selected");
             imageAdapter.clearSelectedItems();

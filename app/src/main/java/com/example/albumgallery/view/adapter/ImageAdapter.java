@@ -27,6 +27,8 @@ import com.bumptech.glide.request.target.Target;
 import com.example.albumgallery.R;
 import com.example.albumgallery.helper.SharePreferenceHelper;
 import com.example.albumgallery.view.listeners.ImageAdapterListener;
+import com.google.android.gms.tasks.Task;
+import com.google.android.gms.tasks.Tasks;
 import com.google.android.material.progressindicator.CircularProgressIndicator;
 
 import java.util.ArrayList;
@@ -114,6 +116,23 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> 
         }
         return selectedImageURLs;
     }
+
+    public List<Task> getSelectedImageURLsTask() {
+        List<Task> selectedImageURLsTask = new ArrayList<>();
+        SparseBooleanArray selectedItems = getSelectedItems();
+        List<String> imageURLs = getImageURLs();
+
+        for (int i = 0; i < selectedItems.size(); i++) {
+            int key = selectedItems.keyAt(i);
+            if (selectedItems.get(key)) {
+                String imageURL = imageURLs.get(key);
+                Task<Uri> task = Tasks.forResult(Uri.parse(imageURL));
+                selectedImageURLsTask.add(task);
+            }
+        }
+        return selectedImageURLsTask;
+    }
+
 
     public boolean toggleMultipleChoiceImagesEnabled() {
         if (listener != null) {

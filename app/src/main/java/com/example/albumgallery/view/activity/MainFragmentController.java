@@ -189,17 +189,27 @@ public class MainFragmentController extends AppCompatActivity implements Backgro
     public void onBackgroundTaskCompleted() {
         isBackgroundTaskCompleted = true;
         Log.v("MainFragmentController", "Background task completed");
-        HomeScreenFragment fragment = (HomeScreenFragment) getSupportFragmentManager().findFragmentById(R.id.fragment_container);
+
+        // Find the fragment by its ID
+        Fragment fragment = getSupportFragmentManager().findFragmentById(R.id.fragment_container);
+
+        // Update UI if fragment is added
         if (fragment != null && fragment.isAdded()) {
-            Log.v("MainFragmentController", "Fragment: " + fragment);
-            fragment.updateUI();
+            // Check if the fragment is HomeScreenFragment
+            if (fragment instanceof HomeScreenFragment) {
+                Log.v("MainFragmentController", "HomeScreenFragment: " + fragment);
+                ((HomeScreenFragment) fragment).updateUI();
+            }
+            // Check if the fragment is BinFragment
+            else if (fragment instanceof BinFragment) {
+                Log.v("MainFragmentController", "BinFragment: " + fragment);
+                ((BinFragment) fragment).updateUI();
+            }
         }
-//        else if (currentFragment instanceof BinFragment) {
-//            BinFragment fragment = (BinFragment) currentFragment;
-//            fragment.updateUI();
-//        }
+
         isBackgroundTaskCompleted = false;
     }
+
 
 
 //    @Override
@@ -262,11 +272,14 @@ public class MainFragmentController extends AppCompatActivity implements Backgro
     public void toggleMultipleChoice() {
         Fragment fragment = getSupportFragmentManager().findFragmentById(R.id.fragment_container);
         if (fragment instanceof HomeScreenFragment) {
+            Log.d("Fragment homescreen", "ok");
             changeBottomMenu(((HomeScreenFragment) fragment).toggleMultipleChoice());
         } else if (fragment instanceof BinFragment) {
+            Log.d("Fragment bin", "ok");
             changeBottomMenu(((BinFragment) fragment).toggleMultipleChoice());
         }
         else if (fragment instanceof SearchFragment) {
+            Log.d("Fragment search", "ok");
             changeBottomMenu(((SearchFragment) fragment).toggleMultipleChoice());
         }
     }
@@ -310,8 +323,11 @@ public class MainFragmentController extends AppCompatActivity implements Backgro
         Fragment fragment = getSupportFragmentManager().findFragmentById(R.id.fragment_container);
         if (fragment instanceof HomeScreenFragment && fragment.isAdded()) {
             ((HomeScreenFragment) fragment).ActivityToFragListener("Share");
-        } else {
-            ((SearchFragment) fragment).ActivityToFragListener("Share");
+        } else if (fragment instanceof BinFragment && fragment.isAdded()) {
+            ((BinFragment) fragment).ActivityToFragListener("Delete");
+        }
+        else if (fragment instanceof SearchFragment && fragment.isAdded()) {
+            ((SearchFragment) fragment).ActivityToFragListener("Delete");
         }
     }
 
@@ -343,9 +359,12 @@ public class MainFragmentController extends AppCompatActivity implements Backgro
 //        }
 
         Fragment fragment = getSupportFragmentManager().findFragmentById(R.id.fragment_container);
-        if (fragment instanceof HomeScreenFragment && fragment.isAdded()) {
+        if (fragment instanceof HomeScreenFragment) {
             ((HomeScreenFragment) fragment).ActivityToFragListener("Delete");
-        } else {
+        } else if (fragment instanceof BinFragment) {
+            ((BinFragment) fragment).ActivityToFragListener("Delete");
+        }
+        else if (fragment instanceof SearchFragment) {
             ((SearchFragment) fragment).ActivityToFragListener("Delete");
         }
     }

@@ -331,7 +331,7 @@ public class SearchFragment extends Fragment {
         imageURIs.addAll(mainController.getImageController().selectImagesByNotice(query));
         Log.d("Size of image uris", String.valueOf(imageURIs.size()));
         imageAdapter = new ImageAdapter(getActivity(), imageURIs);
-        recyclerMediaView.setLayoutManager(new GridLayoutManager(getContext(), 3));
+        recyclerMediaView.setLayoutManager(new GridLayoutManager(getContext(), 4));
         recyclerMediaView.setAdapter(imageAdapter);
         imageAdapter.notifyDataSetChanged();
     }

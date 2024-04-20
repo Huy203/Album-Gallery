@@ -180,6 +180,7 @@ public class HomeScreenFragment extends Fragment {
             isSelectAll = true;
         }
         // if no items are selected, clear the selected items and return false
+        Log.v("HomeScreenFragment", "Length " + length);
         if (length == 0) {
             Log.v("HomeScreenFragment", "No items selected");
             imageAdapter.clearSelectedItems();
