@@ -81,7 +81,7 @@ public class DetailPicture extends AppCompatActivity implements ImageInfoListene
 
     private void initializeViews() {
         mainController = new MainController(this);
-        imagePaths = mainController.getImageController().getAllImageURLsSortByDate();
+        imagePaths = mainController.getImageController().getAllImageURLsUndeleted();
         currentPosition = getIntent().getIntExtra("position", 0);
 
         imageView = findViewById(R.id.memeImageView);
@@ -101,6 +101,9 @@ public class DetailPicture extends AppCompatActivity implements ImageInfoListene
                 if (currentPosition < imagePaths.size() - 1) {
                     currentPosition++;
                     loadImage(currentPosition);
+                } else {
+                    // Notify the user that this is the last image
+                    Toast.makeText(DetailPicture.this, "This is the last image", Toast.LENGTH_SHORT).show();
                 }
             }
 
@@ -109,6 +112,9 @@ public class DetailPicture extends AppCompatActivity implements ImageInfoListene
                 if (currentPosition > 0) {
                     currentPosition--;
                     loadImage(currentPosition);
+                } else {
+                    // Notify the user that this is the first image
+                    Toast.makeText(DetailPicture.this, "This is the first image", Toast.LENGTH_SHORT).show();
                 }
             }
         });
@@ -174,7 +180,7 @@ public class DetailPicture extends AppCompatActivity implements ImageInfoListene
     }
 
     protected void loadImage(int position) {
-        Glide.with(this).load(Uri.parse(imageModel.getRef())).into(imageView);
+        Glide.with(this).load(Uri.parse(imagePaths.get(position))).into(imageView);
     }
 
     private void loadImageInfo() {
