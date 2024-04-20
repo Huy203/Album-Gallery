@@ -11,6 +11,7 @@ import android.util.Log;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.UUID;
 
 public class AlbumController implements Controller {
     private AlbumModel album;
@@ -53,8 +54,10 @@ public class AlbumController implements Controller {
     }
 
     public void addAlbum(String name, String password, int numOfImages) {
+        UUID id = UUID.randomUUID();
         // Add an album
         AlbumModel albumModel = new AlbumModel(name, password, numOfImages);
+        albumModel.setId(id.toString());
         this.insert(albumModel);
     }
 
@@ -62,7 +65,7 @@ public class AlbumController implements Controller {
         return dbHelper.isAlbumNameExists(albumName);
     }
 
-    public long getAlbumIdByName(String albumName) {
+    public String getAlbumIdByName(String albumName) {
         return dbHelper.getAlbumIdByName(albumName);
     }
 
@@ -72,8 +75,8 @@ public class AlbumController implements Controller {
         return albumNames;
     }
 
-    public long getLastAlbumId() {
-        long res = dbHelper.getLastId("Album");
+    public String getLastAlbumId() {
+        String res = dbHelper.getLastId("Album");
         return res;
     }
 

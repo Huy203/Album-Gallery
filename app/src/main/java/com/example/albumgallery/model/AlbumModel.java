@@ -129,10 +129,16 @@ public class AlbumModel implements Model{
         this.thumbnail = "";
     }
 
+//    @Override
+//    public String insert() {
+//        return "INSERT INTO Album (name, capacity, created_at, notice, ref, is_deleted, num_of_images, password) " +
+//                "VALUES ('" + name + "', " + capacity + ", '" + created_at + "', '" + notice + "', '" + ref + "', " + is_deleted + ", " + num_of_images + ", '" + password + "')";
+//    }
+
     @Override
     public String insert() {
-        return "INSERT INTO Album (name, capacity, created_at, notice, ref, is_deleted, num_of_images, password) " +
-                "VALUES ('" + name + "', " + capacity + ", '" + created_at + "', '" + notice + "', '" + ref + "', " + is_deleted + ", " + num_of_images + ", '" + password + "')";
+        return "INSERT INTO Album (id, name, capacity, created_at, notice, ref, is_deleted, num_of_images, password) " +
+                "VALUES ('" + id + "', '" + name + "', " + capacity + ", '" + created_at + "', '" + notice + "', '" + ref + "', " + is_deleted + ", " + num_of_images + ", '" + password + "')";
     }
 
 
