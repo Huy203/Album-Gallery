@@ -3,13 +3,17 @@ package com.example.albumgallery.view.activity;
 import static com.example.albumgallery.utils.Constant.REQUEST_CODE_PICK_MULTIPLE_IMAGES;
 
 import android.annotation.SuppressLint;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -38,10 +42,12 @@ import com.example.albumgallery.view.fragment.SearchFragment;
 import com.example.albumgallery.view.listeners.BackgroundProcessingCallback;
 import com.example.albumgallery.view.listeners.FragToActivityListener;
 import com.example.albumgallery.view.listeners.ImageAdapterListener;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.imageview.ShapeableImageView;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 
 public class MainFragmentController extends AppCompatActivity implements BackgroundProcessingCallback, ImageAdapterListener, FragToActivityListener {
@@ -265,7 +271,7 @@ public class MainFragmentController extends AppCompatActivity implements Backgro
 
     }
 
-    /**
+    /** 
      * This method is used to toggle multiple choice mode in the fragment
      */
     @Override
@@ -332,6 +338,13 @@ public class MainFragmentController extends AppCompatActivity implements Backgro
     }
 
     public void addAction(View view) {
+        HomeScreenFragment fragment = (HomeScreenFragment) getSupportFragmentManager().findFragmentById(R.id.fragment_container);
+        if (fragment != null && fragment.isAdded()) {
+            fragment.ActivityToFragListener("Add");
+        } else {
+            Log.e("MainFragmentController", "Fragment is null or not added");
+        }
+
     }
 
     public void likeAction(View view) {

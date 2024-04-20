@@ -5,6 +5,7 @@ import static com.example.albumgallery.utils.Constant.REQUEST_CODE_DETAIL_IMAGE;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.ColorStateList;
 import android.net.Uri;
@@ -17,6 +18,8 @@ import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.PopupMenu;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -41,6 +44,7 @@ import com.example.albumgallery.view.listeners.ImageAdapterListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.Tasks;
 import com.google.android.material.button.MaterialButton;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -156,13 +160,7 @@ public class HomeScreenFragment extends Fragment {
                 selectedItems.put(i, true);
             }
         } else {
-            if (SharePreferenceHelper.isDarkModeEnabled(requireContext())) {
-                tickBtn.setIconTint(ColorStateList.valueOf(getResources().getColor(R.color.white)));
-                tickBtn.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(R.color.none)));
-            } else {
-                tickBtn.setIconTint(ColorStateList.valueOf(getResources().getColor(R.color.black)));
-                tickBtn.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(R.color.none)));
-            }
+            changeColorChoiceAll(tickBtn);
         }
         imageAdapter.setMultipleChoiceEnabled(isSelectAll);
         imageAdapter.setSelectedItems(selectedItems);
@@ -170,11 +168,22 @@ public class HomeScreenFragment extends Fragment {
         imageAdapter.notifyItemRangeChanged(0, imageURIs.size());
     }
 
+    private void changeColorChoiceAll(MaterialButton tickBtn) {
+        if (SharePreferenceHelper.isDarkModeEnabled(requireContext())) {
+            tickBtn.setIconTint(ColorStateList.valueOf(getResources().getColor(R.color.white)));
+            tickBtn.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(R.color.none)));
+        } else {
+            tickBtn.setIconTint(ColorStateList.valueOf(getResources().getColor(R.color.black)));
+            tickBtn.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(R.color.none)));
+        }
+    }
+
     public boolean toggleMultipleChoice() {
         int length = imageAdapter.getSelectedItems().size(); // get the number of selected items
         fragToActivityListener.onFragmentAction("ShowMultipleChoice", length);
 
         MaterialButton unChooseBtn = view.findViewById(R.id.unChooseBtn);
+        MaterialButton tickBtn = view.findViewById(R.id.tickBtn);
         if (imageAdapter.getMultipleChoiceEnabled()) {
             unChooseBtn.setVisibility(View.VISIBLE);
             isSelectAll = true;
@@ -185,7 +194,12 @@ public class HomeScreenFragment extends Fragment {
             Log.v("HomeScreenFragment", "No items selected");
             imageAdapter.clearSelectedItems();
             unChooseBtn.setVisibility(View.GONE);
+            changeColorChoiceAll(tickBtn);
             isSelectAll = false;
+
+            if (mainController.getImageController().getAllImageURLsUndeleted().size() < imageURIs.size()) {
+                updateUI();
+            }
             return false;
         }
         return true;
@@ -236,13 +250,33 @@ public class HomeScreenFragment extends Fragment {
 
     public void updateUI() {
         Log.v("HomeScreenFragment", "updateUI");
-        imageURIs.clear();
-        // lấy ảnh sort theo date (mới nhất xếp trước).
-//        imageURIs.addAll(mainController.getImageController().getAllImageURLsSortByDate());
+        List<String> allImage = mainController.getImageController().getAllImageURLsUndeleted();
         List<String> imageURLsFavourited = mainController.getImageController().getAllImageURLsFavourited();
-        imageURIs.addAll(mainController.getImageController().getAllImageURLsUndeleted());
 
-        imageAdapter = new ImageAdapter(getActivity(), imageURIs);
+        if (allImage.size() > imageURIs.size()) {
+            for (int i = 0; i < allImage.size(); i++) {
+                if (!imageURIs.contains(allImage.get(i))) {
+                    imageURIs.add(allImage.get(i));
+                    imageAdapter.setImageURIs(imageURIs);
+                    imageAdapter.notifyItemInserted(i);
+                }
+            }
+        } else if (allImage.size() < imageURIs.size()){
+            for (int i = 0; i < imageURIs.size(); i++) {
+                if (!allImage.contains(imageURIs.get(i))) {
+                    imageURIs.remove(i);
+                    imageAdapter.setImageURIs(imageURIs);
+                    imageAdapter.notifyItemRemoved(i);
+                }
+            }
+        }
+
+//        imageURIs.clear();
+//        // lấy ảnh sort theo date (mới nhất xếp trước).
+////        imageURIs.addAll(mainController.getImageController().getAllImageURLsSortByDate());
+//        imageURIs.addAll();
+//
+//        imageAdapter = new ImageAdapter(getActivity(), imageURIs);
         imageAdapter.setImageURLsFavourite(imageURLsFavourited);
         // Switch to list display
         if (SharePreferenceHelper.isGridLayoutEnabled(getActivity()).equals("full")) {
@@ -251,7 +285,7 @@ public class HomeScreenFragment extends Fragment {
             recyclerMediaView.setLayoutManager(new GridLayoutManager(getContext(), 4));
         }
         recyclerMediaView.setAdapter(imageAdapter);
-        imageAdapter.toggleAll();
+        imageAdapter.notifyDataSetChanged();
     }
 
     public void showDeleteConfirmationDialog() {
@@ -361,6 +395,13 @@ public class HomeScreenFragment extends Fragment {
                 updateUI();
                 break;
             case "Add":
+//                List<Uri> UriToAdd = new ArrayList<>();
+                List<String> ids = new ArrayList<>();
+                for(String uri: imageAdapter.getSelectedImageURLs()) {
+                    ids.add(mainController.getImageController().getIdByRef(uri));
+                    Log.d("Action Add", mainController.getImageController().getIdByRef(uri));
+                }
+                handleAddMultipleImagesToAlbum(ids);
                 break;
         }
     }
@@ -372,5 +413,43 @@ public class HomeScreenFragment extends Fragment {
         recyclerMediaView.setLayoutManager(new GridLayoutManager(getContext(), 3));
         recyclerMediaView.setAdapter(imageAdapter);
         imageAdapter.notifyDataSetChanged();
+    }
+
+    private void handleAddMultipleImagesToAlbum(List<String> images_id) {
+        List<String> albumNames = mainController.getAlbumController().getAlbumNames();
+        LayoutInflater inflater = getLayoutInflater();
+        View dialogView = inflater.inflate(R.layout.albums_dialog, null);
+        RadioGroup albumGroup = dialogView.findViewById(R.id.albumDialog);
+
+        for (String a : albumNames) {
+            RadioButton albumBtn = new RadioButton(getContext());
+            albumBtn.setText(a);
+            albumGroup.addView(albumBtn);
+        }
+
+        MaterialAlertDialogBuilder albumsDialog = new MaterialAlertDialogBuilder(getContext());
+        albumsDialog.setView(dialogView)
+                .setTitle("Choose an album")
+                .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        int selectedRadioButtonId = albumGroup.getCheckedRadioButtonId();
+                        RadioButton selectedRadioBtn = dialogView.findViewById(selectedRadioButtonId);
+                        if (selectedRadioBtn != null) {
+                            String selectedAlbum = selectedRadioBtn.getText().toString();
+                            String album_id = mainController.getAlbumController().getAlbumIdByName(selectedAlbum);
+                            for(String image_id : images_id) {
+                                mainController.getImageAlbumController().addImageAlbum(image_id, album_id);
+                            }
+                        }
+                    }
+                })
+                .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        dialogInterface.dismiss();
+                    }
+                });
+        albumsDialog.show();
     }
 }

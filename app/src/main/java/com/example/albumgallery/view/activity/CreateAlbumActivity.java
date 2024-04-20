@@ -130,7 +130,7 @@ public class CreateAlbumActivity extends AppCompatActivity {
                     // add album
                     mainController.getAlbumController().addAlbum(albumName, password, numOfImages);
                     // get the album's id just added and add to album_image table
-                    int id_album = (int) mainController.getAlbumController().getLastAlbumId();
+                    String id_album = mainController.getAlbumController().getLastAlbumId();
                     selectedImageURLs = getIntent().getStringArrayListExtra("selectedImageURIs");
                     List<String> ids = new ArrayList<>();
                     for(String uri: selectedImageURLs) {
@@ -138,6 +138,7 @@ public class CreateAlbumActivity extends AppCompatActivity {
                     }
                     mainController.getAlbumController().updateThumbnailByAlbumName(albumName, selectedImageURLs.get(0));
                     for(String id: ids) {
+                        Log.d("Create Album Activity", id);
                         mainController.getImageAlbumController().addImageAlbum(id, id_album);
                     }
                     // navigate to album main after adding album

@@ -58,4 +58,5 @@
     <string name="square_grid">Square photo grid</string>
     <string name="ratio_grid">Ratio photo grid</string>
     <string name="full_screen_grid">Full screen</string>
+    <string name="crop">Crop</string>
 </resources>

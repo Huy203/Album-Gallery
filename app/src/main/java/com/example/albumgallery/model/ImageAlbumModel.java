@@ -7,7 +7,7 @@ import com.example.albumgallery.helper.DatabaseHelper;
 
 public class ImageAlbumModel implements Model {
     String image_id;
-    long album_id;
+    String album_id;
     DatabaseHelper dbHelper;
 
     public String getImage_id() {
@@ -26,11 +26,11 @@ public class ImageAlbumModel implements Model {
         this.image_id = image_id;
     }
 
-    public long getAlbum_id() {
+    public String getAlbum_id() {
         return album_id;
     }
 
-    public void setAlbum_id(long album_id) {
+    public void setAlbum_id(String album_id) {
         this.album_id = album_id;
     }
 
@@ -38,14 +38,14 @@ public class ImageAlbumModel implements Model {
         dbHelper = new DatabaseHelper(context);
     }
 
-    public ImageAlbumModel(String image_id, long album_id) {
+    public ImageAlbumModel(String image_id, String album_id) {
         this.image_id = image_id;
         this.album_id = album_id;
     }
 
     @Override
     public String insert() {
-        String query = "INSERT INTO Image_Album (image_id, album_id) VALUES (" + image_id + ", " + album_id + ")";
+        String query = "INSERT INTO Image_Album (image_id, album_id) VALUES ('" + image_id + "', '" + album_id + "')";
         Log.d("insert image album", query);
         return query;
     }

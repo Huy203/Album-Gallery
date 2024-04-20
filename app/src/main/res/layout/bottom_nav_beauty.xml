@@ -40,19 +40,19 @@
 
             <!-- com.google.android.material.button.MaterialButton Cut -->
             <com.google.android.material.button.MaterialButton
-                android:id="@+id/action_filter"
+                android:id="@+id/action_warm"
                 style="@style/AppButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                app:icon="@drawable/filter" />
+                app:icon="@drawable/warm" />
 
             <!-- com.google.android.material.button.MaterialButton Beautify -->
             <com.google.android.material.button.MaterialButton
-                android:id="@+id/action_beautify"
+                android:id="@+id/action_tones"
                 style="@style/AppButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                app:icon="@drawable/beautiful" />
+                app:icon="@drawable/tones" />
 
         </com.google.android.flexbox.FlexboxLayout>
 

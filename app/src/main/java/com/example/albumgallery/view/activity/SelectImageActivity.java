@@ -56,7 +56,7 @@ public class SelectImageActivity extends AppCompatActivity implements ImageAdapt
         recyclerMediaView.setAdapter(imageAdapter);
 
         imageAdapter.notifyDataSetChanged();
-        //imageAdapter.toggleMultipleChoiceImagesEnabled();
+//        imageAdapter.toggleMultipleChoiceImagesEnabled();
 
         handleInteractions();
     }

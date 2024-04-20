@@ -2,6 +2,7 @@ package com.example.albumgallery.view.fragment;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -54,7 +55,11 @@ public class AlbumsMainFragment extends Fragment implements AlbumAdapterListener
         mainController = new MainController(getActivity());
         handleInteractions(view);
 
-        initializeData(); // just for testing
+        initializeData();
+        for (int i = 0; i < thumbnails.size(); i++) {
+            Log.d("albumfrag", thumbnails.get(i));
+            Log.d("albumfrag", albumNames.get(i));
+        }
 
         recyclerView = (RecyclerView) view.findViewById(R.id.albumsRecyclerView);
         recyclerView.setLayoutManager(new GridLayoutManager(view.getContext(), 2, GridLayoutManager.HORIZONTAL, false));
