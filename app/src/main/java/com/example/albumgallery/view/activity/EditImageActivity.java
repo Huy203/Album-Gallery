@@ -29,6 +29,9 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
+
 
 public class EditImageActivity extends AppCompatActivity {
     private MainController mainController;
@@ -125,13 +128,14 @@ public class EditImageActivity extends AppCompatActivity {
                 } else if (buttonId == buttonIds[4]) {
                     startImageBeautyActivity();
                 } else if (buttonId == buttonIds[5]) {
-                    Intent intent = new Intent();
-                    intent.putExtra("update", true);
-                    setResult(RESULT_OK, intent);
-                    finish();
+                    showSaveChangesDialog();
                 }
             });
         }
+    }
+    @Override
+    public void onBackPressed() {
+        showSaveChangesDialog();
     }
 
     private boolean isMotionEventInsideView(float x, float y, View view) {
@@ -143,33 +147,37 @@ public class EditImageActivity extends AppCompatActivity {
         return (x > viewX && x < (viewX + view.getWidth()) && y > viewY && y < (viewY + view.getHeight()));
     }
 
-//    private void showSaveChangesDialog() {
-//        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-//        builder.setTitle("Save Changes");
-//        builder.setMessage("Do you want to save changes before going back?");
-//        builder.setPositiveButton("Save", new DialogInterface.OnClickListener() {
-//            @Override
-//            public void onClick(DialogInterface dialog, int which) {
-//                // Save changes here
-//                saveChangesAndGoBack();
-//            }
-//        });
-//        builder.setNegativeButton("Discard", new DialogInterface.OnClickListener() {
-//            @Override
-//            public void onClick(DialogInterface dialog, int which) {
-//                // Discard changes and go back
-//                goBackToDetailScreen();
-//            }
-//        });
-//        builder.setNeutralButton("Cancel", new DialogInterface.OnClickListener() {
-//            @Override
-//            public void onClick(DialogInterface dialog, int which) {
-//                // Do nothing, just dismiss the dialog
-//                dialog.dismiss();
-//            }
-//        });
-//        builder.show();
-//    }
+    private void showSaveChangesDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Save Changes");
+        builder.setMessage("Do you want to save changes before going back?");
+        builder.setPositiveButton("Save", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                Intent intent = new Intent();
+                intent.putExtra("update", true);
+                setResult(RESULT_OK, intent);
+                finish();
+            }
+        });
+        builder.setNegativeButton("Discard", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                Intent intent = new Intent();
+                intent.putExtra("update", true);
+                setResult(RESULT_OK, intent);
+                finish();
+            }
+        });
+        builder.setNeutralButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                // Do nothing, just dismiss the dialog
+                dialog.dismiss();
+            }
+        });
+        builder.show();
+    }
 
 //    private void saveChangesAndGoBack() {
 //        goBackToDetailScreen();
@@ -187,7 +195,7 @@ public class EditImageActivity extends AppCompatActivity {
         Intent intent = new Intent(EditImageActivity.this, BeautyImageActivity.class);
         String id = getIntent().getStringExtra("id");
         intent.putExtra("id", id);
-        startActivityForResult(intent, 100);
+        startActivityForResult(intent, 101);
     }
 
 
@@ -202,6 +210,19 @@ public class EditImageActivity extends AppCompatActivity {
                 if (croppedImage != null) {
                     mImageView.setImageBitmap(croppedImage);
                     mainController.getImageController().onActivityResult(REQUEST_CODE_EDIT_IMAGE, RESULT_OK, data);
+                }
+            } catch (Exception e) {
+                Log.e("EditImageActivity", "Error loading image: " + e.getMessage());
+            }
+        }
+        if (requestCode == 101 && resultCode == RESULT_OK && data != null) {
+            try {
+                Bitmap adjustedBitmap = data.getParcelableExtra("adjustedBitmap");
+                if (adjustedBitmap != null) {
+                    // Hiển thị ảnh đã chỉnh sửa trên ImageView
+                    mImageView.setImageBitmap(adjustedBitmap);
+                    // Lưu lại ảnh đã chỉnh sửa hoặc thực hiện các hành động khác
+                    // ...
                 }
             } catch (Exception e) {
                 Log.e("EditImageActivity", "Error loading image: " + e.getMessage());
