@@ -80,7 +80,6 @@ public class DetailPicture extends AppCompatActivity implements ImageInfoListene
         loadImage(currentPosition);
         loadImageInfo();
         loadQRCodeLink();
-        loadRecognizeText();
     }
 
     @Override
@@ -211,23 +210,7 @@ public class DetailPicture extends AppCompatActivity implements ImageInfoListene
     }
 
     protected void loadImage(int position) {
-        Glide.with(this)
-                .asBitmap()
-                .load(imagePaths.get(position))
-                .addListener(new RequestListener<Bitmap>() {
-                    @Override
-                    public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Bitmap> target, boolean isFirstResource) {
-                        return false;
-                    }
-
-                    @Override
-                    public boolean onResourceReady(Bitmap resource, Object model, Target<Bitmap> target, DataSource dataSource, boolean isFirstResource) {
-                        // Once the image is loaded, set it to the imageView
-                        imageView.setImageBitmap(resource);
-                        return true;
-                    }
-                })
-                .into(imageView);
+        Glide.with(this).load(Uri.parse(imageModel.getRef())).into(imageView);
     }
 
     private void loadImageInfo() {
@@ -487,6 +470,9 @@ public class DetailPicture extends AppCompatActivity implements ImageInfoListene
         }
     }
 
+    public void ocrAction(View view){
+        loadRecognizeText();
+    }
     private void toggleDeleteImage(String id) {
         Log.d("update delete successfully 2", "ok");
         isDeleted = !isDeleted;
@@ -548,7 +534,6 @@ public class DetailPicture extends AppCompatActivity implements ImageInfoListene
             int finalI = i;
             boxView.setTextIsSelectable(true);
             boxView.setTextColor(getResources().getColor(R.color.none));
-            boxView.setBackgroundColor(getResources().getColor(R.color.blue_500));
 
             boxView.setOnClickListener(v -> {
                 for (int k = 0; k < boundingBoxes.size(); k++) {
@@ -557,9 +542,6 @@ public class DetailPicture extends AppCompatActivity implements ImageInfoListene
                 // Handle the click event
                 String recognizedText = textRecognized.get(finalI);
                 boxView.setText(recognizedText);
-                Log.v("DetailPicture", "Clicked on text: " + recognizedText + " at position: " + finalI);
-
-                Toast.makeText(DetailPicture.this, "Clicked on text: " + recognizedText + " at position: " + finalI, Toast.LENGTH_SHORT).show();
             });
 
             // Add the View to the parent layout
