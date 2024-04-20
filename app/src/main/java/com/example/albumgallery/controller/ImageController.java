@@ -28,6 +28,7 @@ import com.example.albumgallery.helper.DatabaseHelper;
 import com.example.albumgallery.model.ImageModel;
 import com.example.albumgallery.model.Model;
 import com.example.albumgallery.utils.QRCodeRecognization;
+import com.example.albumgallery.utils.textRecognization.TextRecognization;
 import com.example.albumgallery.view.activity.MainFragmentController;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -612,6 +613,42 @@ public class ImageController implements Controller {
         }
         return null;
     }
+
+    public void recognizeText(String uri) {
+        TextRecognization textRecognization = new TextRecognization(activity);
+        try {
+            textRecognization.execute(uri).get();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+//        FirebaseVisionImage image = null;
+//        try {
+//            image = FirebaseVisionImage.fromFilePath(activity, Uri.parse(uri));
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
+//
+//        FirebaseVisionTextRecognizer detector = FirebaseVision.getInstance()
+//                .getOnDeviceTextRecognizer();
+//
+//        Task<FirebaseVisionText> result =
+//                detector.processImage(image)
+//                        .addOnSuccessListener(new OnSuccessListener<FirebaseVisionText>() {
+//                            @Override
+//                            public void onSuccess(FirebaseVisionText result) {
+//
+//                            }
+//                        })
+//                        .addOnFailureListener(
+//                                new OnFailureListener() {
+//                                    @Override
+//                                    public void onFailure(@NonNull Exception e) {
+//                                        // Task failed with an exception
+//                                        // ...
+//                                    }
+//                                });
 
     public Bitmap createQRCodeFromImage(String uri) {
         QRCodeRecognization qrCodeRecognization = new QRCodeRecognization();
