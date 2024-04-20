@@ -174,6 +174,8 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> 
                 if (!isMultipleChoice) {
                     listener.handleImagePick(imageView, imageURL, getAdapterPosition());
                 } else {
+//                    Log.d("justclick", imageURL);
+                    listener.getInteractedURIs(imageURL);
                     toggleSelection();
                     listener.toggleMultipleChoice();
                 }
@@ -182,10 +184,10 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> 
             itemView.setOnLongClickListener(view -> {
                 isMultipleChoice = true;
                 toggleSelection();
+                listener.getInteractedURIs(imageURL);
                 listener.toggleMultipleChoice();
                 return true;
             });
-            listener.getInteractedURIs(imageURL);
         }
 
         private void toggleSelection() {
@@ -199,6 +201,7 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> 
                 checkbox.setVisibility(View.VISIBLE);
                 getSelectedItems().put(position, true);
             }
+            listener.toggleMultipleChoice();
         }
 
         private void showImage(String imageURL) {

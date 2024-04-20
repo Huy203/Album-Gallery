@@ -319,10 +319,10 @@ public class DetailPicture extends AppCompatActivity implements ImageInfoListene
                         RadioButton selectedRadioBtn = dialogView.findViewById(selectedRadioButtonId);
                         if (selectedRadioBtn != null) {
                             String selectedAlbum = selectedRadioBtn.getText().toString();
-                            long album_id = mainController.getAlbumController().getAlbumIdByName(selectedAlbum);
+                            String album_id = mainController.getAlbumController().getAlbumIdByName(selectedAlbum);
                             String image_id = mainController.getImageController().getIdByRef(imagePaths.get(currentPosition));
-                            Log.d("add to album", Long.toString(album_id) + " " + image_id);
-                            mainController.getImageAlbumController().addImageAlbum(image_id, (int) album_id);
+//                            Log.d("add to album", Long.toString(album_id) + " " + image_id);
+                            mainController.getImageAlbumController().addImageAlbum(image_id, album_id);
                         }
                     }
                 })

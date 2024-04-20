@@ -412,7 +412,7 @@ public class ImageController implements Controller {
     }
 
 
-    public String getImageRefById(long imageId) {
+    public String getImageRefById(String imageId) {
         return dbHelper.getImageRefById(imageId);
     }
 
@@ -582,7 +582,7 @@ public class ImageController implements Controller {
         }
     }
 
-    public long getTotalCapacityFromImageIDs(List<Long> imageIDs) {
+    public long getTotalCapacityFromImageIDs(List<String> imageIDs) {
         return dbHelper.getTotalCapacityFromImageIDs(imageIDs);
     }
 
