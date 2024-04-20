@@ -77,8 +77,8 @@ public class ImageController implements Controller {
         return activity;
     }
 
-    public void createModel(String name, int width, int height, long capacity, String dateAdded) {
-        currentModel = new ImageModel(name, width, height, capacity, dateAdded);
+    public FirebaseManager getFirebaseManager() {
+        return firebaseManager;
     }
 
     @Override
@@ -527,6 +527,7 @@ public class ImageController implements Controller {
                             // File deleted successfully
                             delete("ref = '" + imageURL + "'");
                             Log.d("After delete on db", "ok");
+
                             if (allTasksCompletedGeneric(imageURLs)) {
                                 Log.v("Image", "All images deleted" + activity);
                                 activity.runOnUiThread(() -> {

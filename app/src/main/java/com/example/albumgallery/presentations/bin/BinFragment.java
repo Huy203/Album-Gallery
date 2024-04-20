@@ -6,9 +6,11 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.res.ColorStateList;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
+import android.util.SparseBooleanArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -27,6 +29,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.albumgallery.R;
 import com.example.albumgallery.controller.MainController;
+import com.example.albumgallery.helper.SharePreferenceHelper;
 import com.example.albumgallery.view.activity.MainFragmentController;
 import com.example.albumgallery.view.adapter.ImageAdapter;
 import com.example.albumgallery.view.listeners.BackgroundProcessingCallback;
@@ -34,6 +37,7 @@ import com.example.albumgallery.view.listeners.FragToActivityListener;
 import com.example.albumgallery.view.listeners.ImageAdapterListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.Tasks;
+import com.google.android.material.button.MaterialButton;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -91,7 +95,7 @@ public class BinFragment extends Fragment {
 
         imageAdapter = new ImageAdapter(getActivity(), imageURIs);
         recyclerView = (RecyclerView) view.findViewById(R.id.recyclerViewBin);
-        recyclerView.setLayoutManager(new GridLayoutManager(getContext(), 3));
+        recyclerView.setLayoutManager(new GridLayoutManager(getContext(), 4));
         recyclerView.setAdapter(imageAdapter);
         imageAdapter.notifyDataSetChanged();
 
@@ -108,6 +112,46 @@ public class BinFragment extends Fragment {
                 startActivity(mainFragment);
             }
         });
+
+        MaterialButton unChooseBtn = view.findViewById(R.id.unChooseBtn);
+        MaterialButton tickBtn = view.findViewById(R.id.tickBtn);
+        tickBtn.setOnClickListener(view1 -> {
+            choiceAll(view);
+            if (imageAdapter.getMultipleChoiceEnabled()) {
+                unChooseBtn.setVisibility(View.VISIBLE);
+            } else {
+                unChooseBtn.setVisibility(View.GONE);
+            }
+        });
+        unChooseBtn.setOnClickListener(view1 -> {
+            choiceAll(view);
+            unChooseBtn.setVisibility(View.GONE);
+        });
+    }
+
+    private void choiceAll(View view) {
+        isSelectAll = !isSelectAll;
+        MaterialButton tickBtn = view.findViewById(R.id.tickBtn);
+        SparseBooleanArray selectedItems = new SparseBooleanArray();
+        if (isSelectAll) {
+            tickBtn.setIconTint(ColorStateList.valueOf(getResources().getColor(R.color.white)));
+            tickBtn.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(R.color.blue_200)));
+            for (int i = 0; i < imageURIs.size(); i++) {
+                selectedItems.put(i, true);
+            }
+        } else {
+            if (SharePreferenceHelper.isDarkModeEnabled(requireContext())) {
+                tickBtn.setIconTint(ColorStateList.valueOf(getResources().getColor(R.color.white)));
+                tickBtn.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(R.color.none)));
+            } else {
+                tickBtn.setIconTint(ColorStateList.valueOf(getResources().getColor(R.color.black)));
+                tickBtn.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(R.color.none)));
+            }
+        }
+        imageAdapter.setMultipleChoiceEnabled(isSelectAll);
+        imageAdapter.setSelectedItems(selectedItems);
+        fragToActivityListener.onFragmentAction("SelectAll", true);
+        imageAdapter.notifyItemRangeChanged(0, imageURIs.size());
     }
 
     public void handleDeletedImagePick(View view, String uri, int position) {
@@ -162,15 +206,27 @@ public class BinFragment extends Fragment {
                     builder.setMessage("Are you sure you want to delete this image forever?");
 
                     builder.setPositiveButton("Delete", (dialog, which) -> {
-                        selectedImageURLsTask = imageAdapter.getSelectedImageURLsTask();
+//                        selectedImageURLsTask = imageAdapter.getSelectedImageURLsTask();
+//
+//                        mainController.getImageController().deleteSelectedImageAtBin(selectedImageURLsTask);
+//
+//                        imageAdapter.clearSelectedItems();
+//                        onResume();
+//                        fragToActivityListener.onFragmentAction("Delete", true);
+//                        updateUI();
 
-                        mainController.getImageController().deleteSelectedImageAtBin(selectedImageURLsTask);
-
+                        for (String uri : imageAdapter.getSelectedImageURLs()) {
+                            String id = mainController.getImageController().getIdByRef(uri);
+                            String userID = mainController.getImageController().getFirebaseManager().getFirebaseAuth().getCurrentUser().getUid();
+                            if (id != null) {
+                                mainController.getImageController().getFirebaseManager().getFirebaseHelper().deleteImage("Image", id, userID);
+                                mainController.getImageController().delete("id = '" + id + "'");
+                            }
+                        }
                         imageAdapter.clearSelectedItems();
                         onResume();
                         fragToActivityListener.onFragmentAction("Delete", true);
                         updateUI();
-//                        this.mainController.getImageController().deleteSelectedImageAtHomeScreeen(selectedImageURLsTask);
                     });
 
                     builder.setNegativeButton("Cancel", null);
@@ -204,9 +260,17 @@ public class BinFragment extends Fragment {
         // lấy ảnh sort theo date (mới nhất xếp trước).
         imageURIs.addAll(mainController.getImageController().getAllImageURLsSortByDateAtBin());
         imageAdapter = new ImageAdapter(getActivity(), imageURIs);
-        recyclerView.setLayoutManager(new GridLayoutManager(getContext(), 3));
+        recyclerView.setLayoutManager(new GridLayoutManager(getContext(), 4));
         recyclerView.setAdapter(imageAdapter);
         imageAdapter.notifyDataSetChanged();
+
+        // Reset the state of tick button and unchoose button
+        isSelectAll = false;
+        MaterialButton tickBtn = getView().findViewById(R.id.tickBtn);
+        MaterialButton unChooseBtn = getView().findViewById(R.id.unChooseBtn);
+        tickBtn.setIconTint(ColorStateList.valueOf(getResources().getColor(R.color.black)));
+        tickBtn.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(R.color.none)));
+        unChooseBtn.setVisibility(View.GONE);
     }
 
     public boolean toggleMultipleChoice() {

@@ -44,8 +44,8 @@
             <com.google.android.material.imageview.ShapeableImageView
                 android:id="@+id/trashButton"
                 style="@style/AppImageButton"
-                android:layout_width="30dp"
-                android:layout_height="30dp"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
                 android:onClick="deleteAction"
                 android:scaleType="centerCrop"
                 android:src="@drawable/trash"
@@ -54,8 +54,8 @@
             <com.google.android.material.imageview.ShapeableImageView
                 android:id="@+id/restoreButton"
                 style="@style/AppImageButton"
-                android:layout_width="30dp"
-                android:layout_height="30dp"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
                 android:onClick="restoreAction"
                 android:scaleType="centerCrop"
                 android:src="@drawable/restore" />

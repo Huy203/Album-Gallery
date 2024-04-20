@@ -21,6 +21,12 @@
             app:justifyContent="space_between"
             android:gravity="end">
 
+            <include
+                android:id="@+id/searchFragment"
+                layout="@layout/fragment_search"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"/>
+
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/unChooseBtn"
                 style="@style/AppButton"
@@ -59,11 +65,7 @@
                     app:icon="@drawable/grid_black" />
             </LinearLayout>
 
-            <include
-                android:id="@+id/searchFragment"
-                layout="@layout/fragment_search"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"/>
+
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
