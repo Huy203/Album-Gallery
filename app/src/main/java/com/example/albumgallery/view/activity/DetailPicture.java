@@ -1,5 +1,6 @@
 package com.example.albumgallery.view.activity;
 
+import static android.app.ProgressDialog.show;
 import static com.example.albumgallery.utils.Constant.REQUEST_CODE_EDIT_IMAGE;
 import static com.example.albumgallery.utils.Utilities.convertFromBitmapToUri;
 
@@ -16,11 +17,13 @@ import android.graphics.Rect;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
+import android.text.InputType;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
@@ -48,6 +51,8 @@ import com.example.albumgallery.view.listeners.OnSwipeTouchListener;
 import com.example.albumgallery.view.listeners.TextRecognitionListener;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
+
+import org.w3c.dom.Text;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -80,6 +85,7 @@ public class DetailPicture extends AppCompatActivity implements ImageInfoListene
         loadImage(currentPosition);
         loadImageInfo();
         loadQRCodeLink();
+
     }
 
     @Override
@@ -339,6 +345,11 @@ public class DetailPicture extends AppCompatActivity implements ImageInfoListene
     public void onNoticePassed(String data) {
         String where = "id = '" + getIntent().getStringExtra("id") + "'";
         mainController.getImageController().update("notice", data, where);
+    }
+    @Override
+    public void onTimePassed(String data) {
+        String where = "id = '" + getIntent().getStringExtra("id") + "'";
+        mainController.getImageController().update("created_at", data, where);
     }
 
     @Override

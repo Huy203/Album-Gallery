@@ -11,6 +11,7 @@
         android:layout_height="match_parent"
         android:orientation="vertical">
 
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -36,6 +37,28 @@
                 android:layout_marginLeft="16dp"
                 android:layout_marginTop="8dp"
                 android:layout_marginBottom="8dp"/>
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/unChooseBtn"
+                style="@style/AppButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:visibility="gone"
+                app:icon="@android:drawable/ic_menu_close_clear_cancel"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintStart_toStartOf="parent" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/tickBtn"
+                style="@style/AppButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:checkable="false"
+                android:clickable="true"
+                android:minHeight="0dp"
+                android:padding="0dp"
+                app:icon="@drawable/tick_black"
+                app:toggleCheckedStateOnClick="false" />
         </LinearLayout>
         <View
             android:layout_width="match_parent"
@@ -57,41 +80,8 @@
                 android:layout_weight="1"
                 app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
 
-
         </LinearLayout>
     </LinearLayout>
-
-    <RelativeLayout
-        android:layout_width="91dp"
-        android:layout_height="134dp"
-        android:layout_marginTop="100dp"
-        android:layout_marginLeft="300dp"
-        android:orientation="vertical"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
-
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerHorizontal="true"
-            android:orientation="vertical">
-
-            <Button
-                android:id="@+id/btnPickMultipleImages"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:padding="8dp"
-                android:text="Select" />
-
-            <Button
-                android:id="@+id/btnDeleteMultipleImages"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:padding="8dp"
-                android:text="Delete" />
-
-        </LinearLayout>
-    </RelativeLayout>
 
     <TextView
         android:id="@+id/numberOfSelectedImages"

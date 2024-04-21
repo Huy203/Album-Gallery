@@ -30,7 +30,7 @@
             android:layout_height="wrap_content"
             android:orientation="horizontal">
 
-            <TextView
+            <EditText
                 android:id="@+id/imageCreatedAt"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -40,7 +40,12 @@
                 android:gravity=""
                 android:padding="8dp"
                 android:text="@string/image_created_at"
-                android:textSize="16sp" />
+                android:textSize="16sp"
+                android:focusable="false"
+                android:clickable="false"
+                android:imeOptions="actionDone"
+                android:inputType="text" />
+
 
             <TextView
                 android:id="@+id/editImageTime"
@@ -50,7 +55,9 @@
                 android:gravity="start"
                 android:padding="8dp"
                 android:text="@string/edit_time"
-                android:textSize="16sp" />
+                android:textSize="16sp"
+                android:clickable="true"/>
+
         </LinearLayout>
 
         <TextView

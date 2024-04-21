@@ -12,6 +12,7 @@ import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
@@ -45,6 +46,38 @@ public class ImageInfo extends Fragment {
         TextView capacity = view.findViewById(R.id.imageCapacity);
         TextView created_at = view.findViewById(R.id.imageCreatedAt);
         EditText notice = view.findViewById(R.id.imageNotice);
+        TextView editImageTime = view.findViewById(R.id.editImageTime);
+        EditText imageCreatedAt = view.findViewById(R.id.imageCreatedAt);
+
+        editImageTime.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                imageCreatedAt.setEnabled(true);
+                imageCreatedAt.setFocusableInTouchMode(true);
+                imageCreatedAt.setFocusable(true);
+                imageCreatedAt.requestFocus(); // Set focus to the EditText
+
+                // Log.d("image created at", imageCreatedAt.getText().toString());
+
+                // sendTimeDataToActivity(imageCreatedAt.getText().toString());
+            }
+        });
+
+        imageCreatedAt.setOnEditorActionListener((v, actionId, event) -> {
+            if (actionId == EditorInfo.IME_ACTION_DONE) {
+                InputMethodManager imm = (InputMethodManager) requireActivity().getSystemService(INPUT_METHOD_SERVICE);
+                imm.hideSoftInputFromWindow(imageCreatedAt.getWindowToken(), 0);
+
+                String editedText = imageCreatedAt.getText().toString();
+
+                // Send the edited text to the activity
+                sendTimeDataToActivity(editedText);
+
+                return true;
+            }
+            // Return false to indicate that the action has not been handled
+            return false;
+        });
 
         notice.setOnEditorActionListener((v, actionId, event) -> {
             Log.v("ImageInfo", "Action ID: " + actionId);
@@ -88,6 +121,12 @@ public class ImageInfo extends Fragment {
     private void sendDataToActivity(String data) {
         if (listener != null) {
             listener.onNoticePassed(data);
+        }
+    }
+
+    private void sendTimeDataToActivity(String data) {
+        if (listener != null) {
+            listener.onTimePassed(data);
         }
     }
 }

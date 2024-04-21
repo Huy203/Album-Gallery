@@ -245,7 +245,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         try {
             // Define the query to select image paths by notice
-            String query = "SELECT ref FROM " + IMAGE_TABLE + " WHERE notice = ?";
+            String query = "SELECT ref FROM " + IMAGE_TABLE + " WHERE notice = ? AND is_deleted = 0";
 
             // Execute the query
             cursor = db.rawQuery(query, new String[]{notice});
