@@ -455,6 +455,10 @@ public class DetailPicture extends AppCompatActivity implements ImageInfoListene
         }
     }
 
+    public void ocrAction(View view){
+        loadRecognizeText();
+    }
+
     private void toggleDeleteImage(String id) {
         Log.d("update delete successfully 2", "ok");
         isDeleted = !isDeleted;
@@ -530,5 +534,6 @@ public class DetailPicture extends AppCompatActivity implements ImageInfoListene
         }
         return bitmapWithBoxes;
     }
+
 
 }
