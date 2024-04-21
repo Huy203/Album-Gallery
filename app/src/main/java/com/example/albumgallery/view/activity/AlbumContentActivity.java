@@ -3,8 +3,6 @@ package com.example.albumgallery.view.activity;
 import android.annotation.SuppressLint;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.media.Image;
-import android.net.Uri;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -24,18 +22,14 @@ import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.albumgallery.R;
-import com.example.albumgallery.controller.AlbumController;
 import com.example.albumgallery.controller.MainController;
 import com.example.albumgallery.model.AlbumModel;
 import com.example.albumgallery.model.ImageAlbumModel;
-import com.example.albumgallery.model.ImageModel;
-import com.example.albumgallery.view.adapter.AlbumAdapter;
 import com.example.albumgallery.view.adapter.AlbumInfoListener;
 import com.example.albumgallery.view.adapter.ImageAdapter;
 import com.example.albumgallery.view.fragment.AlbumInfo;
-import com.example.albumgallery.view.fragment.ImageInfo;
 import com.example.albumgallery.view.listeners.ImageAdapterListener;
-import com.google.android.gms.tasks.Tasks;
+import com.google.android.material.button.MaterialButton;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.textfield.TextInputEditText;
@@ -55,6 +49,7 @@ public class AlbumContentActivity extends AppCompatActivity implements ImageAdap
     private String album_id;
     private View view;
     private boolean isAlbumInfoVisible = false;
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -82,7 +77,7 @@ public class AlbumContentActivity extends AppCompatActivity implements ImageAdap
 
         updateCapacity();
 
-        for(String image_id: image_ids) {
+        for (String image_id : image_ids) {
             String ref = mainController.getImageController().getImageRefById(image_id);
             Log.d("ref from id", ref);
             imageURIs.add(ref);
@@ -120,7 +115,7 @@ public class AlbumContentActivity extends AppCompatActivity implements ImageAdap
     }
 
     private void handleInteractions() {
-        ImageButton backBtn = (ImageButton) findViewById(R.id.backButtonAlbumContent);
+        MaterialButton backBtn = findViewById(R.id.backButtonAlbumContent);
         backBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -131,7 +126,7 @@ public class AlbumContentActivity extends AppCompatActivity implements ImageAdap
             }
         });
         Button deleteBtn = (Button) this.findViewById(R.id.btnDelete);
-        deleteBtn.setOnClickListener(new View.OnClickListener(){
+        deleteBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 showDeleteConfirmationDialog();
@@ -141,7 +136,7 @@ public class AlbumContentActivity extends AppCompatActivity implements ImageAdap
 
     @SuppressLint("SetTextI18n")
     @Override
-    public void getSelectedItemsCount( ){
+    public void getSelectedItemsCount() {
 //        Log.v("SelectedItems", count + " items selected");
 //        numberOfImagesSelected.setText(count + " images selected");
 //
@@ -166,6 +161,11 @@ public class AlbumContentActivity extends AppCompatActivity implements ImageAdap
         Intent intent = new Intent(this, DetailPicture.class);
         ActivityOptionsCompat options = ActivityOptionsCompat.makeSceneTransitionAnimation(this, itemView, "image");
         String id = mainController.getImageController().getIdByRef(uri);
+        Log.v("ImageAdapter", "Image selected: " + uri);
+        Log.v("ImageAdapter", "Image selected: " + id);
+        Log.v("ImageAdapter", "Image selected: " + position);
+
+
         intent.putExtra("id", id);
         intent.putExtra("position", position);
         Log.v("ImageAdapter", "Image selected: " + itemView);
@@ -197,9 +197,9 @@ public class AlbumContentActivity extends AppCompatActivity implements ImageAdap
                 Log.d("check before id", String.valueOf(id_album));
                 List<ImageAlbumModel> image_albums = mainController.getImageAlbumController().getAllImageAlbums();
                 Log.d("check delete image_album size", String.valueOf(image_albums.size()));
-                for(ImageAlbumModel image_album : image_albums){
+                for (ImageAlbumModel image_album : image_albums) {
                     Log.d("check id", String.valueOf(image_album.getAlbum_id()));
-                    if(Objects.equals(image_album.getAlbum_id(), id_album)){
+                    if (Objects.equals(image_album.getAlbum_id(), id_album)) {
                         mainController.getImageAlbumController().deleteImageAlbum(image_album.getAlbum_id());
                         Log.d("check delete album", String.valueOf(image_album.getAlbum_id()));
                     }
@@ -216,6 +216,7 @@ public class AlbumContentActivity extends AppCompatActivity implements ImageAdap
         builder.setNegativeButton("Cancel", null);
         builder.show();
     }
+
     private void toggleAlbumInfo() {
         isAlbumInfoVisible = !isAlbumInfoVisible;
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
@@ -232,7 +233,8 @@ public class AlbumContentActivity extends AppCompatActivity implements ImageAdap
                 builder.setTitle("Are you sure to remove password ?")
                         .setNegativeButton("No", new DialogInterface.OnClickListener() {
                             @Override
-                            public void onClick(DialogInterface dialogInterface, int i) {}
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                            }
                         })
                         .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                             @Override
@@ -251,12 +253,16 @@ public class AlbumContentActivity extends AppCompatActivity implements ImageAdap
         Button applyPassword = (Button) findViewById(R.id.applyPasswordAlbumInfo);
         passwordInputAlbumInfo.addTextChangedListener(new TextWatcher() {
             @Override
-            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {}
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+            }
+
             @Override
-            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {}
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+            }
+
             @Override
             public void afterTextChanged(Editable editable) {
-                if(editable.toString().trim().length() > 0) {
+                if (editable.toString().trim().length() > 0) {
                     applyPassword.setEnabled(true);
                 } else {
                     applyPassword.setEnabled(false);
@@ -291,7 +297,7 @@ public class AlbumContentActivity extends AppCompatActivity implements ImageAdap
         mainController.getAlbumController().update("notice", data, String.valueOf(album_id));
     }
 
-    public void updateCapacity(){
+    public void updateCapacity() {
         long capacity = mainController.getImageController().getTotalCapacityFromImageIDs(image_ids);
         mainController.getAlbumController().update("capacity", String.valueOf(capacity), "id = " + "'" + String.valueOf(album_id) + "'");
     }
@@ -300,6 +306,7 @@ public class AlbumContentActivity extends AppCompatActivity implements ImageAdap
     public void onPointerCaptureChanged(boolean hasCapture) {
         super.onPointerCaptureChanged(hasCapture);
     }
+
     private void startSlideShow() {
         Intent intent = new Intent(this, SlideShowActivity.class);
         intent.putStringArrayListExtra("imageURIs", new ArrayList<>(imageURIs));
