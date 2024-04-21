@@ -1,30 +1,30 @@
 package com.example.albumgallery.view.activity;
 
 import static com.example.albumgallery.utils.Utilities.bitmapToByteArray;
-import static com.example.albumgallery.utils.Utilities.convertFromUriToBitmap;
 
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.net.Uri;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.Spinner;
-import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.bumptech.glide.Glide;
-import com.bumptech.glide.load.DataSource;
-import com.bumptech.glide.load.engine.GlideException;
-import com.bumptech.glide.request.RequestListener;
-import com.bumptech.glide.request.target.Target;
-import com.canhub.cropper.CropImageView;
+import com.bumptech.glide.load.DecodeFormat;
+import com.bumptech.glide.request.target.SimpleTarget;
+import com.bumptech.glide.request.transition.Transition;
 import com.example.albumgallery.R;
 import com.example.albumgallery.controller.MainController;
+import com.theartofdev.edmodo.cropper.CropImageView;
 
 public class CropImageActivity extends AppCompatActivity {
     private MainController mainController;
@@ -44,25 +44,47 @@ public class CropImageActivity extends AppCompatActivity {
 
         String id = getIntent().getStringExtra("id");
         String imageURL = mainController.getImageController().getImageById(id).getRef();
-        Glide.with(this)
-                .asBitmap()
-                .load(Uri.parse(imageURL))
-                .addListener(new RequestListener<Bitmap>() {
-                    @Override
-                    public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Bitmap> target, boolean isFirstResource) {
 
-                        return false;
-                    }
+        if (imageURL != null && !imageURL.isEmpty()) {
+            try {
+                // Load image into Bitmap using Glide
+                Glide.with(this)
+                        .asBitmap()
+                        .load(imageURL)
+                        .into(new SimpleTarget<Bitmap>() {
+                            @Override
+                            public void onResourceReady(@NonNull Bitmap resource, @Nullable Transition<? super Bitmap> transition) {
+                                // Set the loaded Bitmap to the CropImageView
+                                cropImageView.setImageBitmap(resource);
+                            }
 
-                    @Override
-                    public boolean onResourceReady(Bitmap resource, Object model, Target<Bitmap> target, DataSource dataSource, boolean isFirstResource) {
-                        cropImageView.setImageBitmap(resource);
-                        return false;
-                    }
-                })
-                .submit();
+                            @Override
+                            public void onLoadFailed(@Nullable Drawable errorDrawable) {
+                                super.onLoadFailed(errorDrawable);
+                                Log.e("CropImageActivity", "Failed to load image");
+                            }
+                        });
+            } catch (Exception e) {
+                Log.e("CropImageActivity", "Error loading image: " + e.getMessage());
+            }
+        } else {
+            Log.e("CropImageActivity", "Image URL is null or empty");
+        }
 
         setupAspectRatioSpinner();
+
+        Button buttonSave = findViewById(R.id.buttonSave);
+        buttonSave.setOnClickListener(v -> goBack(true));
+
+        View buttonBack = findViewById(R.id.action_back);
+        buttonBack.setOnClickListener(v -> goBack(false));
+
+        Button buttonCrop = findViewById(R.id.buttonCrop);
+        buttonCrop.setOnClickListener(v -> {
+            hasChanges = true;
+            Bitmap croppedImage = cropImageView.getCroppedImage();
+            cropImageView.setImageBitmap(croppedImage);
+        });
     }
 
     private void setupAspectRatioSpinner() {
@@ -119,22 +141,16 @@ public class CropImageActivity extends AppCompatActivity {
 //        }
 //    }
 
-    public void cropAction(View view) {
-        hasChanges = true;
-        Bitmap croppedImage = cropImageView.getCroppedImage();
-        cropImageView.setImageBitmap(croppedImage);
-    }
+    private void goBack(boolean acceptChanges) {
+        if (acceptChanges) {
+            Bitmap croppedImage = cropImageView.getCroppedImage();
 
-    public void saveAction(View view) {
-        Bitmap croppedImage = cropImageView.getCroppedImage();
-
-        Intent intent = new Intent(this, EditImageActivity.class);
-        intent.putExtra("imageByteArray", bitmapToByteArray(croppedImage));
-        setResult(RESULT_OK, intent);
-        finish();
-    }
-
-    public void backAction(View view) {
+            Intent intent = new Intent(this, EditImageActivity.class);
+            intent.putExtra("imageByteArray", bitmapToByteArray(croppedImage));
+            setResult(RESULT_OK, intent);
+        } else {
+            setResult(RESULT_CANCELED);
+        }
         finish();
     }
 }

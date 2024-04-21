@@ -127,8 +127,9 @@ dependencies {
 
     implementation("com.github.bumptech.glide:glide:4.16.0")
     // Image Cropper
-    implementation("com.vanniktech:android-image-cropper:4.5.0")
+    //implementation("com.vanniktech:android-image-cropper:4.5.0")
     // QR Code Scanner
     implementation("com.google.zxing:core:3.5.3")
     implementation("com.github.denzcoskun:ImageSlideshow:0.1.0")
+    implementation("com.theartofdev.edmodo:android-image-cropper:2.8.0")
 }
