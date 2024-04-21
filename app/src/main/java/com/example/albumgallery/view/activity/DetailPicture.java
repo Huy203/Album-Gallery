@@ -133,27 +133,6 @@ public class DetailPicture extends AppCompatActivity implements ImageInfoListene
                 }
             }
         });
-
-        imageView.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                // Get touch coordinates relative to the ImageView
-                float x = event.getX();
-                float y = event.getY();
-
-                // Check if the touch coordinates are within any of the bounding boxes
-                for (int i = 0; i < boundingBoxes.size(); i++) {
-                    Rect rect = boundingBoxes.get(i);
-                    if (rect.contains((int) x, (int) y)) {
-                        // If the touch coordinates are within the bounding box, handle the click event
-                        String clickedText = textRecognized.get(i);
-                        Toast.makeText(DetailPicture.this, "Clicked: " + clickedText, Toast.LENGTH_SHORT).show();
-                        return true; // Consume the touch event
-                    }
-                }
-                return false; // Let other touch listeners handle the event
-            }
-        });
     }
 
     private void setIconTintButton(MaterialButton button, boolean temp) {
@@ -476,9 +455,6 @@ public class DetailPicture extends AppCompatActivity implements ImageInfoListene
         }
     }
 
-    public void ocrAction(View view){
-        loadRecognizeText();
-    }
     private void toggleDeleteImage(String id) {
         Log.d("update delete successfully 2", "ok");
         isDeleted = !isDeleted;
@@ -490,7 +466,6 @@ public class DetailPicture extends AppCompatActivity implements ImageInfoListene
         Log.d("image content id", String.valueOf(id));
         return mainController.getImageController().getImageById(id);
     }
-
     @Override
     public void onTextRecognized(List<String> textRecognized, List<Rect> boundingBoxes, Bitmap bitmap) {
         // You can also draw bounding boxes on an ImageView
@@ -555,4 +530,5 @@ public class DetailPicture extends AppCompatActivity implements ImageInfoListene
         }
         return bitmapWithBoxes;
     }
+
 }
