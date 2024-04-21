@@ -59,4 +59,9 @@
     <string name="ratio_grid">Ratio photo grid</string>
     <string name="full_screen_grid">Full screen</string>
     <string name="crop">Crop</string>
+    <string name="choose_image">Choose Image</string>
+    <string name="enter_password">Enter password</string>
+    <string name="options">Options</string>
+    <string name="add_to_album">Add to Album</string>
+    <string name="set_as_wallpaper">Set as Wallpaper</string>
 </resources>

@@ -57,5 +57,11 @@
     <string name="square_grid">Lưới ảnh vuông</string>
     <string name="ratio_grid">Lưới ảnh theo tỉ lệ</string>
     <string name="full_screen_grid">Toàn màn hình</string>
+    <string name="crop">Cắt ảnh</string>
+    <string name="choose_image">Chọn ảnh</string>
+    <string name="enter_password">Nhập mật khẩu</string>
+    <string name="options">Tùy chọn</string>
+    <string name="add_to_album">Thêm vào Album</string>
+    <string name="set_as_wallpaper">Đặt làm Hình nền</string>
 
 </resources>

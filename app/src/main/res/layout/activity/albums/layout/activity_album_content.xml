@@ -17,14 +17,13 @@
             android:gravity="center_vertical"
             android:layout_marginLeft="8dp"
             android:layout_marginRight="8dp">
-            <ImageButton
+            <com.google.android.material.button.MaterialButton
                 android:id="@+id/backButtonAlbumContent"
-                android:layout_width="48dp"
-                android:layout_height="48dp"
-                android:src="@drawable/previous_button"
+                style="@style/AppButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 android:scaleType="fitCenter"
-                android:background="?attr/selectableItemBackgroundBorderless"
-                android:contentDescription="@string/create_album" />
+                app:icon="@drawable/back_black" />
             <TextView
                 android:id="@+id/albumNameAlbumContent"
                 android:layout_width="wrap_content"
