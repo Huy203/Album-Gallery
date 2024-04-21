@@ -203,7 +203,7 @@ public class BinFragment extends Fragment {
                     Log.v("HomeScreenFragment", "showDeleteConfirmationDialog" + getActivity());
 
                     builder.setTitle("Confirm Deletion");
-                    builder.setMessage("Are you sure you want to delete this image forever?");
+                    builder.setMessage("Are you sure you want to delete these images forever?");
 
                     builder.setPositiveButton("Delete", (dialog, which) -> {
 //                        selectedImageURLsTask = imageAdapter.getSelectedImageURLsTask();
@@ -226,6 +226,39 @@ public class BinFragment extends Fragment {
                         imageAdapter.clearSelectedItems();
                         onResume();
                         fragToActivityListener.onFragmentAction("Delete", true);
+                        updateUI();
+                    });
+
+                    builder.setNegativeButton("Cancel", null);
+                    builder.show();
+                });
+            }
+        }
+    }
+
+    public void showRestoreConfirmationDialog() {
+        if (isAdded() && getActivity() != null) {
+            if (!getActivity().isFinishing()) {
+                getActivity().runOnUiThread(() -> {
+
+                    AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+                    Log.v("HomeScreenFragment", "showRestoreConfirmationDialog" + getActivity());
+
+                    builder.setTitle("Confirm Deletion");
+                    builder.setMessage("Are you sure you want to restore these images?");
+
+                    builder.setPositiveButton("Restore", (dialog, which) -> {
+
+                        for (String uri : imageAdapter.getSelectedImageURLs()) {
+                            String id = mainController.getImageController().getIdByRef(uri);
+                            if (id != null) {
+                                mainController.getImageController().setDelete(id, false);
+                                mainController.getImageController().delete("id = '" + id + "'");
+                            }
+                        }
+                        imageAdapter.clearSelectedItems();
+                        onResume();
+                        fragToActivityListener.onFragmentAction("Restore", true);
                         updateUI();
                     });
 
@@ -294,6 +327,8 @@ public class BinFragment extends Fragment {
                 onPause();
                 break;
             case "Restore":
+                showRestoreConfirmationDialog();
+                onPause();
                 break;
         }
     }

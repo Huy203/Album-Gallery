@@ -329,11 +329,9 @@ public class MainFragmentController extends AppCompatActivity implements Backgro
         Fragment fragment = getSupportFragmentManager().findFragmentById(R.id.fragment_container);
         if (fragment instanceof HomeScreenFragment && fragment.isAdded()) {
             ((HomeScreenFragment) fragment).ActivityToFragListener("Share");
-        } else if (fragment instanceof BinFragment && fragment.isAdded()) {
-            ((BinFragment) fragment).ActivityToFragListener("Delete");
         }
         else if (fragment instanceof SearchFragment && fragment.isAdded()) {
-            ((SearchFragment) fragment).ActivityToFragListener("Delete");
+            ((SearchFragment) fragment).ActivityToFragListener("Share");
         }
     }
 
@@ -406,7 +404,10 @@ public class MainFragmentController extends AppCompatActivity implements Backgro
     }
 
     public void restoreAction(View view) {
-
+        Fragment fragment = getSupportFragmentManager().findFragmentById(R.id.fragment_container);
+        if (fragment instanceof BinFragment) {
+            ((BinFragment) fragment).ActivityToFragListener("Restore");
+        }
     }
 
     @SuppressLint("SetTextI18n")
@@ -424,6 +425,15 @@ public class MainFragmentController extends AppCompatActivity implements Backgro
                     toggleMultipleChoice();
                 } else {
                     Toast.makeText(this, "Failed to delete image", Toast.LENGTH_SHORT).show();
+                }
+                break;
+            case "Restore":
+                boolean isRestored = (boolean) data;
+                Log.v("MainFragmentController", "Is restored: " + isRestored);
+                if (isRestored) {
+                    toggleMultipleChoice();
+                } else {
+                    Toast.makeText(this, "Failed to restore image", Toast.LENGTH_SHORT).show();
                 }
                 break;
             case "Like":

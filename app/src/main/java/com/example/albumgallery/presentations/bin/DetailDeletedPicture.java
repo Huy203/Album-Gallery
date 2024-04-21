@@ -7,6 +7,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -126,7 +127,10 @@ public class DetailDeletedPicture extends AppCompatActivity implements ImageInfo
         builder.setPositiveButton("Restore", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                // Call deleteSelectedImage() method from ImageController
+
+                LinearLayout bottom_main_menu2 = findViewById(R.id.bottomMenuMain2);
+                bottom_main_menu2.setVisibility(View.GONE);
+
                 finish();
                 // mainController.getImageController().deleteSelectedImage(uri);
 
@@ -175,7 +179,7 @@ public class DetailDeletedPicture extends AppCompatActivity implements ImageInfo
         if (imageModel != null) {
             showRestoreConfirmationDialog(imageModel.getRef());
         } else {
-            Toast.makeText(this, "No image to delete", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "No image to restore", Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -189,5 +193,10 @@ public class DetailDeletedPicture extends AppCompatActivity implements ImageInfo
         intent.putExtra("update", false);
         setResult(RESULT_OK, intent);
         supportFinishAfterTransition();
+    }
+
+    @Override
+    public void onTimePassed(String data) {
+
     }
 }

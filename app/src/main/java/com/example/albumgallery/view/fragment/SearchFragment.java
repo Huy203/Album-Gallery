@@ -16,6 +16,8 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
 import android.widget.PopupMenu;
 import android.widget.Toast;
 
@@ -131,7 +133,6 @@ public class SearchFragment extends Fragment {
                 return true;
             }
         });
-
     }
 
     private void changeViewAction(View view) {
@@ -223,12 +224,16 @@ public class SearchFragment extends Fragment {
 
     public void updateUI() {
         Log.v("HomeScreenFragment", "updateUI");
-        imageURIs.clear();
-        List<String> imageURLsFavourited = mainController.getImageController().getAllImageURLsFavourited();
-        // imageURIs.addAll(mainController.getImageController().getAllImageURLsUndeleted());
+        String searchText = searchView.getQuery().toString().trim();
+        if (!searchText.isEmpty()) {
+            // If the search box contains text, perform the search
+            searchImages(searchText);
+        } else {
+            // If the search box is empty, keep imageURIs empty
+            imageURIs.clear();
+        }
 
         imageAdapter = new ImageAdapter(getActivity(), imageURIs);
-        imageAdapter.setImageURLsFavourite(imageURLsFavourited);
         // Switch to list display
         if (SharePreferenceHelper.isGridLayoutEnabled(getActivity()).equals("full")) {
             recyclerMediaView.setLayoutManager(new LinearLayoutManager(getContext()));
