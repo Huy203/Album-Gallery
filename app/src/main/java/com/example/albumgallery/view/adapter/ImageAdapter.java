@@ -12,7 +12,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.CheckBox;
-import android.widget.FrameLayout;
 import android.widget.ImageView;
 
 import androidx.annotation.NonNull;
@@ -68,7 +67,8 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> 
         String imageURL = getImageURLs().get(position);
         holder.bind(imageURL);
         holder.isLiked.setVisibility(imageURLsFavourited.contains(imageURL) ? View.VISIBLE : View.GONE);
-        holder.checkbox.setVisibility(isMultipleChoice ? View.VISIBLE : View.GONE); // Update visibility based on isMultipleChoice
+        holder.checkbox.setVisibility(getSelectedItems().get(position, false) ? View.VISIBLE : View.GONE); // Update visibility based on isMultipleChoice
+        holder.checkbox.setChecked(getSelectedItems().get(position, false)); // Update checkbo
         holderList.add(holder);
     }
 
@@ -186,26 +186,24 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> 
 
             checkbox.setOnClickListener(view -> {
                 toggleSelection();
-                listener.toggleMultipleChoice();
+//                listener.toggleMultipleChoice();
             });
 
             itemView.setOnClickListener(view -> {
                 if (!isMultipleChoice) {
                     listener.handleImagePick(imageView, imageURL, getAdapterPosition());
                 } else {
-                    listener.getInteractedURIs(imageURL);
+//                    listener.getInteractedURIs(imageURL);
                     toggleSelection();
-                    listener.toggleMultipleChoice();
-                    listener.getInteractedURIs(imageURL);
+//                    listener.toggleMultipleChoice();
                 }
             });
 
             itemView.setOnLongClickListener(view -> {
                 isMultipleChoice = true;
                 toggleSelection();
-                listener.getInteractedURIs(imageURL);
-                listener.toggleMultipleChoice();
-                listener.getInteractedURIs(imageURL);
+//                listener.getInteractedURIs(imageURL);
+//                listener.toggleMultipleChoice();
                 return true;
             });
         }
