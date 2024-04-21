@@ -42,6 +42,7 @@ import com.google.android.material.textfield.TextInputEditText;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class AlbumContentActivity extends AppCompatActivity implements ImageAdapterListener, AlbumInfoListener {
     private RecyclerView recyclerView;
@@ -50,8 +51,8 @@ public class AlbumContentActivity extends AppCompatActivity implements ImageAdap
     private MainController mainController;
     private String albumName;
     private TextView albumNameTxtView;
-    private List<Long> image_ids;
-    private int album_id;
+    private List<String> image_ids;
+    private String album_id;
     private View view;
     private boolean isAlbumInfoVisible = false;
     @Override
@@ -74,14 +75,14 @@ public class AlbumContentActivity extends AppCompatActivity implements ImageAdap
         Button SlideShow = findViewById(R.id.SlideShow);
         view = findViewById(R.id.albumInfo);
 
-        album_id = (int) mainController.getAlbumController().getAlbumIdByName(albumName);
-        Log.d("album_id", Integer.toString(album_id));
+        album_id = mainController.getAlbumController().getAlbumIdByName(albumName);
+//        Log.d("album_id", Integer.toString(album_id));
 
         image_ids = mainController.getImageAlbumController().getImageIdsByAlbumId(album_id);
 
         updateCapacity();
 
-        for(Long image_id: image_ids) {
+        for(String image_id: image_ids) {
             String ref = mainController.getImageController().getImageRefById(image_id);
             Log.d("ref from id", ref);
             imageURIs.add(ref);
@@ -190,7 +191,7 @@ public class AlbumContentActivity extends AppCompatActivity implements ImageAdap
             public void onClick(DialogInterface dialog, int which) {
                 // Call deleteSelectedImage() method from ImageController
 
-                long id_album = mainController.getAlbumController().getAlbumIdByName(albumName);
+                String id_album = mainController.getAlbumController().getAlbumIdByName(albumName);
 
                 Log.d("check before name", albumName);
                 Log.d("check before id", String.valueOf(id_album));
@@ -198,7 +199,7 @@ public class AlbumContentActivity extends AppCompatActivity implements ImageAdap
                 Log.d("check delete image_album size", String.valueOf(image_albums.size()));
                 for(ImageAlbumModel image_album : image_albums){
                     Log.d("check id", String.valueOf(image_album.getAlbum_id()));
-                    if(image_album.getAlbum_id() == id_album){
+                    if(Objects.equals(image_album.getAlbum_id(), id_album)){
                         mainController.getImageAlbumController().deleteImageAlbum(image_album.getAlbum_id());
                         Log.d("check delete album", String.valueOf(image_album.getAlbum_id()));
                     }
@@ -292,7 +293,7 @@ public class AlbumContentActivity extends AppCompatActivity implements ImageAdap
 
     public void updateCapacity(){
         long capacity = mainController.getImageController().getTotalCapacityFromImageIDs(image_ids);
-        mainController.getAlbumController().update("capacity", String.valueOf(capacity), String.valueOf(album_id));
+        mainController.getAlbumController().update("capacity", String.valueOf(capacity), "id = " + "'" + String.valueOf(album_id) + "'");
     }
 
     @Override

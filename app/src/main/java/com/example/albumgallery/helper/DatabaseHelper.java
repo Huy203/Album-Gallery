@@ -68,7 +68,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                     "    picture TEXT\n" +
                     ");");
             db.execSQL("CREATE TABLE " + ALBUM_TABLE + " (\n" +
-                    "    id TEXT,\n" +
+                    "    id TEXT PRIMARY KEY,\n" +
                     "    name TEXT,\n" +
                     "    capacity INTEGER,\n" +
                     "    created_at TIMESTAMP,\n" +
@@ -164,6 +164,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public String insert(String table, Model model) {
         Log.v("DatabaseHelper", "Inserting data");
         SQLiteDatabase db = getWritableDatabase();
+        Log.v("DatabaseHelper", model.insert());
         db.execSQL(model.insert());
         return model.getId();
     }
@@ -171,6 +172,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public void insertByCustomId(String table, Model model) {
         SQLiteDatabase db = getWritableDatabase();
         try {
+            Log.d("Create Album Activity", model.insert());
             db.execSQL(model.insert());
         } catch (SQLiteException e) {
             Log.e("database error", e.getMessage());
@@ -346,13 +348,13 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return null;
     }
 
-    public long getLastId(String table) {
+    public String getLastId(String table) {
         SQLiteDatabase db = getWritableDatabase();
         Cursor cursor = db.rawQuery("SELECT id FROM " + table + " ORDER BY id DESC LIMIT 1", null);
         if (cursor.moveToFirst()) {
-            return cursor.getLong(0);
+            return cursor.getString(0);
         }
-        return -1;
+        return null;
     }
 
     //    public List<String> getAll(String table) {
@@ -459,14 +461,14 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return count > 0;
     }
 
-    public long getAlbumIdByName(String albumName) {
+    public String getAlbumIdByName(String albumName) {
         SQLiteDatabase db = getReadableDatabase();
         Cursor cursor = db.rawQuery("SELECT id FROM " + ALBUM_TABLE + " WHERE name = ?", new String[]{albumName});
-        long albumId = -1;
+        String albumId = "";
         if (cursor != null) {
             Log.d("cursor", cursor.toString());
             if (cursor.moveToFirst()) {
-                albumId = cursor.getLong(0);
+                albumId = cursor.getString(0);
                 Log.d("album id", String.valueOf(albumId));
             }
             cursor.close();
@@ -474,14 +476,14 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return albumId;
     }
 
-    public List<Long> getImageIdsByAlbumId(long albumId) {
-        List<Long> imageIds = new ArrayList<>();
+    public List<String> getImageIdsByAlbumId(String albumId) {
+        List<String> imageIds = new ArrayList<>();
         SQLiteDatabase db = getReadableDatabase();
         Cursor cursor = db.rawQuery("SELECT image_id FROM " + IMAGE_ALBUM_TABLE + " WHERE album_id = ?", new String[]{String.valueOf(albumId)});
         if (cursor != null) {
             if (cursor.moveToFirst()) {
                 do {
-                    long imageId = cursor.getLong(0);
+                    String imageId = cursor.getString(0);
                     imageIds.add(imageId);
                 } while (cursor.moveToNext());
             }
@@ -490,7 +492,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return imageIds;
     }
 
-    public String getImageRefById(long imageId) {
+    public String getImageRefById(String imageId) {
         SQLiteDatabase db = getReadableDatabase();
         String ref = null;
         Cursor cursor = db.rawQuery("SELECT ref FROM " + IMAGE_TABLE + " WHERE id = ?", new String[]{String.valueOf(imageId)});
@@ -504,11 +506,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
 
     @SuppressLint("Range")
-    public long getTotalCapacityFromImageIDs(List<Long> imageIDs) {
+    public long getTotalCapacityFromImageIDs(List<String> imageIDs) {
         long totalCapacity = 0;
         SQLiteDatabase db = getReadableDatabase();
 
-        for (Long imageId : imageIDs) {
+        for (String imageId : imageIDs) {
             Cursor cursor = db.rawQuery("SELECT capacity FROM " + IMAGE_TABLE + " WHERE id = ?", new String[]{String.valueOf(imageId)});
             if (cursor != null && cursor.moveToFirst()) {
                 // Get the capacity from the cursor and add it to the total capacity
