@@ -181,7 +181,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     public void delete(String table, String where) {
         SQLiteDatabase db = getWritableDatabase();
-        db.execSQL("DELETE FROM " + table + " WHERE " + where);
+        if(where == null) {
+            db.execSQL("DELETE FROM " + table);
+        } else {
+            db.execSQL("DELETE FROM " + table + " WHERE " + where);
+        }
     }
 
     public void update(String table, String column, String value, String where) {

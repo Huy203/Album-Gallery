@@ -117,6 +117,10 @@ public class Auth extends AppCompatActivity {
         firebaseManager.getFirebaseAuth().signInWithEmailAndPassword(email, password)
                 .addOnCompleteListener(this, task -> {
                     if (task.isSuccessful()) {
+                        FirebaseUser user = firebaseManager.getFirebaseAuth().getCurrentUser();
+                        if (user != null) {
+                            mainController.getUserController().loadFromFirestore();
+                        }
                     } else {
                         Snackbar.make(findViewById(android.R.id.content), "The supplied auth credential is incorrect", Snackbar.LENGTH_LONG)
                                 .setTextColor(SharePreferenceHelper.isDarkModeEnabled(Auth.this) ? getResources().getColor(R.color.white) : getResources().getColor(R.color.black))

@@ -48,6 +48,9 @@ import com.google.android.material.imageview.ShapeableImageView;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 
 public class MainFragmentController extends AppCompatActivity implements BackgroundProcessingCallback, ImageAdapterListener, FragToActivityListener {
@@ -101,11 +104,14 @@ public class MainFragmentController extends AppCompatActivity implements Backgro
 
         MainController mainController = new MainController(this);
         mainController.getImageController().loadFromFirestore();
-        mainController.getUserController().loadFromFirestore();
-        initiateVariable(mainController.getUserController().getUser().getPicture());
+        ScheduledExecutorService executorService = Executors.newSingleThreadScheduledExecutor();
+        executorService.schedule(() -> {
+            initiateVariable(mainController.getUserController().getUser().getPicture());
+            Log.v("MainFragmentController", "Scheduled task");
+        }, 1, TimeUnit.SECONDS);
     }
 
-    private void initiateVariable(String picture) {
+    public void initiateVariable(String picture) {
         ShapeableImageView avatar = findViewById(R.id.action_user);
         if (picture != null) {
             Log.v("UserActivity", "Picture: " + picture);
