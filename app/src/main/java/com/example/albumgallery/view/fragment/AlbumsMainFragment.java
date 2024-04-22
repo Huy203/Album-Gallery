@@ -7,6 +7,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -16,8 +17,10 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.albumgallery.R;
 import com.example.albumgallery.controller.MainController;
+import com.example.albumgallery.presentations.bin.BinFragment;
 import com.example.albumgallery.view.activity.AlbumContentActivity;
 import com.example.albumgallery.view.activity.CreateAlbumActivity;
+import com.example.albumgallery.view.activity.MainFragmentController;
 import com.example.albumgallery.view.activity.PasswordAlbumActivity;
 import com.example.albumgallery.view.adapter.AlbumAdapter;
 import com.example.albumgallery.view.adapter.AlbumAdapterListener;
@@ -56,10 +59,10 @@ public class AlbumsMainFragment extends Fragment implements AlbumAdapterListener
         handleInteractions(view);
 
         initializeData();
-        for (int i = 0; i < thumbnails.size(); i++) {
-            Log.d("albumfrag", thumbnails.get(i));
-            Log.d("albumfrag", albumNames.get(i));
-        }
+//        for (int i = 0; i < thumbnails.size(); i++) {
+//            Log.d("albumfrag", thumbnails.get(i));
+//            Log.d("albumfrag", albumNames.get(i));
+//        }
 
         recyclerView = (RecyclerView) view.findViewById(R.id.albumsRecyclerView);
         recyclerView.setLayoutManager(new GridLayoutManager(view.getContext(), 2, GridLayoutManager.HORIZONTAL, false));
@@ -67,6 +70,22 @@ public class AlbumsMainFragment extends Fragment implements AlbumAdapterListener
         albumAdapter = new AlbumAdapter(getActivity(), albumNames, thumbnails);
         albumAdapter.setAlbumAdapterListener(this);
         recyclerView.setAdapter(albumAdapter);
+
+        // Find the included layouts by their IDs
+        View favouriteLayout = getView().findViewById(R.id.favourite);
+        View binLayout = getView().findViewById(R.id.bin);
+
+        favouriteLayout.setOnClickListener(view1 -> {
+            Intent mainFragment = new Intent(getContext(), MainFragmentController.class);
+            mainFragment.putExtra("fragmentToLoad", "Favourite");
+            startActivity(mainFragment);
+        });
+
+        binLayout.setOnClickListener(view1 -> {
+            Intent mainFragment = new Intent(getContext(), MainFragmentController.class);
+            mainFragment.putExtra("fragmentToLoad", "Bin");
+            startActivity(mainFragment);
+        });
     }
 
     private void handleInteractions(View view) {

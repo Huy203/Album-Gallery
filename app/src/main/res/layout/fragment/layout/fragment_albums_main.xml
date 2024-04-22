@@ -32,6 +32,14 @@
             android:layout_marginBottom="10dp"
             android:background="#61677A" />
 
+        <include
+            android:id="@+id/favourite"
+            layout="@layout/item_album_favourite"/>
+
+        <include
+            android:id="@+id/bin"
+            layout="@layout/item_album_bin"/>
+
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/albumsRecyclerView"
             android:layout_width="match_parent"

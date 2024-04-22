@@ -63,5 +63,6 @@
     <string name="options">Tùy chọn</string>
     <string name="add_to_album">Thêm vào Album</string>
     <string name="set_as_wallpaper">Đặt làm Hình nền</string>
-
+    <string name="album_favourite">Ảnh yêu thích</string>
+    <string name="album_bin">Thùng rác/string></string>
 </resources>

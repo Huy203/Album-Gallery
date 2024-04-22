@@ -64,4 +64,6 @@
     <string name="options">Options</string>
     <string name="add_to_album">Add to Album</string>
     <string name="set_as_wallpaper">Set as Wallpaper</string>
+    <string name="album_favourite">Favourites</string>
+    <string name="album_bin">Bin</string>
 </resources>
