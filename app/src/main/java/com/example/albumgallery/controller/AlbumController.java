@@ -1,25 +1,52 @@
 package com.example.albumgallery.controller;
 
+import com.example.albumgallery.FirebaseManager;
 import com.example.albumgallery.helper.DatabaseHelper;
 import com.example.albumgallery.model.AlbumModel;
 import com.example.albumgallery.model.ImageModel;
 import com.example.albumgallery.model.Model;
+import com.example.albumgallery.view.activity.MainFragmentController;
 
+import android.app.Activity;
 import android.content.Context;
 import android.util.Log;
 
+import androidx.annotation.NonNull;
+
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
-public class AlbumController implements Controller {
-    private AlbumModel album;
-    private final DatabaseHelper dbHelper;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
 
-    public AlbumController(Context context) {
-        album = new AlbumModel(context);
-        this.dbHelper = new DatabaseHelper(context);
+public class AlbumController implements Controller {
+//    private AlbumModel album;
+    private final static String TAG = "Album";
+    private final DatabaseHelper dbHelper;
+    private final Activity activity;
+    private final FirebaseManager firebaseManager;
+    private AlbumModel currentModel;
+
+
+//    public AlbumController(Context context) {
+////        album = new AlbumModel(context);
+//        this.dbHelper = new DatabaseHelper(context);
+////        this.firebaseManager = FirebaseManager.getInstance(activity);
+//
+//    }
+
+    public AlbumController(Activity activity) {
+        this.activity = activity;
+        this.dbHelper = new DatabaseHelper(activity);
+        this.firebaseManager = FirebaseManager.getInstance(activity);
+        this.currentModel = new AlbumModel();
     }
     private DatabaseHelper getDbHelper(){
         return dbHelper;
@@ -37,14 +64,41 @@ public class AlbumController implements Controller {
     }
     @Override
     public void insert(Model model) {
-        dbHelper.insert("Album", model);
-        dbHelper.close();
+//        dbHelper.insert("Album", model);
+//        dbHelper.close();
+
+        firebaseManager.getFirebaseHelper().add(TAG, model, firebaseManager.getFirebaseAuth().getCurrentUser().getUid())
+                .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
+                    @Override
+                    public void onSuccess(DocumentReference documentReference) {
+                        currentModel.setId(documentReference.getId());
+//                        idSelectedImages.add(dbHelper.insert("Image", currentModel));
+                        dbHelper.insert("Album", currentModel);
+                        update("id", documentReference.getId(), "id = '" + documentReference.getId() + "'");
+                        dbHelper.close();
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Log.w(TAG, "Error adding document", e);
+                    }
+                });
     }
 
     @Override
     public void update(String column, String value, String where) {
+//        dbHelper.update("Album", column, value, where);
+//        dbHelper.close();
         dbHelper.update("Album", column, value, where);
         dbHelper.close();
+        Map<String, Object> data = new HashMap<>();
+        data.put(column, value);
+        int start = where.indexOf("'") + 1;
+        int end = where.lastIndexOf("'");
+        String id = where.substring(start, end);
+        Log.v(TAG, "Updating document with ID: " + id + " " + data.toString());
+        firebaseManager.getFirebaseHelper().update(TAG, data, id, firebaseManager.getFirebaseAuth().getCurrentUser().getUid());
     }
 
     @Override
@@ -52,13 +106,21 @@ public class AlbumController implements Controller {
         dbHelper.delete("Album", where);
         dbHelper.close();
     }
-
-    public void addAlbum(String name, String password, int numOfImages) {
+//    public void handleCreateAlbum(AlbumModel albumModel) {
+//        currentModel = albumModel;
+//        insert(currentModel);
+//    }
+    public void addAlbum(String name, String password, int numOfImages, String thumbnail) {
         UUID id = UUID.randomUUID();
         // Add an album
-        AlbumModel albumModel = new AlbumModel(name, password, numOfImages);
-        albumModel.setId(id.toString());
-        this.insert(albumModel);
+//        AlbumModel albumModel = new AlbumModel(name, password, numOfImages);
+//        albumModel.setId(id.toString());
+//        this.currentModel = albumModel;
+//        this.insert(currentModel);
+        this.currentModel = new AlbumModel(name, password, numOfImages);
+        currentModel.setId(id.toString());
+        currentModel.setThumbnail(thumbnail);
+        this.insert(currentModel);
     }
 
     public boolean isAlbumNameExists(String albumName) {
@@ -127,6 +189,66 @@ public class AlbumController implements Controller {
         String[] temp = data.split(",");
         Log.d("temp data", Arrays.toString(temp));
         return new AlbumModel(temp[0], temp[1], Integer.parseInt(temp[2]), temp[4], temp[5], Integer.parseInt(temp[7]));
+    }
+
+    public List<String> getAllAlbumIds() {
+        return dbHelper.getFromAlbum("id");
+    }
+
+
+
+    public void loadFromFirestore() {
+        List<String> albumIdsIdsInDatabase = getAllAlbumIds();
+        List<String> albumIdsInFirestore = new ArrayList<>();
+        firebaseManager.getFirebaseHelper().getAll(firebaseManager.getFirebaseAuth().getCurrentUser().getUid(), TAG)
+                .continueWith(task -> {
+                    if (task.isSuccessful()) {
+                        for (DocumentSnapshot document : task.getResult()) {
+                            albumIdsInFirestore.add(document.getId());
+//                            Log.d("Firebase album", document.getId());
+                        }
+                        if (albumIdsIdsInDatabase.size() < albumIdsInFirestore.size()) {
+                            for (String albumId : albumIdsInFirestore) {
+                                if (!albumIdsIdsInDatabase.contains(albumId)) {
+                                    firebaseManager.getFirebaseHelper().getById(TAG, albumId, firebaseManager.getFirebaseAuth().getCurrentUser().getUid())
+                                            .addOnSuccessListener(documentSnapshot -> {
+                                                if (documentSnapshot != null) {
+                                                    currentModel = new AlbumModel(
+                                                            documentSnapshot.get("id").toString(),
+                                                            documentSnapshot.get("name").toString(),
+                                                            Integer.parseInt(documentSnapshot.get("capacity").toString()),
+                                                            documentSnapshot.get("created_at").toString(),
+                                                            documentSnapshot.get("notice").toString(),
+                                                            documentSnapshot.get("ref").toString(),
+                                                            documentSnapshot.get("password").toString(),
+                                                            Integer.parseInt(documentSnapshot.get("num_of_images").toString()),
+//                                                            documentSnapshot.get("is_deleted").equals("1") ? true : false,
+                                                            Integer.parseInt(documentSnapshot.get("is_deleted").toString()),
+                                                            documentSnapshot.get("thumbnail").toString() );
+                                                    String latest_album_id = getLastAlbumId();
+                                                    Log.d("Firebase album latest", latest_album_id);
+                                                    if(!latest_album_id.equals(currentModel.getId())) {
+                                                        dbHelper.insert("Album", currentModel);
+                                                        Log.d("Firebase album", currentModel.getName());
+                                                    }
+//                                                    activity.runOnUiThread(() -> {
+//                                                        ((MainFragmentController) activity).onBackgroundTaskCompleted();
+//                                                    });
+                                                } else {
+                                                    Log.d("Firebase album", "document is null");
+                                                }
+                                            });
+                                }
+                            }
+                        }
+//                        if (allTasksCompleted(uploadTasks)) {
+//                            activity.runOnUiThread(() -> {
+//                                ((MainFragmentController) activity).onBackgroundTaskCompleted();
+//                            });
+//                        }
+                    }
+                    return albumIdsInFirestore;
+                });
     }
 
 }

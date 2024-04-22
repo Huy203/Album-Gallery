@@ -67,8 +67,11 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> 
         holder.bind(imageURL);
         holder.isLiked.setVisibility(imageURLsFavourited.contains(imageURL) ? View.VISIBLE : View.GONE);
         holder.checkbox.setVisibility(isMultipleChoice ? View.VISIBLE : View.GONE); // Update visibility based on isMultipleChoice
+//        holder.checkbox.setVisibility(getSelectedItems().get(position, false) ? View.VISIBLE : View.GONE); // Update visibility based on isMultipleChoice
+//        holder.checkbox.setChecked(getSelectedItems().get(position, false)); // Update checkbox
         holderList.add(holder);
     }
+
 
     @Override
     public int getItemCount() {
@@ -173,16 +176,16 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> 
                     listener.handleImagePick(imageView, imageURL, getAdapterPosition());
                 } else {
 //                    Log.d("justclick", imageURL);
-                    listener.getInteractedURIs(imageURL);
                     toggleSelection();
                     listener.toggleMultipleChoice();
+                    listener.getInteractedURIs(imageURL);
                 }
             });
 
             itemView.setOnLongClickListener(view -> {
                 isMultipleChoice = true;
                 toggleSelection();
-                listener.getInteractedURIs(imageURL);
+//                listener.getInteractedURIs(imageURL);
                 listener.toggleMultipleChoice();
                 return true;
             });

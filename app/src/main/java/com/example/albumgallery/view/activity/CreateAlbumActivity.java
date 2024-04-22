@@ -78,12 +78,20 @@ public class CreateAlbumActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 Intent selectImageActivity = new Intent(CreateAlbumActivity.this, SelectImageActivity.class);
+                selectImageActivity.putExtra("albumName", albumNameInputTxt.getEditText().getText().toString());
                 startActivity(selectImageActivity);
                 finish();
             }
         });
 
         albumNameInputTxt = (TextInputLayout) findViewById(R.id.albumName);
+        String albumNameTemp = getIntent().getStringExtra("albumName");
+        if(albumNameTemp != null) {
+            Log.d("Keep album name in create", albumNameTemp);
+            albumNameInputTxt.getEditText().setText(albumNameTemp);
+        } else {
+            Log.d("Keep album name in create", "is null");
+        }
 
         passwordInputText = (TextInputLayout) findViewById(R.id.passwordInputText);
 
@@ -127,16 +135,17 @@ public class CreateAlbumActivity extends AppCompatActivity {
                         makeNotification(findViewById(R.id.relativeLayoutCreateAlbum), "Please choose at least 1 image");
                         return;
                     }
+                    selectedImageURLs = getIntent().getStringArrayListExtra("selectedImageURIs");
                     // add album
-                    mainController.getAlbumController().addAlbum(albumName, password, numOfImages);
+                    mainController.getAlbumController().addAlbum(albumName, password, numOfImages, selectedImageURLs.get(0));
                     // get the album's id just added and add to album_image table
                     String id_album = mainController.getAlbumController().getLastAlbumId();
-                    selectedImageURLs = getIntent().getStringArrayListExtra("selectedImageURIs");
                     List<String> ids = new ArrayList<>();
                     for(String uri: selectedImageURLs) {
                         ids.add(mainController.getImageController().getIdByRef(uri));
                     }
-                    mainController.getAlbumController().updateThumbnailByAlbumName(albumName, selectedImageURLs.get(0));
+//                    mainController.getAlbumController().update("thumbnail", selectedImageURLs.get(0), "id = '" + id_album + "'");
+//                    mainController.getAlbumController().updateThumbnailByAlbumName(albumName, selectedImageURLs.get(0));
                     for(String id: ids) {
                         Log.d("Create Album Activity", id);
                         mainController.getImageAlbumController().addImageAlbum(id, id_album);

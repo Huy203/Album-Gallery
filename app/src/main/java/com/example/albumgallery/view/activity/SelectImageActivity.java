@@ -35,6 +35,7 @@ public class SelectImageActivity extends AppCompatActivity implements ImageAdapt
     List<String> selectedImageURLs;
     List<Task> selectedImageURLsTask;
     List<String> selectedImageURIs;
+    String albumName;
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -56,7 +57,12 @@ public class SelectImageActivity extends AppCompatActivity implements ImageAdapt
         recyclerMediaView.setAdapter(imageAdapter);
 
         imageAdapter.notifyDataSetChanged();
+        imageAdapter.setMultipleChoiceEnabled(true);
+
+        albumName = getIntent().getStringExtra("albumName");
+
 //        imageAdapter.toggleMultipleChoiceImagesEnabled();
+
 
         handleInteractions();
     }
@@ -74,6 +80,10 @@ public class SelectImageActivity extends AppCompatActivity implements ImageAdapt
                 // set the afterSelectImage
                 intent.putExtra("isSelected", true);
 
+                // set the albumName
+                Log.d("Keep album name in select", albumName);
+                intent.putExtra("albumName", albumName);
+
                 startActivity(intent);
                 finish();
             }
@@ -84,6 +94,7 @@ public class SelectImageActivity extends AppCompatActivity implements ImageAdapt
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(SelectImageActivity.this, CreateAlbumActivity.class);
+                intent.putExtra("albumName", albumName);
                 startActivity(intent);
                 finish();
             }

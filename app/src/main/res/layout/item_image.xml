@@ -33,7 +33,7 @@
                 style="@style/AppCheckbox"
                 android:layout_width="20dp"
                 android:layout_height="20dp"
-                android:checked="true"
+                android:checked="false"
                 android:visibility="visible"
                 app:layout_constraintBottom_toBottomOf="@+id/imageView"
                 app:layout_constraintEnd_toEndOf="@+id/imageView" />
