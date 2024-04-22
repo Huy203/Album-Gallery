@@ -1,11 +1,9 @@
 package com.example.albumgallery.view.activity;
 
 import android.content.Intent;
-import android.media.Image;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
-import android.widget.ImageButton;
 import android.widget.TextView;
 
 import androidx.annotation.Nullable;
@@ -13,11 +11,13 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.albumgallery.R;
 import com.example.albumgallery.controller.MainController;
+import com.google.android.material.button.MaterialButton;
 import com.google.android.material.textfield.TextInputEditText;
 
 public class PasswordAlbumActivity extends AppCompatActivity {
     private String albumName;
     private MainController mainController;
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -33,7 +33,7 @@ public class PasswordAlbumActivity extends AppCompatActivity {
             public void onClick(View view) {
                 String inputPassword = inputPasswordEditTxt.getText().toString();
                 String password = mainController.getAlbumController().getPasswordByAlbumName(albumName);
-                if(password.equals(inputPassword)) {
+                if (password.equals(inputPassword)) {
                     Intent intent = new Intent(PasswordAlbumActivity.this, AlbumContentActivity.class);
                     intent.putExtra("albumName", albumName);
                     startActivity(intent);
@@ -45,7 +45,7 @@ public class PasswordAlbumActivity extends AppCompatActivity {
                 }
             }
         });
-        ImageButton backBtn = (ImageButton) findViewById(R.id.backButtonAlbumPassword);
+        MaterialButton backBtn = findViewById(R.id.backButtonAlbumPassword);
         backBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

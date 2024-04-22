@@ -12,7 +12,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.CheckBox;
-import android.widget.FrameLayout;
 import android.widget.ImageView;
 
 import androidx.annotation.NonNull;
@@ -27,6 +26,8 @@ import com.bumptech.glide.request.target.Target;
 import com.example.albumgallery.R;
 import com.example.albumgallery.helper.SharePreferenceHelper;
 import com.example.albumgallery.view.listeners.ImageAdapterListener;
+import com.google.android.gms.tasks.Task;
+import com.google.android.gms.tasks.Tasks;
 import com.google.android.material.progressindicator.CircularProgressIndicator;
 
 import java.util.ArrayList;
@@ -35,7 +36,7 @@ import java.util.List;
 public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> {
     private final Context context;
     private List<ViewHolder> holderList; // List to store ViewHolders
-    private final List<String> imageURLs;  // List of image URLs
+    private List<String> imageURLs;  // List of image URLs
     private List<String> imageURLsFavourited; // List of favourited image URLs
     private final SparseBooleanArray selectedItems; // SparseBooleanArray to store selected items
     private boolean isMultipleChoice = false; // Flag to determine if multiple choice is enabled
@@ -66,9 +67,8 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> 
         String imageURL = getImageURLs().get(position);
         holder.bind(imageURL);
         holder.isLiked.setVisibility(imageURLsFavourited.contains(imageURL) ? View.VISIBLE : View.GONE);
-        holder.checkbox.setVisibility(isMultipleChoice ? View.VISIBLE : View.GONE); // Update visibility based on isMultipleChoice
-//        holder.checkbox.setVisibility(getSelectedItems().get(position, false) ? View.VISIBLE : View.GONE); // Update visibility based on isMultipleChoice
-//        holder.checkbox.setChecked(getSelectedItems().get(position, false)); // Update checkbox
+        holder.checkbox.setVisibility(getSelectedItems().get(position, false) ? View.VISIBLE : View.GONE); // Update visibility based on isMultipleChoice
+        holder.checkbox.setChecked(getSelectedItems().get(position, false)); // Update checkbo
         holderList.add(holder);
     }
 
@@ -118,6 +118,23 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> 
         return selectedImageURLs;
     }
 
+    public List<Task> getSelectedImageURLsTask() {
+        List<Task> selectedImageURLsTask = new ArrayList<>();
+        SparseBooleanArray selectedItems = getSelectedItems();
+        List<String> imageURLs = getImageURLs();
+
+        for (int i = 0; i < selectedItems.size(); i++) {
+            int key = selectedItems.keyAt(i);
+            if (selectedItems.get(key)) {
+                String imageURL = imageURLs.get(key);
+                Task<Uri> task = Tasks.forResult(Uri.parse(imageURL));
+                selectedImageURLsTask.add(task);
+            }
+        }
+        return selectedImageURLsTask;
+    }
+
+
     public boolean toggleMultipleChoiceImagesEnabled() {
         if (listener != null) {
             setMultipleChoiceEnabled(!isMultipleChoice);
@@ -146,8 +163,11 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> 
         listener.toggleMultipleChoice();
     }
 
+    public void setImageURIs(List<String> imageURIs) {
+        this.imageURLs = imageURIs;
+    }
+
     public class ViewHolder extends RecyclerView.ViewHolder {
-        private final FrameLayout constraintLayout;
         private final ImageView imageView;
         private final ImageView isLiked;
         private final CheckBox checkbox;
@@ -155,7 +175,6 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> 
 
         public ViewHolder(View itemView) {
             super(itemView);
-            constraintLayout = itemView.findViewById(R.id.imageLayout);
             imageView = itemView.findViewById(R.id.imageView);
             isLiked = itemView.findViewById(R.id.isLiked);
             checkbox = itemView.findViewById(R.id.checkbox);
@@ -168,16 +187,17 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> 
 
             checkbox.setOnClickListener(view -> {
                 toggleSelection();
-                listener.toggleMultipleChoice();
+//                listener.toggleMultipleChoice();
             });
 
             itemView.setOnClickListener(view -> {
                 if (!isMultipleChoice) {
                     listener.handleImagePick(imageView, imageURL, getAdapterPosition());
                 } else {
-//                    Log.d("justclick", imageURL);
+//                    listener.getInteractedURIs(imageURL);
                     toggleSelection();
-                    listener.toggleMultipleChoice();
+//                    listener.toggleMultipleChoice();
+//                    Log.d("justclick", imageURL);
                     listener.getInteractedURIs(imageURL);
                 }
             });
@@ -186,7 +206,6 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> 
                 isMultipleChoice = true;
                 toggleSelection();
 //                listener.getInteractedURIs(imageURL);
-                listener.toggleMultipleChoice();
                 return true;
             });
         }

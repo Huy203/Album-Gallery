@@ -31,7 +31,6 @@ public class MainActivity extends ComponentActivity {
 
         db = new DatabaseManager(this);
         db.open();
-
         FirebaseManager firebaseManager = FirebaseManager.getInstance(this);
         firebaseManager.getFirebaseAuth().addAuthStateListener(firebaseAuth -> {
             if (firebaseAuth.getCurrentUser() == null) {
@@ -44,6 +43,7 @@ public class MainActivity extends ComponentActivity {
                 finish();
             }
         });
+
 
 
         // Step 1: Export Data from SQLite

@@ -28,6 +28,7 @@ import com.example.albumgallery.helper.DatabaseHelper;
 import com.example.albumgallery.model.ImageModel;
 import com.example.albumgallery.model.Model;
 import com.example.albumgallery.utils.QRCodeRecognization;
+import com.example.albumgallery.utils.textRecognization.TextRecognization;
 import com.example.albumgallery.view.activity.MainFragmentController;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -77,8 +78,8 @@ public class ImageController implements Controller {
         return activity;
     }
 
-    public void createModel(String name, int width, int height, long capacity, String dateAdded) {
-        currentModel = new ImageModel(name, width, height, capacity, dateAdded);
+    public FirebaseManager getFirebaseManager() {
+        return firebaseManager;
     }
 
     @Override
@@ -241,11 +242,11 @@ public class ImageController implements Controller {
                         Uri uriImage = task1.getResult(); // The uri with the location of the file in firebase
                         Log.v("Image", "Image uploaded" + " " + uriImage + " " + idSelectedImages.get(uploadTasks.indexOf(task)));
                         this.update("ref", uriImage.toString(), "id = '" + idSelectedImages.get(uploadTasks.indexOf(task)) + "'");
-//                        if (allTasksCompleted(uploadTasks)) {
-                        activity.runOnUiThread(() -> {
-                            ((MainFragmentController) activity).onBackgroundTaskCompleted();
-                        });
-//                        }
+                        if (allTasksCompleted(uploadTasks)) {
+                            activity.runOnUiThread(() -> {
+                                ((MainFragmentController) activity).onBackgroundTaskCompleted();
+                            });
+                        }
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
@@ -332,6 +333,15 @@ public class ImageController implements Controller {
             Log.v("Image", "Image uploaded" + " " + imageRef.getDownloadUrl());
             return imageRef.getDownloadUrl();
         });
+    }
+
+    private boolean allTasksCompleted(List<Task<Uri>> tasks) {
+        for (Task<Uri> task : tasks) {
+            if (!task.isSuccessful()) {
+                return false;
+            }
+        }
+        return true;
     }
 
     private boolean allTasksCompletedGeneric(List<Task> tasks) {
@@ -434,7 +444,9 @@ public class ImageController implements Controller {
         } catch (URISyntaxException e) {
             e.printStackTrace();
         }
-        filename = "images/" + filename;
+        // filename = "images/" + filename;
+        // filename = "mdxa9wwR9Vbfo0XliX8ubCFY4Sz2/" + filename;
+        filename = firebaseManager.getFirebaseAuth().getCurrentUser().getUid() + "/" + filename;
         return filename;
     }
 
@@ -511,16 +523,21 @@ public class ImageController implements Controller {
                     String imageURL = taskImageURL.getResult().toString();
                     Log.d("Image task", imageURL);
                     String URL = parseURL(imageURL);
+                    Log.d("URL Image task", URL);
 
                     // Create a reference to the file to delete
                     StorageReference desertRef = storageRef.child(URL);
+                    Log.d("Executing", "ok");
 
                     // Delete the file
                     desertRef.delete().addOnSuccessListener(new OnSuccessListener<Void>() {
                         @Override
                         public void onSuccess(Void aVoid) {
+                            Log.d("Before delete on db", "ok");
                             // File deleted successfully
                             delete("ref = '" + imageURL + "'");
+                            Log.d("After delete on db", "ok");
+
                             if (allTasksCompletedGeneric(imageURLs)) {
                                 Log.v("Image", "All images deleted" + activity);
                                 activity.runOnUiThread(() -> {
@@ -603,6 +620,42 @@ public class ImageController implements Controller {
         }
         return null;
     }
+
+    public void recognizeText(String uri) {
+        TextRecognization textRecognization = new TextRecognization(activity);
+        try {
+            textRecognization.execute(uri).get();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+//        FirebaseVisionImage image = null;
+//        try {
+//            image = FirebaseVisionImage.fromFilePath(activity, Uri.parse(uri));
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
+//
+//        FirebaseVisionTextRecognizer detector = FirebaseVision.getInstance()
+//                .getOnDeviceTextRecognizer();
+//
+//        Task<FirebaseVisionText> result =
+//                detector.processImage(image)
+//                        .addOnSuccessListener(new OnSuccessListener<FirebaseVisionText>() {
+//                            @Override
+//                            public void onSuccess(FirebaseVisionText result) {
+//
+//                            }
+//                        })
+//                        .addOnFailureListener(
+//                                new OnFailureListener() {
+//                                    @Override
+//                                    public void onFailure(@NonNull Exception e) {
+//                                        // Task failed with an exception
+//                                        // ...
+//                                    }
+//                                });
 
     public Bitmap createQRCodeFromImage(String uri) {
         QRCodeRecognization qrCodeRecognization = new QRCodeRecognization();

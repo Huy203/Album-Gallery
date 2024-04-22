@@ -98,6 +98,7 @@ public class Auth extends AppCompatActivity {
                         loadingBar.dismiss();
                         Snackbar.make(findViewById(android.R.id.content), "Password reset email sent", Snackbar.LENGTH_LONG)
                                 .setTextColor(SharePreferenceHelper.isDarkModeEnabled(this) ? getResources().getColor(R.color.white) : getResources().getColor(R.color.black))
+                                .setBackgroundTint(SharePreferenceHelper.isDarkModeEnabled(this) ? getResources().getColor(R.color.black) : getResources().getColor(R.color.white))
                                 .show();
                     }
                 });

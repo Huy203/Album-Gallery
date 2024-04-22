@@ -1,33 +1,29 @@
 package com.example.albumgallery.controller;
 
-import com.example.albumgallery.FirebaseManager;
-import com.example.albumgallery.helper.DatabaseHelper;
-import com.example.albumgallery.model.AlbumModel;
-import com.example.albumgallery.model.ImageModel;
-import com.example.albumgallery.model.Model;
-import com.example.albumgallery.view.activity.MainFragmentController;
-
 import android.app.Activity;
-import android.content.Context;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
+
+import com.example.albumgallery.FirebaseManager;
+import com.example.albumgallery.helper.DatabaseHelper;
+import com.example.albumgallery.model.AlbumModel;
+import com.example.albumgallery.model.Model;
+import com.example.albumgallery.view.activity.CreateAlbumActivity;
+import com.example.albumgallery.view.listeners.BackgroundProcessingCallback;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
-
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.firebase.firestore.CollectionReference;
-import com.google.firebase.firestore.DocumentReference;
-import com.google.firebase.firestore.DocumentSnapshot;
 
 public class AlbumController implements Controller {
-//    private AlbumModel album;
+    //    private AlbumModel album;
     private final static String TAG = "Album";
     private final DatabaseHelper dbHelper;
     private final Activity activity;
@@ -48,9 +44,11 @@ public class AlbumController implements Controller {
         this.firebaseManager = FirebaseManager.getInstance(activity);
         this.currentModel = new AlbumModel();
     }
-    private DatabaseHelper getDbHelper(){
+
+    private DatabaseHelper getDbHelper() {
         return dbHelper;
     }
+
     public List<AlbumModel> getAllAlbums() {
         // Get all albums
         List<String> data = dbHelper.getAll("Album");
@@ -62,6 +60,7 @@ public class AlbumController implements Controller {
         }
         return albumModels;
     }
+
     @Override
     public void insert(Model model) {
 //        dbHelper.insert("Album", model);
@@ -75,6 +74,9 @@ public class AlbumController implements Controller {
 //                        idSelectedImages.add(dbHelper.insert("Image", currentModel));
                         dbHelper.insert("Album", currentModel);
                         update("id", documentReference.getId(), "id = '" + documentReference.getId() + "'");
+                        activity.runOnUiThread(() -> {
+                            ((CreateAlbumActivity) activity).backAction();
+                        });
                         dbHelper.close();
                     }
                 })
@@ -106,19 +108,13 @@ public class AlbumController implements Controller {
         dbHelper.delete("Album", where);
         dbHelper.close();
     }
-//    public void handleCreateAlbum(AlbumModel albumModel) {
+
+    //    public void handleCreateAlbum(AlbumModel albumModel) {
 //        currentModel = albumModel;
 //        insert(currentModel);
 //    }
     public void addAlbum(String name, String password, int numOfImages, String thumbnail) {
-        UUID id = UUID.randomUUID();
-        // Add an album
-//        AlbumModel albumModel = new AlbumModel(name, password, numOfImages);
-//        albumModel.setId(id.toString());
-//        this.currentModel = albumModel;
-//        this.insert(currentModel);
         this.currentModel = new AlbumModel(name, password, numOfImages);
-        currentModel.setId(id.toString());
         currentModel.setThumbnail(thumbnail);
         this.insert(currentModel);
     }
@@ -196,7 +192,6 @@ public class AlbumController implements Controller {
     }
 
 
-
     public void loadFromFirestore() {
         List<String> albumIdsIdsInDatabase = getAllAlbumIds();
         List<String> albumIdsInFirestore = new ArrayList<>();
@@ -207,7 +202,7 @@ public class AlbumController implements Controller {
                             albumIdsInFirestore.add(document.getId());
 //                            Log.d("Firebase album", document.getId());
                         }
-                        if (albumIdsIdsInDatabase.size() < albumIdsInFirestore.size()) {
+                        if (albumIdsIdsInDatabase.size() == 0) {
                             for (String albumId : albumIdsInFirestore) {
                                 if (!albumIdsIdsInDatabase.contains(albumId)) {
                                     firebaseManager.getFirebaseHelper().getById(TAG, albumId, firebaseManager.getFirebaseAuth().getCurrentUser().getUid())
@@ -224,13 +219,8 @@ public class AlbumController implements Controller {
                                                             Integer.parseInt(documentSnapshot.get("num_of_images").toString()),
 //                                                            documentSnapshot.get("is_deleted").equals("1") ? true : false,
                                                             Integer.parseInt(documentSnapshot.get("is_deleted").toString()),
-                                                            documentSnapshot.get("thumbnail").toString() );
-                                                    String latest_album_id = getLastAlbumId();
-                                                    Log.d("Firebase album latest", latest_album_id);
-                                                    if(!latest_album_id.equals(currentModel.getId())) {
-                                                        dbHelper.insert("Album", currentModel);
-                                                        Log.d("Firebase album", currentModel.getName());
-                                                    }
+                                                            documentSnapshot.get("thumbnail").toString());
+                                                    dbHelper.insert("Album", currentModel);
 //                                                    activity.runOnUiThread(() -> {
 //                                                        ((MainFragmentController) activity).onBackgroundTaskCompleted();
 //                                                    });

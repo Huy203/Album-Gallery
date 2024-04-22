@@ -2,10 +2,12 @@ package com.example.albumgallery.presentations.bin;
 
 import android.annotation.SuppressLint;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -16,6 +18,7 @@ import com.bumptech.glide.Glide;
 import com.example.albumgallery.R;
 import com.example.albumgallery.controller.MainController;
 import com.example.albumgallery.model.ImageModel;
+import com.example.albumgallery.view.activity.MainFragmentController;
 import com.example.albumgallery.view.fragment.ImageInfo;
 import com.example.albumgallery.view.listeners.ImageInfoListener;
 import com.example.albumgallery.view.listeners.OnSwipeTouchListener;
@@ -98,7 +101,48 @@ public class DetailDeletedPicture extends AppCompatActivity implements ImageInfo
             public void onClick(DialogInterface dialog, int which) {
                 // Call deleteSelectedImage() method from ImageController
                 finish();
-                mainController.getImageController().deleteSelectedImage(uri);
+                // mainController.getImageController().deleteSelectedImage(uri);
+
+                String id = mainController.getImageController().getIdByRef(uri);
+                String userID = mainController.getImageController().getFirebaseManager().getFirebaseAuth().getCurrentUser().getUid();
+                if (id != null) {
+                    mainController.getImageController().getFirebaseManager().getFirebaseHelper().deleteImage("Image", id, userID);
+                    mainController.getImageController().delete("id = '" + id + "'");
+                }
+
+                Intent intent = new Intent(DetailDeletedPicture.this, MainFragmentController.class);
+                intent.putExtra("fragmentToLoad", "Bin");
+                startActivity(intent);
+
+            }
+        });
+        builder.setNegativeButton("Cancel", null);
+        builder.show();
+    }
+
+    protected void showRestoreConfirmationDialog(String uri) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Confirm Restore");
+        builder.setMessage("Are you sure you want to restore this image?");
+        builder.setPositiveButton("Restore", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+
+                LinearLayout bottom_main_menu2 = findViewById(R.id.bottomMenuMain2);
+                bottom_main_menu2.setVisibility(View.GONE);
+
+                finish();
+                // mainController.getImageController().deleteSelectedImage(uri);
+
+                String id = mainController.getImageController().getIdByRef(uri);
+                if (id != null) {
+                    mainController.getImageController().setDelete(id, false);
+                    mainController.getImageController().delete("id = '" + id + "'");
+                }
+
+                Intent intent = new Intent(DetailDeletedPicture.this, MainFragmentController.class);
+                intent.putExtra("fragmentToLoad", "Bin");
+                startActivity(intent);
 
             }
         });
@@ -132,15 +176,27 @@ public class DetailDeletedPicture extends AppCompatActivity implements ImageInfo
     }
 
     public void restoreAction(View view) {
-//        if (imageModel != null) {
-//            showDeleteConfirmationDialog(imageModel.getRef());
-//        } else {
-//            Toast.makeText(this, "No image to delete", Toast.LENGTH_SHORT).show();
-//        }
+        if (imageModel != null) {
+            showRestoreConfirmationDialog(imageModel.getRef());
+        } else {
+            Toast.makeText(this, "No image to restore", Toast.LENGTH_SHORT).show();
+        }
     }
 
     @Override
     public void onNoticePassed(String notice) {
+
+    }
+
+    public void backAction(View view) {
+        Intent intent = new Intent();
+        intent.putExtra("update", false);
+        setResult(RESULT_OK, intent);
+        supportFinishAfterTransition();
+    }
+
+    @Override
+    public void onTimePassed(String data) {
 
     }
 }

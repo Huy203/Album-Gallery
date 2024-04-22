@@ -80,6 +80,7 @@ public class AlbumsMainFragment extends Fragment implements AlbumAdapterListener
         albumAdapter = new AlbumAdapter(getActivity(), albumNames, thumbnails);
         albumAdapter.setAlbumAdapterListener(this);
         recyclerView.setAdapter(albumAdapter);
+        albumAdapter.notifyDataSetChanged();
     }
 
     private void handleInteractions(View view) {
@@ -105,40 +106,6 @@ public class AlbumsMainFragment extends Fragment implements AlbumAdapterListener
         for(String i: mainController.getAlbumController().getAllAlbumIds()) {
             Log.d("Firebase test ids", i);
         }
-
-//        firebaseManager.getFirebaseHelper().getAll(firebaseManager.getFirebaseAuth().getCurrentUser().getUid(), TAG)
-//                .continueWith(task -> {
-//                    if (task.isSuccessful()) {
-//                        firebaseManager.getFirebaseHelper().getById(TAG, albumId, firebaseManager.getFirebaseAuth().getCurrentUser().getUid())
-//                                .addOnSuccessListener(documentSnapshot -> {
-//                                    if (documentSnapshot != null) {
-//                                        Log.d("Firebase album", "document not null");
-//                                        currentModel = new AlbumModel(
-//                                                documentSnapshot.get("id").toString(),
-//                                                documentSnapshot.get("name").toString(),
-//                                                Integer.parseInt(documentSnapshot.get("capacity").toString()),
-//                                                documentSnapshot.get("created_at").toString(),
-//                                                documentSnapshot.get("notice").toString(),
-//                                                documentSnapshot.get("ref").toString(),
-//                                                documentSnapshot.get("password").toString(),
-//                                                Integer.parseInt(documentSnapshot.get("num_of_images").toString()),
-////                                                            documentSnapshot.get("is_deleted").equals("1") ? true : false,
-//                                                Integer.parseInt(documentSnapshot.get("is_deleted").toString()),
-//                                                documentSnapshot.get("thumbnail").toString() );
-//                                        String latest_album_id = getLastAlbumId();
-//                                        Log.d("Firebase album latest", latest_album_id);
-//                                        if(!latest_album_id.equals(currentModel.getId())) {
-//                                            dbHelper.insert("Album", currentModel);
-//                                            Log.d("Firebase album", currentModel.getName());
-//                                        }
-//                                    } else {
-//                                        Log.d("Firebase album", "document is null");
-//                                    }
-//                                });
-//                    }
-//                });
-
-
     }
 
     @Override

@@ -16,4 +16,8 @@
         android:id="@+id/bin"
         android:title="Bin"
         android:icon="@drawable/trash_bin"/>
+    <item
+        android:id="@+id/search"
+        android:title="Search"
+        android:icon="@drawable/search_icon"/>
 </menu>

@@ -1,5 +1,6 @@
 package com.example.albumgallery.view.activity;
 
+import static android.app.ProgressDialog.show;
 import static com.example.albumgallery.utils.Constant.REQUEST_CODE_EDIT_IMAGE;
 import static com.example.albumgallery.utils.Utilities.convertFromBitmapToUri;
 
@@ -9,16 +10,24 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.ColorStateList;
 import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
+import android.graphics.Rect;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
+import android.text.InputType;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -39,13 +48,17 @@ import com.example.albumgallery.model.ImageModel;
 import com.example.albumgallery.view.fragment.ImageInfo;
 import com.example.albumgallery.view.listeners.ImageInfoListener;
 import com.example.albumgallery.view.listeners.OnSwipeTouchListener;
+import com.example.albumgallery.view.listeners.TextRecognitionListener;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
+import org.w3c.dom.Text;
+
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
-public class DetailPicture extends AppCompatActivity implements ImageInfoListener {
+public class DetailPicture extends AppCompatActivity implements ImageInfoListener, TextRecognitionListener {
 
     protected MainController mainController;
     protected ImageView imageView;
@@ -59,6 +72,9 @@ public class DetailPicture extends AppCompatActivity implements ImageInfoListene
     protected AlertDialog optionsDialog;
     ImageModel imageModel;
 
+    List<String> textRecognized;
+    List<Rect> boundingBoxes;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -69,6 +85,7 @@ public class DetailPicture extends AppCompatActivity implements ImageInfoListene
         loadImage(currentPosition);
         loadImageInfo();
         loadQRCodeLink();
+
     }
 
     @Override
@@ -81,7 +98,7 @@ public class DetailPicture extends AppCompatActivity implements ImageInfoListene
 
     private void initializeViews() {
         mainController = new MainController(this);
-        imagePaths = mainController.getImageController().getAllImageURLsSortByDate();
+        imagePaths = mainController.getImageController().getAllImageURLsUndeleted();
         currentPosition = getIntent().getIntExtra("position", 0);
 
         imageView = findViewById(R.id.memeImageView);
@@ -89,6 +106,10 @@ public class DetailPicture extends AppCompatActivity implements ImageInfoListene
 
         imageInfoView = findViewById(R.id.imageInfo);
         imageInfoFragment = new ImageInfo();
+
+        textRecognized = new ArrayList<>();
+        boundingBoxes = new ArrayList<>();
+
         update();
     }
 
@@ -101,6 +122,9 @@ public class DetailPicture extends AppCompatActivity implements ImageInfoListene
                 if (currentPosition < imagePaths.size() - 1) {
                     currentPosition++;
                     loadImage(currentPosition);
+                } else {
+                    // Notify the user that this is the last image
+                    Toast.makeText(DetailPicture.this, "This is the last image", Toast.LENGTH_SHORT).show();
                 }
             }
 
@@ -109,6 +133,9 @@ public class DetailPicture extends AppCompatActivity implements ImageInfoListene
                 if (currentPosition > 0) {
                     currentPosition--;
                     loadImage(currentPosition);
+                } else {
+                    // Notify the user that this is the first image
+                    Toast.makeText(DetailPicture.this, "This is the first image", Toast.LENGTH_SHORT).show();
                 }
             }
         });
@@ -174,7 +201,7 @@ public class DetailPicture extends AppCompatActivity implements ImageInfoListene
     }
 
     protected void loadImage(int position) {
-        Glide.with(this).load(Uri.parse(imageModel.getRef())).into(imageView);
+        Glide.with(this).load(Uri.parse(imagePaths.get(position))).into(imageView);
     }
 
     private void loadImageInfo() {
@@ -199,6 +226,12 @@ public class DetailPicture extends AppCompatActivity implements ImageInfoListene
         } else {
             Log.v("DetailPicture", "No QR Code data found");
         }
+    }
+
+    private void loadRecognizeText() {
+        String uri = imageModel.getRef();
+        Log.v("DetailPicture", "uriImage: " + uri);
+        mainController.getImageController().recognizeText(uri);
     }
 
     private void launchEditImageActivity() {
@@ -312,6 +345,11 @@ public class DetailPicture extends AppCompatActivity implements ImageInfoListene
     public void onNoticePassed(String data) {
         String where = "id = '" + getIntent().getStringExtra("id") + "'";
         mainController.getImageController().update("notice", data, where);
+    }
+    @Override
+    public void onTimePassed(String data) {
+        String where = "id = '" + getIntent().getStringExtra("id") + "'";
+        mainController.getImageController().update("created_at", data, where);
     }
 
     @Override
@@ -428,6 +466,10 @@ public class DetailPicture extends AppCompatActivity implements ImageInfoListene
         }
     }
 
+    public void ocrAction(View view){
+        loadRecognizeText();
+    }
+
     private void toggleDeleteImage(String id) {
         Log.d("update delete successfully 2", "ok");
         isDeleted = !isDeleted;
@@ -439,4 +481,70 @@ public class DetailPicture extends AppCompatActivity implements ImageInfoListene
         Log.d("image content id", String.valueOf(id));
         return mainController.getImageController().getImageById(id);
     }
+    @Override
+    public void onTextRecognized(List<String> textRecognized, List<Rect> boundingBoxes, Bitmap bitmap) {
+        // You can also draw bounding boxes on an ImageView
+        Bitmap bitmapWithBoxes = drawBoundingBoxesOnBitmap(bitmap, boundingBoxes);
+        imageView.setImageBitmap(bitmapWithBoxes);
+
+        // Store the recognized text and bounding boxes for later use
+        this.textRecognized = textRecognized;
+        this.boundingBoxes = boundingBoxes;
+    }
+
+    private Bitmap drawBoundingBoxesOnBitmap(Bitmap originalBitmap, List<Rect> boundingBoxes) {
+        Bitmap bitmapWithBoxes = originalBitmap.copy(Bitmap.Config.ARGB_8888, true);
+        Canvas canvas = new Canvas(bitmapWithBoxes);
+        Paint paint = new Paint();
+        paint.setColor(Color.RED);
+        paint.setStyle(Paint.Style.STROKE);
+        paint.setStrokeWidth(4);
+
+        RelativeLayout parentLayout = findViewById(R.id.imageContainer);
+
+        for (int i = 0; i < boundingBoxes.size(); i++) {
+            Rect rect = boundingBoxes.get(i);
+            canvas.drawRect(rect, paint);
+
+            TextView boxView = new TextView(this);
+            boxView.setBackgroundColor(Color.TRANSPARENT); // Set the background color to transparent
+
+            // Calculate the position and size of the box relative to the parent layout
+            float xScaleFactor = (float) parentLayout.getWidth() / originalBitmap.getWidth();
+            float yScaleFactor = (float) parentLayout.getHeight() / originalBitmap.getHeight();
+
+            int left = (int) (rect.left * xScaleFactor);
+            int top = (int) (rect.top * yScaleFactor);
+            int width = (int) (rect.width() * xScaleFactor);
+            int height = (int) (rect.height() * yScaleFactor);
+
+
+            RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(width, height);
+            layoutParams.leftMargin = left;
+            layoutParams.topMargin = top;
+            boxView.setLayoutParams(layoutParams);
+
+            float textSize = height * 0.9f; // Adjust this value as needed
+            boxView.setTextSize(textSize);
+
+            int finalI = i;
+            boxView.setTextIsSelectable(true);
+            boxView.setTextColor(getResources().getColor(R.color.none));
+
+            boxView.setOnClickListener(v -> {
+                for (int k = 0; k < boundingBoxes.size(); k++) {
+                    parentLayout.getChildAt(k).setBackgroundColor(Color.TRANSPARENT);
+                }
+                // Handle the click event
+                String recognizedText = textRecognized.get(finalI);
+                boxView.setText(recognizedText);
+            });
+
+            // Add the View to the parent layout
+            parentLayout.addView(boxView);
+        }
+        return bitmapWithBoxes;
+    }
+
+
 }

@@ -91,19 +91,21 @@ dependencies {
     implementation("com.google.android.flexbox:flexbox:3.0.0")
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.7.0")
     implementation("androidx.activity:activity-compose:1.8.2")
-    implementation(platform("androidx.compose:compose-bom:2023.08.00"))
+    implementation(platform("androidx.compose:compose-bom:2024.04.01"))
     implementation("androidx.compose.ui:ui")
     implementation("androidx.compose.ui:ui-graphics")
     implementation("androidx.compose.ui:ui-tooling-preview")
-    implementation(platform("androidx.compose:compose-bom:2023.08.00"))
-    implementation("androidx.compose.animation:animation-core-android:1.6.4")
+    implementation(platform("androidx.compose:compose-bom:2024.04.01"))
+    implementation("androidx.compose.animation:animation-core-android:1.6.5")
     implementation("androidx.legacy:legacy-support-v4:1.0.0")
     implementation("androidx.recyclerview:recyclerview")
+    implementation("androidx.camera:camera-core:1.3.3")
+    implementation("com.google.firebase:firebase-ml-vision:24.1.0")
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
 
-    implementation(platform("com.google.firebase:firebase-bom:32.7.1"))
+    implementation(platform("com.google.firebase:firebase-bom:32.8.1"))
     implementation("com.google.firebase:firebase-analytics")
 //    don't specify the version when using the BoM
     implementation("com.google.firebase:firebase-auth")
@@ -113,7 +115,7 @@ dependencies {
 //    Firestore
     implementation("com.google.firebase:firebase-firestore")
 //    Google Play services location APIs
-    implementation("com.google.android.gms:play-services-location:21.1.0")
+    implementation("com.google.android.gms:play-services-location:21.2.0")
 //    Google Play services Places SDK
     implementation("com.google.android.gms:play-services-places:17.0.0")
 //    Google Play services Auth SDK
@@ -129,8 +131,11 @@ dependencies {
 
     implementation("com.google.android.gms:play-services-vision:20.1.3")
     // Image Cropper
-    implementation("com.theartofdev.edmodo:android-image-cropper:2.8.0")
+    implementation("com.vanniktech:android-image-cropper:4.5.0")
     // QR Code Scanner
-    implementation("com.google.zxing:core:3.4.1")
+    implementation("com.google.zxing:core:3.5.3")
     implementation("com.github.denzcoskun:ImageSlideshow:0.1.0")
+    implementation("com.google.mlkit:text-recognition:16.0.0")
+    implementation("com.google.firebase:firebase-ml-vision:24.1.0")
+    implementation("com.google.android.gms:play-services-vision:20.1.3")
 }
