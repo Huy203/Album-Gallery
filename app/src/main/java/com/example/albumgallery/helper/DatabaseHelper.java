@@ -350,7 +350,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     public String getLastId(String table) {
         SQLiteDatabase db = getWritableDatabase();
-        Cursor cursor = db.rawQuery("SELECT id FROM " + table + " ORDER BY id DESC LIMIT 1", null);
+        Cursor cursor = db.rawQuery("SELECT id FROM " + table + " ORDER BY ROWID DESC LIMIT 1", null);
         if (cursor.moveToFirst()) {
             return cursor.getString(0);
         }

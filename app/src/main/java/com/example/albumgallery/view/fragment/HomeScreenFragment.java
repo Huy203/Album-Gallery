@@ -117,7 +117,6 @@ public class HomeScreenFragment extends Fragment {
             choiceAll(view);
             unChooseBtn.setVisibility(View.GONE);
         });
-
     }
 
     private void changeViewAction(View view) {

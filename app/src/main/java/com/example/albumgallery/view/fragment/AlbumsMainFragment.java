@@ -14,13 +14,21 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.albumgallery.FirebaseManager;
 import com.example.albumgallery.R;
 import com.example.albumgallery.controller.MainController;
+import com.example.albumgallery.model.AlbumModel;
 import com.example.albumgallery.view.activity.AlbumContentActivity;
 import com.example.albumgallery.view.activity.CreateAlbumActivity;
 import com.example.albumgallery.view.activity.PasswordAlbumActivity;
 import com.example.albumgallery.view.adapter.AlbumAdapter;
 import com.example.albumgallery.view.adapter.AlbumAdapterListener;
+
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
+
 
 import java.util.ArrayList;
 import java.util.List;
@@ -32,6 +40,10 @@ public class AlbumsMainFragment extends Fragment implements AlbumAdapterListener
     private List<String> thumbnails;
     private MainController mainController;
     private AlbumAdapterListener listener;
+    private FirebaseManager firebaseManager;
+    private final static String TAG = "Album";
+
+
 
     public AlbumsMainFragment() {
         // Required empty public constructor
@@ -53,6 +65,7 @@ public class AlbumsMainFragment extends Fragment implements AlbumAdapterListener
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         mainController = new MainController(getActivity());
+        firebaseManager = FirebaseManager.getInstance(getActivity());
         handleInteractions(view);
 
         initializeData();
@@ -67,6 +80,7 @@ public class AlbumsMainFragment extends Fragment implements AlbumAdapterListener
         albumAdapter = new AlbumAdapter(getActivity(), albumNames, thumbnails);
         albumAdapter.setAlbumAdapterListener(this);
         recyclerView.setAdapter(albumAdapter);
+        albumAdapter.notifyDataSetChanged();
     }
 
     private void handleInteractions(View view) {
@@ -83,6 +97,15 @@ public class AlbumsMainFragment extends Fragment implements AlbumAdapterListener
         this.thumbnails = new ArrayList<>();
         albumNames = mainController.getAlbumController().getAlbumNames();
         thumbnails = mainController.getAlbumController().getAllThumbnails();
+        for (String i: albumNames) {
+            Log.d("Firebase album name", i);
+        }
+        for (String i: thumbnails) {
+            Log.d("Firebase album thumbnail", i);
+        }
+        for(String i: mainController.getAlbumController().getAllAlbumIds()) {
+            Log.d("Firebase test ids", i);
+        }
     }
 
     @Override
