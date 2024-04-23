@@ -1,26 +1,23 @@
 package com.example.albumgallery.controller;
 
-import com.example.albumgallery.FirebaseManager;
-import com.example.albumgallery.helper.DatabaseHelper;
-import com.example.albumgallery.model.AlbumModel;
-import com.example.albumgallery.model.ImageAlbumModel;
-import com.example.albumgallery.model.Model;
-import com.example.albumgallery.view.activity.CreateAlbumActivity;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
-
 import android.app.Activity;
-import android.content.Context;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
 
-import java.util.ArrayList;
-import java.util.List;
-
+import com.example.albumgallery.FirebaseManager;
+import com.example.albumgallery.helper.DatabaseHelper;
+import com.example.albumgallery.model.ImageAlbumModel;
+import com.example.albumgallery.model.Model;
+import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class ImageAlbumController implements Controller {
     private final static String TAG = "ImageAlbum";
@@ -29,7 +26,7 @@ public class ImageAlbumController implements Controller {
     private final FirebaseManager firebaseManager;
 
 
-//    public ImageAlbumController(Context context) {
+    //    public ImageAlbumController(Context context) {
 //        ImageAlbum = new ImageAlbumModel(context);
 //        this.dbHelper = new DatabaseHelper(context);
 //    }
@@ -38,9 +35,11 @@ public class ImageAlbumController implements Controller {
         this.currentModel = new ImageAlbumModel();
         this.firebaseManager = FirebaseManager.getInstance(activity);
     }
-    private DatabaseHelper getDbHelper(){
+
+    private DatabaseHelper getDbHelper() {
         return dbHelper;
     }
+
     public List<ImageAlbumModel> getAllImageAlbums() {
         // Get all ImageAlbums
         List<String> data = dbHelper.getAll("Image_Album");
@@ -52,24 +51,14 @@ public class ImageAlbumController implements Controller {
         }
         return ImageAlbumModels;
     }
+
     @Override
     public void insert(Model model) {
-//        dbHelper.insert("Image_Album", model);
-//        dbHelper.insertByCustomId("Image_Album", model);
-//        dbHelper.close();
-
         firebaseManager.getFirebaseHelper().add(TAG, model, firebaseManager.getFirebaseAuth().getCurrentUser().getUid())
                 .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
                     @Override
                     public void onSuccess(DocumentReference documentReference) {
-//                        currentModel.setId(documentReference.getId());
-                        Log.d("Firebase id", documentReference.getId());
-//                        idSelectedImages.add(dbHelper.insert("Image", currentModel));
-                        dbHelper.insert("Image_Album", currentModel);
-//                        update("id", documentReference.getId(), "id = '" + documentReference.getId() + "'");
-//                        activity.runOnUiThread(() -> {
-//                            ((CreateAlbumActivity) activity).backAction();
-//                        });
+                        dbHelper.insert("Image_Album", model);
                         dbHelper.close();
                     }
                 })
@@ -130,5 +119,127 @@ public class ImageAlbumController implements Controller {
 
     public void unfavouriteImageAlbum() {
         // Unfavourite an ImageAlbum
+    }
+
+    public void loadFromFirestore() {
+        List<Map<String, List<String>>> albumIdsIdsInDatabase = getAllAlbumIdsDatabase();
+        String currentIdAlbum = null;
+        List<String> albumIdsInFirestore = new ArrayList<>();
+        List<String> imageIdsInFirestore = new ArrayList<>();
+        firebaseManager.getFirebaseHelper().getAll(firebaseManager.getFirebaseAuth().getCurrentUser().getUid(), TAG)
+                .continueWith(task -> {
+                    if (task.isSuccessful()) {
+                        for (DocumentSnapshot document : task.getResult()) {
+                            imageIdsInFirestore.add(document.get("image_id").toString());
+                            albumIdsInFirestore.add(document.get("album_id").toString());
+                        }
+
+                        List<Map<String, List<String>>> albumIdsIdsInFirestore = getAllAlbumIdsFirestore(albumIdsInFirestore, imageIdsInFirestore);
+                        if (albumIdsIdsInDatabase.size() == 0) {
+                            for (Map<String, List<String>> albumId : albumIdsIdsInFirestore) {
+                                for (String key : albumId.keySet()) {
+                                    for (String imageId : albumId.get(key)) {
+                                        firebaseManager.getFirebaseHelper().getById(TAG, imageId, firebaseManager.getFirebaseAuth().getCurrentUser().getUid())
+                                                .addOnSuccessListener(documentSnapshot -> {
+                                                    if (documentSnapshot != null) {
+                                                        currentModel = new ImageAlbumModel(
+                                                                imageId,
+                                                                key
+                                                        );
+                                                        dbHelper.insert("ImageAlbum", currentModel);
+                                                    } else {
+                                                        Log.d("Firebase album", "document is null");
+                                                    }
+                                                });
+                                    }
+                                }
+                            }
+                        } else if (albumIdsIdsInDatabase.size() < albumIdsIdsInFirestore.size()) {
+                            for (Map<String, List<String>> albumId : albumIdsIdsInDatabase) {
+                                for (Map<String, List<String>> albumId2 : albumIdsIdsInFirestore) {
+                                    if (!albumId.equals(albumId2)) {
+                                        for (String key : albumId2.keySet()) {
+                                            for (String key2 : albumId.keySet()) {
+                                                if (!key.equals(key2)) {
+                                                    for (String imageId : albumId2.get(key)) {
+                                                        firebaseManager.getFirebaseHelper().getById(TAG, imageId, firebaseManager.getFirebaseAuth().getCurrentUser().getUid())
+                                                                .addOnSuccessListener(documentSnapshot -> {
+                                                                    if (documentSnapshot != null) {
+                                                                        currentModel = new ImageAlbumModel(
+                                                                                imageId,
+                                                                                key
+                                                                        );
+                                                                        dbHelper.insert("ImageAlbum", currentModel);
+
+                                                                    } else {
+                                                                        Log.d("Firebase album", "document is null");
+                                                                    }
+                                                                });
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    return albumIdsInFirestore;
+                });
+    }
+
+    private List<Map<String, List<String>>> getAllAlbumIdsFirestore(List<String> albumIdsInFirestore, List<String> imageIdsInFirestore) {
+        List<Map<String, List<String>>> data = new ArrayList<>();
+        Map<String, List<String>> map = new HashMap<>();
+        String currentIdAlbum = null;
+
+        for (int i = 0; i < albumIdsInFirestore.size(); i++) {
+            String albumId = albumIdsInFirestore.get(i);
+            String imageId = imageIdsInFirestore.get(i);
+
+            if (!albumId.equals(currentIdAlbum)) {
+                if (currentIdAlbum != null) {
+                    data.add(map);
+                    map = new HashMap<>();
+                }
+                currentIdAlbum = albumId;
+            }
+            map.computeIfAbsent(albumId, k -> new ArrayList<>()).add(imageId);
+        }
+        if (!map.isEmpty()) {
+            data.add(map);
+        }
+        return data;
+    }
+
+    private List<Map<String, List<String>>> getAllAlbumIdsDatabase() {
+        List<String> imageAlbumList = dbHelper.getAll("Image_Album");
+        if (imageAlbumList.size() == 0) {
+            return new ArrayList<>();
+        } else {
+            List<Map<String, List<String>>> data = new ArrayList<>();
+            Map<String, List<String>> map = new HashMap<>();
+            String currentIdAlbum = null;
+
+            for (String item : dbHelper.getAll("Image_Album")) {
+                String[] temp = item.split(",");
+                String albumId = temp[1];
+                String imageId = temp[0];
+
+                if (!albumId.equals(currentIdAlbum)) {
+                    if (currentIdAlbum != null) {
+                        data.add(map);
+                        map = new HashMap<>();
+                    }
+                    currentIdAlbum = albumId;
+                }
+                map.computeIfAbsent(albumId, k -> new ArrayList<>()).add(imageId);
+            }
+
+            if (!map.isEmpty()) {
+                data.add(map);
+            }
+            return data;
+        }
     }
 }

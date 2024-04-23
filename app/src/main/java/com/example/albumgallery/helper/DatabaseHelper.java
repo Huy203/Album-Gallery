@@ -164,7 +164,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public String insert(String table, Model model) {
         Log.v("DatabaseHelper", "Inserting data");
         SQLiteDatabase db = getWritableDatabase();
-        Log.v("DatabaseHelper", model.insert());
         db.execSQL(model.insert());
         return model.getId();
     }

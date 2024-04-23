@@ -106,6 +106,8 @@ public class UserController implements Controller {
     public void loadFromFirestore() {
         String uid = firebaseManager.getFirebaseAuth().getCurrentUser().getUid();
         String user = dbHelper.getById("User", uid);
+        Log.v("Image", "User222: " + user);
+        Log.v("Image", "User: " + uid);
         if (user == null) {
             firebaseManager.getFirebaseHelper().getById("User", uid, uid)
                     .addOnSuccessListener(documentSnapshot -> {

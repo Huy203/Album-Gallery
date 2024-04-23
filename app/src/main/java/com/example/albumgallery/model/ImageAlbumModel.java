@@ -8,18 +8,9 @@ import com.example.albumgallery.helper.DatabaseHelper;
 public class ImageAlbumModel implements Model {
     String image_id;
     String album_id;
-    DatabaseHelper dbHelper;
 
     public String getImage_id() {
         return image_id;
-    }
-
-    public void setDbHelper(DatabaseHelper dbHelper) {
-        this.dbHelper = dbHelper;
-    }
-
-    public DatabaseHelper getDbHelper() {
-        return dbHelper;
     }
 
     public void setImage_id(String image_id) {
@@ -34,9 +25,6 @@ public class ImageAlbumModel implements Model {
         this.album_id = album_id;
     }
 
-    public ImageAlbumModel(Context context) {
-        dbHelper = new DatabaseHelper(context);
-    }
 
     public ImageAlbumModel(String image_id, String album_id) {
         this.image_id = image_id;
@@ -73,6 +61,6 @@ public class ImageAlbumModel implements Model {
 
     @Override
     public String getId() {
-        return ";";
+        return null;
     }
 }

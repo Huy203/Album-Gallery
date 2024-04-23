@@ -97,15 +97,6 @@ public class AlbumsMainFragment extends Fragment implements AlbumAdapterListener
         this.thumbnails = new ArrayList<>();
         albumNames = mainController.getAlbumController().getAlbumNames();
         thumbnails = mainController.getAlbumController().getAllThumbnails();
-        for (String i: albumNames) {
-            Log.d("Firebase album name", i);
-        }
-        for (String i: thumbnails) {
-            Log.d("Firebase album thumbnail", i);
-        }
-        for(String i: mainController.getAlbumController().getAllAlbumIds()) {
-            Log.d("Firebase test ids", i);
-        }
     }
 
     @Override
