@@ -2,7 +2,6 @@ package com.example.albumgallery.view.activity;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -21,7 +20,7 @@ import com.example.albumgallery.controller.MainController;
 import com.example.albumgallery.view.adapter.ImageAdapter;
 import com.example.albumgallery.view.listeners.ImageAdapterListener;
 import com.google.android.gms.tasks.Task;
-import com.google.android.gms.tasks.Tasks;
+import com.google.android.material.button.MaterialButton;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -35,6 +34,7 @@ public class SelectImageActivity extends AppCompatActivity implements ImageAdapt
     List<String> selectedImageURLs;
     List<Task> selectedImageURLsTask;
     List<String> selectedImageURIs;
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -47,9 +47,11 @@ public class SelectImageActivity extends AppCompatActivity implements ImageAdapt
         selectedImageURLsTask = new ArrayList<>();
 
         selectedImageURIs = new ArrayList<>();
-        numberOfImagesSelected = (TextView) findViewById(R.id.numberOfSelectedImagesInSelectActivity);
+        numberOfImagesSelected = findViewById(R.id.numberOfSelectedImagesInSelectActivity);
 
-        imageURIs.addAll(mainController.getImageController().getAllImageURLsSortByDate());
+//        imageURIs.addAll(mainController.getImageController().getAllImageURLsSortByDate());
+        imageURIs.addAll(mainController.getImageController().getAllImageURLsUndeleted());
+
         imageAdapter = new ImageAdapter(this, imageURIs);
         recyclerMediaView = this.findViewById(R.id.recyclerViewForSelectImageActivity);
         recyclerMediaView.setLayoutManager(new GridLayoutManager(this, 3));
@@ -93,6 +95,7 @@ public class SelectImageActivity extends AppCompatActivity implements ImageAdapt
     @Override
     protected void onResume() {
         super.onResume();
+        imageAdapter.setMultipleChoiceEnabled(true);
     }
 
     @SuppressLint("SetTextI18n")
@@ -125,15 +128,17 @@ public class SelectImageActivity extends AppCompatActivity implements ImageAdapt
 
     @Override
     public void getInteractedURIs(String uri) {
-        if(!selectedImageURIs.contains(uri)) {
-            selectedImageURIs.add(uri);
-            numberOfImagesSelected.setText(selectedImageURIs.size() + " images selected");
-            Log.d("justadded", uri );
-        } else {
-            selectedImageURIs.remove(uri);
-            numberOfImagesSelected.setText(selectedImageURIs.size() + " images selected");
-            Log.d("justremove", uri);
-        }
+
+//
+//        if (!selectedImageURIs.contains(uri)) {
+//            selectedImageURIs.add(uri);
+//
+//            Log.d("justadded", uri);
+//        } else {
+//            selectedImageURIs.remove(uri);
+//            numberOfImagesSelected.setText(length+ " images selected");
+//            Log.d("justremove", uri);
+//        }
 //        for(String u: selectedImageURIs) {
 //            Log.d("current uris", u);
 //        }
@@ -141,6 +146,7 @@ public class SelectImageActivity extends AppCompatActivity implements ImageAdapt
 
     @Override
     public void toggleMultipleChoice() {
-
+        int length = imageAdapter.getSelectedItems().size(); // get the number of selected items
+        numberOfImagesSelected.setText(length+ " images selected");
     }
 }

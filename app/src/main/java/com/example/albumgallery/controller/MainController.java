@@ -2,8 +2,6 @@ package com.example.albumgallery.controller;
 
 import android.app.Activity;
 
-import java.util.List;
-
 public class MainController {
     private final AlbumController albumController;
     private final ImageController imageController;

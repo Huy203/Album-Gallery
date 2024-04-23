@@ -78,8 +78,8 @@ public class ImageController implements Controller {
         return activity;
     }
 
-    public void createModel(String name, int width, int height, long capacity, String dateAdded) {
-        currentModel = new ImageModel(name, width, height, capacity, dateAdded);
+    public FirebaseManager getFirebaseManager() {
+        return firebaseManager;
     }
 
     @Override
@@ -444,7 +444,9 @@ public class ImageController implements Controller {
         } catch (URISyntaxException e) {
             e.printStackTrace();
         }
-        filename = "images/" + filename;
+        // filename = "images/" + filename;
+        // filename = "mdxa9wwR9Vbfo0XliX8ubCFY4Sz2/" + filename;
+        filename = firebaseManager.getFirebaseAuth().getCurrentUser().getUid() + "/" + filename;
         return filename;
     }
 
@@ -521,16 +523,21 @@ public class ImageController implements Controller {
                     String imageURL = taskImageURL.getResult().toString();
                     Log.d("Image task", imageURL);
                     String URL = parseURL(imageURL);
+                    Log.d("URL Image task", URL);
 
                     // Create a reference to the file to delete
                     StorageReference desertRef = storageRef.child(URL);
+                    Log.d("Executing", "ok");
 
                     // Delete the file
                     desertRef.delete().addOnSuccessListener(new OnSuccessListener<Void>() {
                         @Override
                         public void onSuccess(Void aVoid) {
+                            Log.d("Before delete on db", "ok");
                             // File deleted successfully
                             delete("ref = '" + imageURL + "'");
+                            Log.d("After delete on db", "ok");
+
                             if (allTasksCompletedGeneric(imageURLs)) {
                                 Log.v("Image", "All images deleted" + activity);
                                 activity.runOnUiThread(() -> {

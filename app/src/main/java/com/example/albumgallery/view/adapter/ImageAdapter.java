@@ -12,7 +12,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.CheckBox;
-import android.widget.FrameLayout;
 import android.widget.ImageView;
 
 import androidx.annotation.NonNull;
@@ -27,6 +26,8 @@ import com.bumptech.glide.request.target.Target;
 import com.example.albumgallery.R;
 import com.example.albumgallery.helper.SharePreferenceHelper;
 import com.example.albumgallery.view.listeners.ImageAdapterListener;
+import com.google.android.gms.tasks.Task;
+import com.google.android.gms.tasks.Tasks;
 import com.google.android.material.progressindicator.CircularProgressIndicator;
 
 import java.util.ArrayList;
@@ -66,7 +67,8 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> 
         String imageURL = getImageURLs().get(position);
         holder.bind(imageURL);
         holder.isLiked.setVisibility(imageURLsFavourited.contains(imageURL) ? View.VISIBLE : View.GONE);
-        holder.checkbox.setVisibility(isMultipleChoice ? View.VISIBLE : View.GONE); // Update visibility based on isMultipleChoice
+        holder.checkbox.setVisibility(getSelectedItems().get(position, false) ? View.VISIBLE : View.GONE); // Update visibility based on isMultipleChoice
+        holder.checkbox.setChecked(getSelectedItems().get(position, false)); // Update checkbo
         holderList.add(holder);
     }
 
@@ -114,6 +116,23 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> 
         }
         return selectedImageURLs;
     }
+
+    public List<Task> getSelectedImageURLsTask() {
+        List<Task> selectedImageURLsTask = new ArrayList<>();
+        SparseBooleanArray selectedItems = getSelectedItems();
+        List<String> imageURLs = getImageURLs();
+
+        for (int i = 0; i < selectedItems.size(); i++) {
+            int key = selectedItems.keyAt(i);
+            if (selectedItems.get(key)) {
+                String imageURL = imageURLs.get(key);
+                Task<Uri> task = Tasks.forResult(Uri.parse(imageURL));
+                selectedImageURLsTask.add(task);
+            }
+        }
+        return selectedImageURLsTask;
+    }
+
 
     public boolean toggleMultipleChoiceImagesEnabled() {
         if (listener != null) {
@@ -167,25 +186,24 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> 
 
             checkbox.setOnClickListener(view -> {
                 toggleSelection();
-                listener.toggleMultipleChoice();
+//                listener.toggleMultipleChoice();
             });
 
             itemView.setOnClickListener(view -> {
                 if (!isMultipleChoice) {
                     listener.handleImagePick(imageView, imageURL, getAdapterPosition());
                 } else {
-//                    Log.d("justclick", imageURL);
-                    listener.getInteractedURIs(imageURL);
+//                    listener.getInteractedURIs(imageURL);
                     toggleSelection();
-                    listener.toggleMultipleChoice();
+//                    listener.toggleMultipleChoice();
                 }
             });
 
             itemView.setOnLongClickListener(view -> {
                 isMultipleChoice = true;
                 toggleSelection();
-                listener.getInteractedURIs(imageURL);
-                listener.toggleMultipleChoice();
+//                listener.getInteractedURIs(imageURL);
+//                listener.toggleMultipleChoice();
                 return true;
             });
         }

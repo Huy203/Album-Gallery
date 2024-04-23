@@ -181,7 +181,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     public void delete(String table, String where) {
         SQLiteDatabase db = getWritableDatabase();
-        db.execSQL("DELETE FROM " + table + " WHERE " + where);
+        if(where == null) {
+            db.execSQL("DELETE FROM " + table);
+        } else {
+            db.execSQL("DELETE FROM " + table + " WHERE " + where);
+        }
     }
 
     public void update(String table, String column, String value, String where) {
@@ -245,7 +249,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         try {
             // Define the query to select image paths by notice
-            String query = "SELECT ref FROM " + IMAGE_TABLE + " WHERE notice = ?";
+            String query = "SELECT ref FROM " + IMAGE_TABLE + " WHERE notice = ? AND is_deleted = 0";
 
             // Execute the query
             cursor = db.rawQuery(query, new String[]{notice});
