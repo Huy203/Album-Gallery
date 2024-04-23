@@ -167,6 +167,7 @@ public class AlbumContentActivity extends AppCompatActivity implements ImageAdap
 
 
         intent.putExtra("id", id);
+        intent.putStringArrayListExtra("imagePathsAlbum", new ArrayList<>(imageURIs));
         intent.putExtra("position", position);
         Log.v("ImageAdapter", "Image selected: " + itemView);
         startActivity(intent, options.toBundle());
