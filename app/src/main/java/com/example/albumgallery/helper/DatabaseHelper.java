@@ -239,16 +239,25 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
 
     public List<String> selectImagesByNotice(String notice) {
+        if (notice.isEmpty()) {
+            Log.d("notice is null", "ok");
+            return null;
+        }
+        else{
+            Log.d("notice is not null", notice);
+        }
         List<String> imagePaths = new ArrayList<>();
         SQLiteDatabase db = getWritableDatabase();
         Cursor cursor = null;
 
         try {
             // Define the query to select image paths by notice
-            String query = "SELECT ref FROM " + IMAGE_TABLE + " WHERE notice = ? AND is_deleted = 0";
+            String query = "SELECT ref FROM " + IMAGE_TABLE + " WHERE notice LIKE ? AND is_deleted = 0";
+
+            String likeNotice = notice + "%";
 
             // Execute the query
-            cursor = db.rawQuery(query, new String[]{notice});
+            cursor = db.rawQuery(query, new String[]{likeNotice});
 
             // Iterate through the cursor to retrieve the image paths
             if (cursor != null && cursor.moveToFirst()) {
@@ -269,6 +278,49 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         }
 
         return imagePaths;
+    }
+
+    public List<String> selectImageNamesByNotice(String notice) {
+        if (notice.isEmpty()) {
+            Log.d("notice is null", "ok");
+            return null;
+        }
+        else{
+            Log.d("notice is not null", notice);
+        }
+        List<String> imageNames = new ArrayList<>();
+        SQLiteDatabase db = getWritableDatabase();
+        Cursor cursor = null;
+
+        try {
+            // Define the query to select image names by notice
+            String query = "SELECT name FROM " + IMAGE_TABLE + " WHERE notice LIKE ? AND is_deleted = 0";
+
+            // Concatenate the notice text with a wildcard to match any prefix
+            String likeNotice = notice + "%";
+
+            // Execute the query
+            cursor = db.rawQuery(query, new String[]{likeNotice});
+
+            // Iterate through the cursor to retrieve the image paths
+            if (cursor != null && cursor.moveToFirst()) {
+                do {
+                    // Get the image path from the cursor
+                    @SuppressLint("Range") String imageName = cursor.getString(cursor.getColumnIndex("name"));
+                    imageNames.add(imageName);
+                } while (cursor.moveToNext());
+            }
+        } catch (Exception e) {
+            Log.e("DatabaseHelper", "Error selecting images by notice: " + e.getMessage());
+        } finally {
+            // Close the cursor and database connection
+            if (cursor != null) {
+                cursor.close();
+            }
+            db.close();
+        }
+        Log.d("image name find by notice", String.valueOf(imageNames.size()));
+        return imageNames;
     }
 
 
