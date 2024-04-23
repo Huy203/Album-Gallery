@@ -118,12 +118,10 @@ public class Auth extends AppCompatActivity {
                 .addOnCompleteListener(this, task -> {
                     if (task.isSuccessful()) {
                         FirebaseUser user = firebaseManager.getFirebaseAuth().getCurrentUser();
-                        Log.v("Firebase", "User2222: " + user);
                         if (user != null) {
                             mainController.getUserController().loadFromFirestore();
                             mainController.getAlbumController().loadFromFirestore();
                             mainController.getImageAlbumController().loadFromFirestore();
-                            mainController.getImageController().loadFromFirestore();
                         }
                     } else {
                         Snackbar.make(findViewById(android.R.id.content), "The supplied auth credential is incorrect", Snackbar.LENGTH_LONG)
@@ -186,11 +184,8 @@ public class Auth extends AppCompatActivity {
                         // Sign in success, update UI with the signed-in user's information
                         FirebaseUser user = firebaseManager.getFirebaseAuth().getCurrentUser();
                         if (user != null) {
-                            Uri imageUri = Uri.parse("android.resource://com.example.albumgallery/drawable/blank_profile_picture");
-
                             UserProfileChangeRequest profileUpdates = new UserProfileChangeRequest.Builder()
                                     .setDisplayName(username)
-                                    .setPhotoUri(imageUri)
                                     .build();
                             user.updateProfile(profileUpdates)
                                     .addOnCompleteListener(task1 -> {

@@ -100,7 +100,7 @@ public class MainFragmentController extends AppCompatActivity implements Backgro
 
     public void initiateVariable(String picture) {
         ShapeableImageView avatar = findViewById(R.id.action_user);
-        if (picture != null) {
+        if (!picture.contains("android")) {
             Log.v("UserActivity", "Picture: " + picture);
             Glide.with(this).asBitmap()
                     .load(picture)
@@ -131,7 +131,6 @@ public class MainFragmentController extends AppCompatActivity implements Backgro
     @SuppressLint("NotifyDataSetChanged")
     @Override
     public void onResume() {
-        Toast.makeText(this, "onResume", Toast.LENGTH_SHORT).show();
         super.onResume();
         Fragment currentFragment = getSupportFragmentManager().findFragmentById(R.id.fragment_container);
 
@@ -139,8 +138,10 @@ public class MainFragmentController extends AppCompatActivity implements Backgro
         ScheduledExecutorService executorService = Executors.newSingleThreadScheduledExecutor();
         executorService.schedule(() -> {
             initiateVariable(mainController.getUserController().getUser().getPicture());
-            Log.v("MainFragmentController", "Scheduled task");
         }, 1, TimeUnit.SECONDS);
+
+        mainController.getImageController().loadFromFirestore();
+
     }
 
     @Override

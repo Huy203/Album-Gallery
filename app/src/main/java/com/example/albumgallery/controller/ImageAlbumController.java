@@ -123,9 +123,9 @@ public class ImageAlbumController implements Controller {
 
     public void loadFromFirestore() {
         List<Map<String, List<String>>> albumIdsIdsInDatabase = getAllAlbumIdsDatabase();
-        String currentIdAlbum = null;
         List<String> albumIdsInFirestore = new ArrayList<>();
         List<String> imageIdsInFirestore = new ArrayList<>();
+
         firebaseManager.getFirebaseHelper().getAll(firebaseManager.getFirebaseAuth().getCurrentUser().getUid(), TAG)
                 .continueWith(task -> {
                     if (task.isSuccessful()) {
@@ -135,56 +135,42 @@ public class ImageAlbumController implements Controller {
                         }
 
                         List<Map<String, List<String>>> albumIdsIdsInFirestore = getAllAlbumIdsFirestore(albumIdsInFirestore, imageIdsInFirestore);
-                        if (albumIdsIdsInDatabase.size() == 0) {
-                            for (Map<String, List<String>> albumId : albumIdsIdsInFirestore) {
-                                for (String key : albumId.keySet()) {
-                                    for (String imageId : albumId.get(key)) {
-                                        firebaseManager.getFirebaseHelper().getById(TAG, imageId, firebaseManager.getFirebaseAuth().getCurrentUser().getUid())
-                                                .addOnSuccessListener(documentSnapshot -> {
-                                                    if (documentSnapshot != null) {
-                                                        currentModel = new ImageAlbumModel(
-                                                                imageId,
-                                                                key
-                                                        );
-                                                        dbHelper.insert("ImageAlbum", currentModel);
-                                                    } else {
-                                                        Log.d("Firebase album", "document is null");
-                                                    }
-                                                });
-                                    }
-                                }
-                            }
-                        } else if (albumIdsIdsInDatabase.size() < albumIdsIdsInFirestore.size()) {
-                            for (Map<String, List<String>> albumId : albumIdsIdsInDatabase) {
-                                for (Map<String, List<String>> albumId2 : albumIdsIdsInFirestore) {
-                                    if (!albumId.equals(albumId2)) {
-                                        for (String key : albumId2.keySet()) {
-                                            for (String key2 : albumId.keySet()) {
-                                                if (!key.equals(key2)) {
-                                                    for (String imageId : albumId2.get(key)) {
-                                                        firebaseManager.getFirebaseHelper().getById(TAG, imageId, firebaseManager.getFirebaseAuth().getCurrentUser().getUid())
-                                                                .addOnSuccessListener(documentSnapshot -> {
-                                                                    if (documentSnapshot != null) {
-                                                                        currentModel = new ImageAlbumModel(
-                                                                                imageId,
-                                                                                key
-                                                                        );
-                                                                        dbHelper.insert("ImageAlbum", currentModel);
 
-                                                                    } else {
-                                                                        Log.d("Firebase album", "document is null");
-                                                                    }
-                                                                });
-                                                    }
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
-                            }
+                        if (albumIdsIdsInDatabase.isEmpty()) {
+                            insertNewAlbums(albumIdsIdsInFirestore);
+                        } else if (albumIdsIdsInDatabase.size() < albumIdsIdsInFirestore.size()) {
+                            insertNewAlbums(getNewAlbums(albumIdsIdsInDatabase, albumIdsIdsInFirestore));
                         }
                     }
                     return albumIdsInFirestore;
+                });
+    }
+
+    private void insertNewAlbums(List<Map<String, List<String>>> albumIdsIdsInFirestore) {
+        for (Map<String, List<String>> albumId : albumIdsIdsInFirestore) {
+            for (Map.Entry<String, List<String>> entry : albumId.entrySet()) {
+                for (String imageId : entry.getValue()) {
+                    insertImageAlbum(entry.getKey(), imageId);
+                }
+            }
+        }
+    }
+
+    private List<Map<String, List<String>>> getNewAlbums(List<Map<String, List<String>>> albumIdsIdsInDatabase, List<Map<String, List<String>>> albumIdsIdsInFirestore) {
+        List<Map<String, List<String>>> newAlbums = new ArrayList<>(albumIdsIdsInFirestore);
+        newAlbums.removeAll(albumIdsIdsInDatabase);
+        return newAlbums;
+    }
+
+    private void insertImageAlbum(String albumId, String imageId) {
+        firebaseManager.getFirebaseHelper().getById(TAG, imageId, firebaseManager.getFirebaseAuth().getCurrentUser().getUid())
+                .addOnSuccessListener(documentSnapshot -> {
+                    if (documentSnapshot != null) {
+                        currentModel = new ImageAlbumModel(imageId, albumId);
+                        dbHelper.insert("ImageAlbum", currentModel);
+                    } else {
+                        Log.d("Firebase album", "document is null");
+                    }
                 });
     }
 
