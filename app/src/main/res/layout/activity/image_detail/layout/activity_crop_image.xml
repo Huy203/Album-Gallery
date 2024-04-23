@@ -11,15 +11,6 @@
         android:layout_height="wrap_content"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <!-- CropImageView -->
-    <com.theartofdev.edmodo.cropper.CropImageView
-        android:id="@+id/cropImageView"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        app:layout_constraintBottom_toTopOf="@id/progressLayout"
-        app:layout_constraintTop_toBottomOf="@id/top_nav_crop"
-        android:src="@drawable/meme"/>
-
     <FrameLayout
         android:id="@+id/progressLayout"
         android:layout_width="match_parent"
@@ -58,6 +49,16 @@
         </com.google.android.flexbox.FlexboxLayout>
     </FrameLayout>
 
+    <!-- CropImageView -->
 
+    <com.canhub.cropper.CropImageView
+        android:id="@+id/cropImageView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:scaleType="centerCrop"
+        android:src="@drawable/placeholder_image"
+        app:layout_constraintBottom_toTopOf="@id/progressLayout"
+        app:layout_constraintEnd_toEndOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
