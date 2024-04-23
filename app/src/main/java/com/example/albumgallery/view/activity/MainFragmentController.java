@@ -104,13 +104,10 @@ public class MainFragmentController extends AppCompatActivity implements Backgro
         });
 
         MainController mainController = new MainController(this);
-        if(isBackgroundTaskCompleted) {
-            mainController.getImageController().loadFromFirestore();
-            mainController.getUserController().loadFromFirestore();
-            mainController.getAlbumController().loadFromFirestore();
-
-//        initiateVariable(mainController.getUserController().getUser().getPicture());
-        }
+        mainController.getImageController().loadFromFirestore();
+        mainController.getUserController().loadFromFirestore();
+        mainController.getAlbumController().loadFromFirestore();
+        initiateVariable(mainController.getUserController().getUser().getPicture());
     }
 
     private void initiateVariable(String picture) {
