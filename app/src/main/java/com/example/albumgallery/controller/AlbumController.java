@@ -75,6 +75,7 @@ public class AlbumController implements Controller {
                         dbHelper.insert("Album", currentModel);
                         update("id", documentReference.getId(), "id = '" + documentReference.getId() + "'");
                         activity.runOnUiThread(() -> {
+                            ((CreateAlbumActivity) activity).addToImageAlbum();
                             ((CreateAlbumActivity) activity).backAction();
                         });
                         dbHelper.close();

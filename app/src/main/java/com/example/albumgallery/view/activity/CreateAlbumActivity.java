@@ -139,16 +139,8 @@ public class CreateAlbumActivity extends AppCompatActivity {
                 selectedImageURLs = getIntent().getStringArrayListExtra("selectedImageURIs");
                 // add album
                 mainController.getAlbumController().addAlbum(albumName, password, numOfImages, selectedImageURLs.get(0));
-                // get the album's id just added and add to album_image table
-                String id_album = mainController.getAlbumController().getLastAlbumId();
-                List<String> ids = new ArrayList<>();
-                for (String uri : selectedImageURLs) {
-                    ids.add(mainController.getImageController().getIdByRef(uri));
-                }
-                for (String id : ids) {
-                    Log.d("Create Album Activity", id);
-                    mainController.getImageAlbumController().addImageAlbum(id, id_album);
-                }
+
+
             }
         });
     }
@@ -166,5 +158,18 @@ public class CreateAlbumActivity extends AppCompatActivity {
         albumFrag.putExtra("fragmentToLoad", "AlbumMain");
         startActivity(albumFrag);
         finish();
+    }
+
+    public void addToImageAlbum() {
+        // get the album's id just added and add to album_image table
+        String id_album = mainController.getAlbumController().getLastAlbumId();
+        List<String> ids = new ArrayList<>();
+        for (String uri : selectedImageURLs) {
+            Log.d("Firebase content uri", mainController.getImageController().getIdByRef(uri));
+            ids.add(mainController.getImageController().getIdByRef(uri));
+        }
+        for (String id : ids) {
+            mainController.getImageAlbumController().addImageAlbum(id, id_album);
+        }
     }
 }

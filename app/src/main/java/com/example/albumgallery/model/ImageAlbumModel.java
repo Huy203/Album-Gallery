@@ -43,6 +43,12 @@ public class ImageAlbumModel implements Model {
         this.album_id = album_id;
     }
 
+    public ImageAlbumModel() {
+        this.image_id = "";
+        this.album_id = "";
+    }
+
+
     @Override
     public String insert() {
         String query = "INSERT INTO Image_Album (image_id, album_id) VALUES ('" + image_id + "', '" + album_id + "')";

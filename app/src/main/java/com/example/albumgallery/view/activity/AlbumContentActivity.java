@@ -71,7 +71,7 @@ public class AlbumContentActivity extends AppCompatActivity implements ImageAdap
         view = findViewById(R.id.albumInfo);
 
         album_id = mainController.getAlbumController().getAlbumIdByName(albumName);
-//        Log.d("album_id", Integer.toString(album_id));
+        Log.d("Firebase content", album_id);
 
         image_ids = mainController.getImageAlbumController().getImageIdsByAlbumId(album_id);
 
@@ -80,6 +80,7 @@ public class AlbumContentActivity extends AppCompatActivity implements ImageAdap
         for (String image_id : image_ids) {
             String ref = mainController.getImageController().getImageRefById(image_id);
             Log.d("ref from id", ref);
+            Log.d("Firebase album content", image_id);
             imageURIs.add(ref);
         }
 
