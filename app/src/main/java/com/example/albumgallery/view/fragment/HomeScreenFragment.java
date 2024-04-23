@@ -252,6 +252,7 @@ public class HomeScreenFragment extends Fragment {
         List<String> allImage = mainController.getImageController().getAllImageURLsUndeleted();
         List<String> imageURLsFavourited = mainController.getImageController().getAllImageURLsFavourited();
 
+        Log.v("HomeScreenFragment", "updateUI: " + allImage.size() + " " + imageURLsFavourited.size() + " " + imageURIs.size());
         if (allImage.size() > imageURIs.size()) {
             for (int i = 0; i < allImage.size(); i++) {
                 if (!imageURIs.contains(allImage.get(i))) {

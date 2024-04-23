@@ -49,6 +49,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 
 public class MainFragmentController extends AppCompatActivity implements BackgroundProcessingCallback, ImageAdapterListener, FragToActivityListener {
@@ -105,12 +108,17 @@ public class MainFragmentController extends AppCompatActivity implements Backgro
 
         MainController mainController = new MainController(this);
         mainController.getImageController().loadFromFirestore();
+        ScheduledExecutorService executorService = Executors.newSingleThreadScheduledExecutor();
+        executorService.schedule(() -> {
+            initiateVariable(mainController.getUserController().getUser().getPicture());
+            Log.v("MainFragmentController", "Scheduled task");
+        }, 1, TimeUnit.SECONDS);
         mainController.getUserController().loadFromFirestore();
         mainController.getAlbumController().loadFromFirestore();
         initiateVariable(mainController.getUserController().getUser().getPicture());
     }
 
-    private void initiateVariable(String picture) {
+    public void initiateVariable(String picture) {
         ShapeableImageView avatar = findViewById(R.id.action_user);
         if (picture != null) {
             Log.v("UserActivity", "Picture: " + picture);
@@ -309,8 +317,6 @@ public class MainFragmentController extends AppCompatActivity implements Backgro
                 binding.bottomNavigationView.setVisibility(View.GONE);
                 findViewById(R.id.bottomMenuMain1).setVisibility(View.GONE);
                 findViewById(R.id.bottomMenuMain2).setVisibility(View.VISIBLE);
-            } else if (fragment instanceof AlbumsMainFragment) {
-
             }
             else if (fragment instanceof SearchFragment) {
                 Log.v("MainFragmentController", "SearchFragment");

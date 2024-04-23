@@ -138,6 +138,11 @@ public class UserActivity extends AppCompatActivity implements FragToActivityLis
 
     public void signOutAction(View view) {
         mainController.getUserController().getFirebaseManager().getFirebaseAuth().signOut();
+        mainController.getImageController().delete(null);
+        mainController.getAlbumController().delete(null);
+        mainController.getImageAlbumController().delete(null);
+        mainController.getUserController().delete(null);
+
     }
 
     public void languageAction(View view) {
