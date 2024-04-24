@@ -37,6 +37,7 @@ public class CropImageActivity extends AppCompatActivity {
     private boolean hasChanges = false;
     private View overlayView;
     private Rect cropRect;
+    Bitmap croppedBitmap;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -273,7 +274,7 @@ public class CropImageActivity extends AppCompatActivity {
         overlayHeight = Math.min(overlayHeight, originalBitmap.getHeight() - overlayY);
 
         // Tạo một Bitmap mới để lưu phần bên trong overlay
-        Bitmap croppedBitmap = Bitmap.createBitmap(overlayWidth, overlayHeight, Bitmap.Config.ARGB_8888);
+        croppedBitmap = Bitmap.createBitmap(overlayWidth, overlayHeight, Bitmap.Config.ARGB_8888);
         Canvas canvas = new Canvas(croppedBitmap);
         Rect srcRect = new Rect(overlayX, overlayY, overlayX + overlayWidth, overlayY + overlayHeight);
         Rect destRect = new Rect(0, 0, overlayWidth, overlayHeight);
@@ -285,13 +286,18 @@ public class CropImageActivity extends AppCompatActivity {
 
 
     public void saveAction(View view) {
-        //Bitmap croppedImage = cropImageView.getCroppedImage();
-
-        Intent intent = new Intent(this, EditImageActivity.class);
-        //intent.putExtra("imageByteArray", bitmapToByteArray(croppedImage));
-        setResult(RESULT_OK, intent);
-        finish();
+        if (croppedBitmap != null) {
+            // Perform actions with the cropped bitmap
+            Intent intent = new Intent(this, EditImageActivity.class);
+            intent.putExtra("imageByteArray", bitmapToByteArray(croppedBitmap));
+            setResult(RESULT_OK, intent);
+            finish();
+        } else {
+            // Handle the case where no cropping has been performed
+            Toast.makeText(this, "Please crop the image before saving.", Toast.LENGTH_SHORT).show();
+        }
     }
+
     public void backAction(View view) {
         finish();
     }
