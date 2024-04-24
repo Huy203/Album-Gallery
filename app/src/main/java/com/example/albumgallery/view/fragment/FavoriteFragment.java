@@ -71,7 +71,7 @@ public class FavoriteFragment extends Fragment {
             @Override
             public void onClick(View view) {
                 Intent mainFragment = new Intent(getContext(), MainFragmentController.class);
-                mainFragment.putExtra("fragmentToLoad", "HomeScreen");
+                mainFragment.putExtra("fragmentToLoad", "AlbumMain");
                 startActivity(mainFragment);
             }
         });

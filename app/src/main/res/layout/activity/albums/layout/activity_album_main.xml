@@ -39,4 +39,5 @@
         android:background="#61677A"
         android:layout_marginLeft="20dp"
         android:layout_marginRight="20dp"/>
+
 </LinearLayout>

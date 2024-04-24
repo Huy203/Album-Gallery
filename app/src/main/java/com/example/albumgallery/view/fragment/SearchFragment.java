@@ -16,6 +16,7 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.PopupMenu;
@@ -44,18 +45,23 @@ import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.Tasks;
 import com.google.android.material.button.MaterialButton;
 
+import org.checkerframework.framework.qual.DefaultQualifier;
+
 import java.util.ArrayList;
 import java.util.List;
 
 public class SearchFragment extends Fragment {
     private RecyclerView recyclerMediaView;
     private List<String> imageURIs; //contains the list of image encoded.
+    private List<String> imageURIsTemp;
     private ImageAdapter imageAdapter; //adapter for the recycler view
     private MainController mainController; //controller contains other controllers
     List<String> selectedImageURLs;
     List<Task> selectedImageURLsTask;
     private View view;
     private SearchView searchView;
+    private ListView listView;
+    private ArrayAdapter<String> arrayAdapter;
     private FragToActivityListener fragToActivityListener;
     private boolean isSelectAll = false;
 
@@ -91,6 +97,7 @@ public class SearchFragment extends Fragment {
     private void initializeVariables(View view) {
         mainController = new MainController(getActivity());
         imageURIs = new ArrayList<>();
+        imageURIsTemp = new ArrayList<>();
         selectedImageURLs = new ArrayList<>();
         selectedImageURLsTask = new ArrayList<>();
         imageAdapter = new ImageAdapter(getActivity(), imageURIs);
@@ -120,7 +127,7 @@ public class SearchFragment extends Fragment {
             @Override
             public boolean onQueryTextSubmit(String query) {
                 // Perform search when the user submits the query (e.g., presses Enter)
-                searchImages(query);
+                searchImagesSubmit(query);
                 Log.d("query seach", query);
                 return true;
             }
@@ -128,9 +135,21 @@ public class SearchFragment extends Fragment {
             @Override
             public boolean onQueryTextChange(String newText) {
                 // Perform search as the user types
-//                searchImages(newText);
-//                Log.d("new text seach", newText);
+                searchImagesQuerying(newText);
+                Log.d("new text search", newText);
                 return true;
+            }
+        });
+        listView = view.findViewById(R.id.listView);
+        arrayAdapter = new ArrayAdapter<String>(requireContext(), android.R.layout.simple_list_item_1);
+        listView.setAdapter(arrayAdapter);
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Log.d("imageURIs", String.valueOf(imageURIsTemp.size()));
+                // String query = searchView.getQuery().toString();
+                String selectedImageURI = imageURIsTemp.get(position);
+                getImage(selectedImageURI);
             }
         });
     }
@@ -227,7 +246,7 @@ public class SearchFragment extends Fragment {
         String searchText = searchView.getQuery().toString().trim();
         if (!searchText.isEmpty()) {
             // If the search box contains text, perform the search
-            searchImages(searchText);
+            searchImagesSubmit(searchText);
         } else {
             // If the search box is empty, keep imageURIs empty
             imageURIs.clear();
@@ -331,13 +350,41 @@ public class SearchFragment extends Fragment {
         }
     }
 
-    public void searchImages(String query) {
+    public void searchImagesSubmit(String query) {
+        arrayAdapter.clear();
+
         imageURIs.clear();
         imageURIs.addAll(mainController.getImageController().selectImagesByNotice(query));
         Log.d("Size of image uris", String.valueOf(imageURIs.size()));
         imageAdapter = new ImageAdapter(getActivity(), imageURIs);
         recyclerMediaView.setLayoutManager(new GridLayoutManager(getContext(), 4));
         recyclerMediaView.setAdapter(imageAdapter);
+
+        imageAdapter.notifyDataSetChanged();
+    }
+
+    public void searchImagesQuerying(String query) {
+        imageURIsTemp.clear();
+        arrayAdapter.clear();
+        if(mainController.getImageController().selectImagesByNotice(query) != null){
+            arrayAdapter.addAll(mainController.getImageController().selectImageNamesByNotice(query));
+            imageURIsTemp.addAll(mainController.getImageController().selectImagesByNotice(query));
+        }
+        arrayAdapter.notifyDataSetChanged();
+
+
+    }
+
+    public void getImage(String selectedImageURI){
+        List<String> selectedImageURIs = new ArrayList<>();
+        selectedImageURIs.add(selectedImageURI);
+
+        arrayAdapter.clear();
+
+        imageAdapter = new ImageAdapter(getActivity(), selectedImageURIs);
+        recyclerMediaView.setLayoutManager(new GridLayoutManager(getContext(), 4));
+        recyclerMediaView.setAdapter(imageAdapter);
+
         imageAdapter.notifyDataSetChanged();
     }
 }

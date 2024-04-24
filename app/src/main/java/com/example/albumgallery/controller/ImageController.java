@@ -671,4 +671,7 @@ public class ImageController implements Controller {
     public List<String> selectImagesByNotice(String notice) {
         return dbHelper.selectImagesByNotice(notice);
     }
+    public List<String> selectImageNamesByNotice(String notice) {
+        return dbHelper.selectImageNamesByNotice(notice);
+    }
 }

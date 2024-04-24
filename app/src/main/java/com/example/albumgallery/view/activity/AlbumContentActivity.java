@@ -7,10 +7,14 @@ import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.PopupMenu;
 import android.widget.TextView;
 
 import androidx.annotation.Nullable;
@@ -23,6 +27,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.albumgallery.R;
 import com.example.albumgallery.controller.MainController;
+import com.example.albumgallery.helper.SharePreferenceHelper;
 import com.example.albumgallery.model.AlbumModel;
 import com.example.albumgallery.model.ImageAlbumModel;
 import com.example.albumgallery.view.adapter.AlbumInfoListener;
@@ -65,9 +70,7 @@ public class AlbumContentActivity extends AppCompatActivity implements ImageAdap
         albumNameTxtView.setText(albumName);
 
         AlbumInfo albumInfoFragment = new AlbumInfo();
-        Button AlbumInfo = findViewById(R.id.AlbumInfo);
         SlideShowActivity slideShowActivity = new SlideShowActivity();
-        Button SlideShow = findViewById(R.id.SlideShow);
         view = findViewById(R.id.albumInfo);
 
         album_id = mainController.getAlbumController().getAlbumIdByName(albumName);
@@ -90,18 +93,10 @@ public class AlbumContentActivity extends AppCompatActivity implements ImageAdap
         recyclerView.setAdapter(imageAdapter);
         imageAdapter.notifyDataSetChanged();
 
-        AlbumInfo.setOnClickListener(v -> {
-            toggleAlbumInfo();
-        });
-
-        SlideShow.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startSlideShow();
-            }
-        });
-
         albumInfoFragment.setAlbumInfo(getAlbumModel());
+
+        MaterialButton changeGridViewBtn = findViewById(R.id.changeGridViewBtn);
+        changeGridViewBtn.setOnClickListener(this::changeViewAction);
 
         // Add ImageInfo fragment to activity
         getSupportFragmentManager().beginTransaction()
@@ -116,7 +111,7 @@ public class AlbumContentActivity extends AppCompatActivity implements ImageAdap
     }
 
     private void handleInteractions() {
-        MaterialButton backBtn = findViewById(R.id.backButtonAlbumContent);
+        Button backBtn = findViewById(R.id.backButtonAlbumContent);
         backBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -126,11 +121,13 @@ public class AlbumContentActivity extends AppCompatActivity implements ImageAdap
                 finish();
             }
         });
-        Button deleteBtn = (Button) this.findViewById(R.id.btnDelete);
-        deleteBtn.setOnClickListener(new View.OnClickListener() {
+        // Set OnClickListener to the root view of the activity layout
+        findViewById(android.R.id.content).setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View view) {
-                showDeleteConfirmationDialog();
+            public void onClick(View v) {
+                if (isAlbumInfoVisible) {
+                    toggleAlbumInfo();
+                }
             }
         });
     }
@@ -168,6 +165,7 @@ public class AlbumContentActivity extends AppCompatActivity implements ImageAdap
 
 
         intent.putExtra("id", id);
+        intent.putStringArrayListExtra("imagePathsAlbum", new ArrayList<>(imageURIs));
         intent.putExtra("position", position);
         Log.v("ImageAdapter", "Image selected: " + itemView);
         startActivity(intent, options.toBundle());
@@ -312,5 +310,30 @@ public class AlbumContentActivity extends AppCompatActivity implements ImageAdap
         Intent intent = new Intent(this, SlideShowActivity.class);
         intent.putStringArrayListExtra("imageURIs", new ArrayList<>(imageURIs));
         startActivity(intent);
+    }
+    private void changeViewAction(View view) {
+        PopupMenu popupMenu = new PopupMenu(AlbumContentActivity.this, view);
+        popupMenu.getMenu().add(Menu.NONE, 0, 0, getResources().getString(R.string.album_delete));
+        popupMenu.getMenu().add(Menu.NONE, 1, 1, getResources().getString(R.string.album_info));
+        popupMenu.getMenu().add(Menu.NONE, 2, 2, getResources().getString(R.string.slide_show));
+        popupMenu.setOnMenuItemClickListener(item -> {
+            switch (item.getItemId()) {
+                case 0:
+                    // delete
+                    showDeleteConfirmationDialog();
+                    return true;
+                case 1:
+                    // info
+                    toggleAlbumInfo();
+                    return true;
+                case 2:
+                    // slide
+                    startSlideShow();
+                    return true;
+                default:
+                    return false;
+            }
+        });
+        popupMenu.show();
     }
 }

@@ -9,14 +9,6 @@
         android:id="@+id/albums"
         android:icon="@drawable/album"/>
     <item
-        android:id="@+id/favorites"
-        android:title="@string/favorites"
-        android:icon="@drawable/favourite"/>
-    <item
-        android:id="@+id/bin"
-        android:title="Bin"
-        android:icon="@drawable/trash_bin"/>
-    <item
         android:id="@+id/search"
         android:title="Search"
         android:icon="@drawable/search_icon"/>
