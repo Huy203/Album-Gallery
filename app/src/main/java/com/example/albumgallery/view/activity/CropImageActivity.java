@@ -5,6 +5,7 @@ import static com.example.albumgallery.utils.Utilities.convertFromUriToBitmap;
 
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.Canvas;
 import android.graphics.Rect;
 import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
@@ -36,6 +37,7 @@ public class CropImageActivity extends AppCompatActivity {
     private boolean hasChanges = false;
     private View overlayView;
     private Rect cropRect;
+    Bitmap croppedBitmap;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,76 +53,81 @@ public class CropImageActivity extends AppCompatActivity {
             int width = cropImageView.getWidth();
             int height = cropImageView.getHeight();
 
-            // Tính toán kích thước ô vuông dựa trên kích thước mặc định của cropImageView
+            // Calculate square size based on minimum of width and height
             int squareSize = Math.min(width, height);
             int left = (width - squareSize) / 2;
             int top = (height - squareSize) / 2;
             int right = left + squareSize;
             int bottom = top + squareSize;
 
-            // Thiết lập kích thước và vị trí của overlayView để hiển thị ô vuông
+            // Set initial position and size of cropRect
+            cropRect = new Rect(left, top, right, bottom);
+
+            // Set initial position and size of overlayView
             overlayView.getLayoutParams().width = squareSize;
             overlayView.getLayoutParams().height = squareSize;
             overlayView.setX(left);
             overlayView.setY(top);
             overlayView.requestLayout();
-
-            // Initialize cropRect with initial position and size
-            cropRect = new Rect(left, top, right, bottom);
         });
 
-
-        // Thiết lập sự kiện kéo thả cho overlay view để điều chỉnh kích thước và vị trí của khung cắt
+        // Touch listener for overlayView to adjust cropRect size and position
         overlayView.setOnTouchListener(new View.OnTouchListener() {
-            private float startX, startY;
-            private boolean isDragging = false;
-            private boolean isResizing = false;
-            private int resizeAreaSize = 50; // Define the size of the resize area
+            private float startX;
+            private float startY;
+            private int startWidth;
+            private int startHeight;
+            private boolean isCornerDragged = false;
 
             @Override
             public boolean onTouch(View v, MotionEvent event) {
                 switch (event.getAction()) {
                     case MotionEvent.ACTION_DOWN:
-                        startX = event.getX();
-                        startY = event.getY();
-                        isDragging = cropRect.contains((int) startX, (int) startY);
-                        isResizing = isResizeArea((int) startX, (int) startY);
+                        startX = event.getRawX();
+                        startY = event.getRawY();
+                        startWidth = overlayView.getWidth();
+                        startHeight = overlayView.getHeight();
+
+                        // Kiểm tra nếu điểm chạm đủ gần cạnh (ví dụ: trong bán kính 50px)
+                        float edgeRadius = 50; // Điều chỉnh kích thước bán kính của cạnh tại đây
+                        float distanceFromLeftEdge = Math.abs(startX - overlayView.getX());
+                        float distanceFromTopEdge = Math.abs(startY - overlayView.getY());
+                        float distanceFromRightEdge = Math.abs(startX - (overlayView.getX() + overlayView.getWidth()));
+                        float distanceFromBottomEdge = Math.abs(startY - (overlayView.getY() + overlayView.getHeight()));
+
+                        if (distanceFromLeftEdge <= edgeRadius || distanceFromTopEdge <= edgeRadius || distanceFromRightEdge <= edgeRadius || distanceFromBottomEdge <= edgeRadius) {
+                            isCornerDragged = true; // Nếu điểm chạm đủ gần cạnh, cho phép di chuyển cạnh
+                        }
                         break;
                     case MotionEvent.ACTION_MOVE:
-                        if (isDragging) {
-                            float dx = event.getX() - startX;
-                            float dy = event.getY() - startY;
-                            cropRect.left += dx;
-                            cropRect.top += dy;
-                            cropRect.right += dx;
-                            cropRect.bottom += dy;
-                            startX = event.getX();
-                            startY = event.getY();
-                            updateCrop();
-                        } else if (isResizing) {
-                            float dx = event.getX() - startX;
-                            float dy = event.getY() - startY;
-                            if (cropRect.width() + dx > 0 && cropRect.height() + dy > 0) {
-                                cropRect.right += dx;
-                                cropRect.bottom += dy;
-                                startX = event.getX();
-                                startY = event.getY();
-                                updateCrop();
-                            }
+                        if (isCornerDragged) {
+                            float dx = event.getRawX() - startX;
+                            float dy = event.getRawY() - startY;
+
+                            int newWidth = (int) (startWidth + dx);
+                            int newHeight = (int) (startHeight + dy);
+
+                            // Cập nhật kích thước overlayView
+                            updateOverlaySize(newWidth, newHeight);
+                        } else {
+                            // Nếu không phải di chuyển cạnh, thực hiện di chuyển bên trong
+                            float x = event.getRawX() - startX;
+                            float y = event.getRawY() - startY;
+
+                            // Cập nhật vị trí của overlayView
+                            overlayView.setX(overlayView.getX() + x);
+                            overlayView.setY(overlayView.getY() + y);
+
+                            // Lưu vị trí mới của điểm chạm
+                            startX = event.getRawX();
+                            startY = event.getRawY();
                         }
                         break;
                     case MotionEvent.ACTION_UP:
-                        isDragging = false;
-                        isResizing = false;
+                        isCornerDragged = false; // Kết thúc sự kiện khi người dùng nhả tay
                         break;
                 }
                 return true;
-            }
-
-            // Helper method to check if the touch point is in the resize area
-            private boolean isResizeArea(int x, int y) {
-                return (x > cropRect.right - resizeAreaSize && x < cropRect.right + resizeAreaSize &&
-                        y > cropRect.bottom - resizeAreaSize && y < cropRect.bottom + resizeAreaSize);
             }
         });
 
@@ -251,31 +258,46 @@ public class CropImageActivity extends AppCompatActivity {
 
 
     public void cropAction(View view) {
-        hasChanges = true;
+        // Lấy bitmap gốc từ cropImageView
         Bitmap originalBitmap = ((BitmapDrawable) cropImageView.getDrawable()).getBitmap();
 
-        int left = Math.max(cropRect.left, 0);
-        int top = Math.max(cropRect.top, 0);
-        int right = Math.min(cropRect.right, originalBitmap.getWidth());
-        int bottom = Math.min(cropRect.bottom, originalBitmap.getHeight());
+        // Tính toán phần bao phủ của overlayView trên ảnh
+        int overlayWidth = overlayView.getWidth();
+        int overlayHeight = overlayView.getHeight();
+        int overlayX = (int) overlayView.getX();
+        int overlayY = (int) overlayView.getY();
 
-        // Tạo một bitmap mới từ phạm vi của originalBitmap trong cropRect
-        Bitmap croppedBitmap = Bitmap.createBitmap(originalBitmap, left, top, right - left, bottom - top);
+        // Đảm bảo không cắt ra khỏi biên ảnh
+        overlayX = Math.max(0, overlayX);
+        overlayY = Math.max(0, overlayY);
+        overlayWidth = Math.min(overlayWidth, originalBitmap.getWidth() - overlayX);
+        overlayHeight = Math.min(overlayHeight, originalBitmap.getHeight() - overlayY);
 
-        // Hiển thị ảnh đã cắt trên giao diện
+        // Tạo một Bitmap mới để lưu phần bên trong overlay
+        croppedBitmap = Bitmap.createBitmap(overlayWidth, overlayHeight, Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(croppedBitmap);
+        Rect srcRect = new Rect(overlayX, overlayY, overlayX + overlayWidth, overlayY + overlayHeight);
+        Rect destRect = new Rect(0, 0, overlayWidth, overlayHeight);
+        canvas.drawBitmap(originalBitmap, srcRect, destRect, null);
+
+        // Hiển thị ảnh đã cắt trong cropImageView
         cropImageView.setImageBitmap(croppedBitmap);
     }
 
 
-
     public void saveAction(View view) {
-        //Bitmap croppedImage = cropImageView.getCroppedImage();
-
-        Intent intent = new Intent(this, EditImageActivity.class);
-        //intent.putExtra("imageByteArray", bitmapToByteArray(croppedImage));
-        setResult(RESULT_OK, intent);
-        finish();
+        if (croppedBitmap != null) {
+            // Perform actions with the cropped bitmap
+            Intent intent = new Intent(this, EditImageActivity.class);
+            intent.putExtra("imageByteArray", bitmapToByteArray(croppedBitmap));
+            setResult(RESULT_OK, intent);
+            finish();
+        } else {
+            // Handle the case where no cropping has been performed
+            Toast.makeText(this, "Please crop the image before saving.", Toast.LENGTH_SHORT).show();
+        }
     }
+
     public void backAction(View view) {
         finish();
     }
