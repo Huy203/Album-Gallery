@@ -72,6 +72,7 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> 
         holderList.add(holder);
     }
 
+
     @Override
     public int getItemCount() {
         return getImageURLs().size();
@@ -196,6 +197,8 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> 
 //                    listener.getInteractedURIs(imageURL);
                     toggleSelection();
 //                    listener.toggleMultipleChoice();
+//                    Log.d("justclick", imageURL);
+                    listener.getInteractedURIs(imageURL);
                 }
             });
 
@@ -203,7 +206,6 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> 
                 isMultipleChoice = true;
                 toggleSelection();
 //                listener.getInteractedURIs(imageURL);
-//                listener.toggleMultipleChoice();
                 return true;
             });
         }

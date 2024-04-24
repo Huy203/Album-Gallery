@@ -392,7 +392,6 @@ public class ImageController implements Controller {
                                                             documentSnapshot.get("is_deleted").equals("1") ? true : false,
                                                             documentSnapshot.get("is_favourited").equals("1") ? true : false);
                                                     dbHelper.insert("Image", currentModel);
-
                                                     activity.runOnUiThread(() -> {
                                                         ((MainFragmentController) activity).onBackgroundTaskCompleted();
                                                     });
@@ -401,6 +400,8 @@ public class ImageController implements Controller {
                                 }
                             }
                         }
+
+
 //                        if (allTasksCompleted(uploadTasks)) {
 //                            activity.runOnUiThread(() -> {
 //                                ((MainFragmentController) activity).onBackgroundTaskCompleted();

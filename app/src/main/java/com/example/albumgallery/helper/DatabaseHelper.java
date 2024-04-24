@@ -164,7 +164,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public String insert(String table, Model model) {
         Log.v("DatabaseHelper", "Inserting data");
         SQLiteDatabase db = getWritableDatabase();
-        Log.v("DatabaseHelper", model.insert());
         db.execSQL(model.insert());
         return model.getId();
     }
@@ -406,7 +405,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     public String getLastId(String table) {
         SQLiteDatabase db = getWritableDatabase();
-        Cursor cursor = db.rawQuery("SELECT id FROM " + table + " ORDER BY id DESC LIMIT 1", null);
+        Cursor cursor = db.rawQuery("SELECT id FROM " + table + " ORDER BY ROWID DESC LIMIT 1", null);
         if (cursor.moveToFirst()) {
             return cursor.getString(0);
         }

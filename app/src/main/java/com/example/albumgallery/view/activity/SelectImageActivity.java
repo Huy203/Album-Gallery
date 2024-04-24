@@ -34,7 +34,7 @@ public class SelectImageActivity extends AppCompatActivity implements ImageAdapt
     List<String> selectedImageURLs;
     List<Task> selectedImageURLsTask;
     List<String> selectedImageURIs;
-
+    String albumName;
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -58,7 +58,12 @@ public class SelectImageActivity extends AppCompatActivity implements ImageAdapt
         recyclerMediaView.setAdapter(imageAdapter);
 
         imageAdapter.notifyDataSetChanged();
+        imageAdapter.setMultipleChoiceEnabled(true);
+
+        albumName = getIntent().getStringExtra("albumName");
+
 //        imageAdapter.toggleMultipleChoiceImagesEnabled();
+
 
         handleInteractions();
     }
@@ -76,6 +81,10 @@ public class SelectImageActivity extends AppCompatActivity implements ImageAdapt
                 // set the afterSelectImage
                 intent.putExtra("isSelected", true);
 
+                // set the albumName
+                Log.d("Keep album name in select", albumName);
+                intent.putExtra("albumName", albumName);
+
                 startActivity(intent);
                 finish();
             }
@@ -86,6 +95,7 @@ public class SelectImageActivity extends AppCompatActivity implements ImageAdapt
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(SelectImageActivity.this, CreateAlbumActivity.class);
+                intent.putExtra("albumName", albumName);
                 startActivity(intent);
                 finish();
             }
@@ -128,20 +138,17 @@ public class SelectImageActivity extends AppCompatActivity implements ImageAdapt
 
     @Override
     public void getInteractedURIs(String uri) {
+        if (!selectedImageURIs.contains(uri)) {
+            selectedImageURIs.add(uri);
 
-//
-//        if (!selectedImageURIs.contains(uri)) {
-//            selectedImageURIs.add(uri);
-//
-//            Log.d("justadded", uri);
-//        } else {
-//            selectedImageURIs.remove(uri);
-//            numberOfImagesSelected.setText(length+ " images selected");
-//            Log.d("justremove", uri);
-//        }
-//        for(String u: selectedImageURIs) {
-//            Log.d("current uris", u);
-//        }
+            Log.d("justadded", uri);
+        } else {
+            selectedImageURIs.remove(uri);
+            Log.d("justremove", uri);
+        }
+        for(String u: selectedImageURIs) {
+            Log.d("current uris", u);
+        }
     }
 
     @Override

@@ -10,7 +10,8 @@ import java.util.List;
 
 public class AlbumModel implements Model{
     // AlbumModel class is used to store the data of the album.
-    private DatabaseHelper dbHelper;
+//    private DatabaseHelper dbHelper;
+    private String thumbnail;
     private String id; // id of the album
     private String name; // name of the album
     private int capacity; // capacity of the album
@@ -20,15 +21,10 @@ public class AlbumModel implements Model{
     private String password;
     private int num_of_images;   // number of images
     private int is_deleted; // is album deleted
-    private String thumbnail;
 
-    public DatabaseHelper getDbHelper() {
-        return dbHelper;
-    }
-
-    public void setDbHelper(DatabaseHelper dbHelper) {
-        this.dbHelper = dbHelper;
-    }
+//    public DatabaseHelper getDbHelper() {
+//        return dbHelper;
+//    }
 
     public String getId() {
         return id;
@@ -86,25 +82,24 @@ public class AlbumModel implements Model{
         this.password = password;
     }
 
+    public void setThumbnail(String thumbnail) {
+        this.thumbnail = thumbnail;
+    }
+
+    public String getThumbnail() {
+        return thumbnail;
+    }
+
     public int getNum_of_images() {
         return num_of_images;
     }
 
-    public void setNum_of_images(int num_of_images) {
-        this.num_of_images = num_of_images;
-    }
-
-    public int isIs_deleted() {
+    public int getIs_deleted() {
         return is_deleted;
     }
-
-    public void setIs_deleted(int is_deleted) {
-        this.is_deleted = is_deleted;
-    }
-
-    public AlbumModel(Context context) {
-        dbHelper = new DatabaseHelper(context);
-    }
+//    public AlbumModel(Context context) {
+//        dbHelper = new DatabaseHelper(context);
+//    }
 
     public AlbumModel(String id, String name, int capacity, String notice, String ref, int num_of_images) {
         this.id = id;
@@ -129,7 +124,33 @@ public class AlbumModel implements Model{
         this.thumbnail = "";
     }
 
-//    @Override
+    public AlbumModel() {
+        this.name = "";
+        this.capacity = 0;
+        this.id = "";
+        this.created_at = "";
+        this.notice = "";
+        this.ref = "";
+        this.is_deleted = 0;
+        this.num_of_images = 0;
+        this.password = "";
+        this.thumbnail = "";
+    }
+
+    public AlbumModel(String id, String name, int capacity, String created_at, String notice, String ref, String password, int num_of_images, int is_deleted, String thumbnail) {
+        this.id = id;
+        this.name = name;
+        this.capacity = capacity;
+        this.created_at = created_at;
+        this.notice = notice;
+        this.ref = ref;
+        this.password = password;
+        this.num_of_images = num_of_images;
+        this.is_deleted = is_deleted;
+        this.thumbnail = thumbnail;
+    }
+
+    //    @Override
 //    public String insert() {
 //        return "INSERT INTO Album (name, capacity, created_at, notice, ref, is_deleted, num_of_images, password) " +
 //                "VALUES ('" + name + "', " + capacity + ", '" + created_at + "', '" + notice + "', '" + ref + "', " + is_deleted + ", " + num_of_images + ", '" + password + "')";
@@ -137,8 +158,8 @@ public class AlbumModel implements Model{
 
     @Override
     public String insert() {
-        return "INSERT INTO Album (id, name, capacity, created_at, notice, ref, is_deleted, num_of_images, password) " +
-                "VALUES ('" + id + "', '" + name + "', " + capacity + ", '" + created_at + "', '" + notice + "', '" + ref + "', " + is_deleted + ", " + num_of_images + ", '" + password + "')";
+        return "INSERT INTO Album (id, name, capacity, created_at, notice, ref, is_deleted, num_of_images, password, thumbnail) " +
+                "VALUES ('" + id + "', '" + name + "', " + capacity + ", '" + created_at + "', '" + notice + "', '" + ref + "', " + is_deleted + ", " + num_of_images + ", '" + password + "', '" + thumbnail + "')";
     }
 
 

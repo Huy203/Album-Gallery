@@ -117,7 +117,6 @@ public class HomeScreenFragment extends Fragment {
             choiceAll(view);
             unChooseBtn.setVisibility(View.GONE);
         });
-
     }
 
     private void changeViewAction(View view) {
@@ -252,8 +251,6 @@ public class HomeScreenFragment extends Fragment {
         Log.v("HomeScreenFragment", "updateUI");
         List<String> allImage = mainController.getImageController().getAllImageURLsUndeleted();
         List<String> imageURLsFavourited = mainController.getImageController().getAllImageURLsFavourited();
-
-        Log.v("HomeScreenFragment", "updateUI: " + allImage.size() + " " + imageURLsFavourited.size() + " " + imageURIs.size());
         if (allImage.size() > imageURIs.size()) {
             for (int i = 0; i < allImage.size(); i++) {
                 if (!imageURIs.contains(allImage.get(i))) {
@@ -273,6 +270,9 @@ public class HomeScreenFragment extends Fragment {
         }
 
 //        imageURIs.clear();
+//        imageURIs.addAll(allImage);
+//        imageAdapter = new ImageAdapter(getActivity(), imageURIs);
+//        imageURIs.addAll(mainController.getImageController().getAllImageURLsUndeleted());
 //        // lấy ảnh sort theo date (mới nhất xếp trước).
 ////        imageURIs.addAll(mainController.getImageController().getAllImageURLsSortByDate());
 //        imageURIs.addAll();
@@ -398,7 +398,7 @@ public class HomeScreenFragment extends Fragment {
             case "Add":
 //                List<Uri> UriToAdd = new ArrayList<>();
                 List<String> ids = new ArrayList<>();
-                for(String uri: imageAdapter.getSelectedImageURLs()) {
+                for (String uri : imageAdapter.getSelectedImageURLs()) {
                     ids.add(mainController.getImageController().getIdByRef(uri));
                     Log.d("Action Add", mainController.getImageController().getIdByRef(uri));
                 }
@@ -439,7 +439,7 @@ public class HomeScreenFragment extends Fragment {
                         if (selectedRadioBtn != null) {
                             String selectedAlbum = selectedRadioBtn.getText().toString();
                             String album_id = mainController.getAlbumController().getAlbumIdByName(selectedAlbum);
-                            for(String image_id : images_id) {
+                            for (String image_id : images_id) {
                                 mainController.getImageAlbumController().addImageAlbum(image_id, album_id);
                             }
                         }
