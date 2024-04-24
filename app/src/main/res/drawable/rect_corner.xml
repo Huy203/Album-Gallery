@@ -1,0 +1,13 @@
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Background color for the overlay -->
+    <item android:drawable="@android:color/transparent" />
+
+    <!-- Border color and thickness -->
+    <item>
+        <shape android:shape="rectangle">
+            <stroke
+                android:width="2dp"
+                android:color="@android:color/white" /> <!-- Adjust thickness and color as needed -->
+        </shape>
+    </item>
+</layer-list>

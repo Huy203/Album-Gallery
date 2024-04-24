@@ -63,6 +63,7 @@ public class DetailPicture extends AppCompatActivity implements ImageInfoListene
     protected MainController mainController;
     protected ImageView imageView;
     protected List<String> imagePaths;
+    protected List<String> imagePathsAlbum;
     protected TextView qrLink;
     protected int currentPosition;
     protected View imageInfoView;
@@ -98,7 +99,13 @@ public class DetailPicture extends AppCompatActivity implements ImageInfoListene
 
     private void initializeViews() {
         mainController = new MainController(this);
-        imagePaths = mainController.getImageController().getAllImageURLsUndeleted();
+        imagePathsAlbum = getIntent().getStringArrayListExtra("imagePathsAlbum");
+        if(imagePathsAlbum!=null){
+            imagePaths = imagePathsAlbum;
+        }else{
+            imagePaths = mainController.getImageController().getAllImageURLsUndeleted();
+        }
+
         currentPosition = getIntent().getIntExtra("position", 0);
 
         imageView = findViewById(R.id.memeImageView);
