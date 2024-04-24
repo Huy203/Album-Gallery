@@ -49,7 +49,6 @@
                 android:layout_height="wrap_content"
                 android:text="@string/album_name"
                 android:textSize="20sp"
-
                 android:textAppearance="?attr/textAppearanceTitleMedium"
                 />
         </LinearLayout>

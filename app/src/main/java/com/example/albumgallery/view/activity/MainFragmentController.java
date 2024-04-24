@@ -78,6 +78,8 @@ public class MainFragmentController extends AppCompatActivity implements Backgro
             replaceFragment(fragments.get(1));
         } else if (fragmentToLoad != null && fragmentToLoad.equals("HomeScreen")) {
             replaceFragment(fragments.get(0));
+        } else if (fragmentToLoad != null && fragmentToLoad.equals("Favourite")) {
+            replaceFragment(fragments.get(2));
         } else if (fragmentToLoad != null && fragmentToLoad.equals("Bin")) {
             replaceFragment(fragments.get(3));
         }
@@ -91,10 +93,6 @@ public class MainFragmentController extends AppCompatActivity implements Backgro
                 replaceFragment(fragments.get(0));
             } else if (itemId == R.id.albums) {
                 replaceFragment(fragments.get(1));
-            } else if (itemId == R.id.favorites) {
-                replaceFragment(fragments.get(2));
-            } else if (itemId == R.id.bin) {
-                replaceFragment(fragments.get(3));
             }
             else if (itemId == R.id.search) {
                 replaceFragment(fragments.get(4));
