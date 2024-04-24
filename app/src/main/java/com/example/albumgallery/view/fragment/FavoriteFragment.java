@@ -55,7 +55,9 @@ public class FavoriteFragment extends Fragment {
         handleInteractions(view);
 
         imageURIs = new ArrayList<>();
-        imageURIs = mainController.getImageController().getAllImageURLsFavourited();
+        imageURIs = mainController.getImageController().getAllImageURLsUndeleted();
+        List<String> imageF = mainController.getImageController().getAllImageURLsFavourited();
+        imageURIs.retainAll(imageF);
 
         imageAdapter = new ImageAdapter(getActivity(), imageURIs);
         imageAdapter.setImageURLsFavourite(imageURIs);

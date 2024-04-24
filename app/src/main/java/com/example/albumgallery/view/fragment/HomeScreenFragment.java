@@ -48,6 +48,7 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class HomeScreenFragment extends Fragment {
     private static final int CAMERA_REQUEST_CODE = 1000;
@@ -251,33 +252,41 @@ public class HomeScreenFragment extends Fragment {
         Log.v("HomeScreenFragment", "updateUI");
         List<String> allImage = mainController.getImageController().getAllImageURLsUndeleted();
         List<String> imageURLsFavourited = mainController.getImageController().getAllImageURLsFavourited();
-        if (allImage.size() > imageURIs.size()) {
-            for (int i = 0; i < allImage.size(); i++) {
-                if (!imageURIs.contains(allImage.get(i))) {
-                    imageURIs.add(allImage.get(i));
-                    imageAdapter.setImageURIs(imageURIs);
-                    imageAdapter.notifyItemInserted(i);
-                }
-            }
-        } else if (allImage.size() < imageURIs.size()){
-            for (int i = 0; i < imageURIs.size(); i++) {
-                if (!allImage.contains(imageURIs.get(i))) {
-                    imageURIs.remove(i);
-                    imageAdapter.setImageURIs(imageURIs);
-                    imageAdapter.notifyItemRemoved(i);
-                }
+//        if (allImage.size() > imageURIs.size()) {
+//            for (int i = 0; i < allImage.size(); i++) {
+//                if (!imageURIs.contains(allImage.get(i))) {
+//                    imageURIs.add(allImage.get(i));
+//                    imageAdapter.setImageURIs(imageURIs);
+//                    imageAdapter.notifyItemInserted(i);
+//                }
+//            }
+//        } else if (allImage.size() < imageURIs.size()){
+//            for (int i = 0; i < imageURIs.size(); i++) {
+//                if (!allImage.contains(imageURIs.get(i))) {
+//                    imageURIs.remove(i);
+//                    imageAdapter.setImageURIs(imageURIs);
+//                    imageAdapter.notifyItemRemoved(i);
+//                }
+//            }
+//        }
+
+        for(int i = 0; i < imageURIs.size(); i++) {
+            Log.v("HomeScreenFragment", "Image URI: " + imageURIs.get(i));
+            if (Objects.equals(imageURIs.get(i), "")){
+                imageURIs.remove(i);
+                imageAdapter.notifyItemRemoved(i);
             }
         }
 
-//        imageURIs.clear();
-//        imageURIs.addAll(allImage);
+        imageURIs.clear();
+        imageURIs.addAll(allImage);
 //        imageAdapter = new ImageAdapter(getActivity(), imageURIs);
 //        imageURIs.addAll(mainController.getImageController().getAllImageURLsUndeleted());
 //        // lấy ảnh sort theo date (mới nhất xếp trước).
 ////        imageURIs.addAll(mainController.getImageController().getAllImageURLsSortByDate());
 //        imageURIs.addAll();
 //
-//        imageAdapter = new ImageAdapter(getActivity(), imageURIs);
+        imageAdapter = new ImageAdapter(getActivity(), imageURIs);
         imageAdapter.setImageURLsFavourite(imageURLsFavourited);
         // Switch to list display
         if (SharePreferenceHelper.isGridLayoutEnabled(getActivity()).equals("full")) {

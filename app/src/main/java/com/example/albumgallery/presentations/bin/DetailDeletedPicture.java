@@ -127,9 +127,8 @@ public class DetailDeletedPicture extends AppCompatActivity implements ImageInfo
         builder.setPositiveButton("Restore", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-
-                LinearLayout bottom_main_menu2 = findViewById(R.id.bottomMenuMain2);
-                bottom_main_menu2.setVisibility(View.GONE);
+//                LinearLayout bottom_main_menu2 = findViewById(R.id.bottomMenuMain2);
+//                bottom_main_menu2.setVisibility(View.GONE);
 
                 finish();
                 // mainController.getImageController().deleteSelectedImage(uri);

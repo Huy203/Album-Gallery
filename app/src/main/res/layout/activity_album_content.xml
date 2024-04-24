@@ -43,7 +43,7 @@
                 style="@style/AppButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                app:icon="@drawable/grid_black" />
+                app:icon="@drawable/menu_black" />
 
         </LinearLayout>
         <View

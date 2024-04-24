@@ -61,6 +61,7 @@ public class ImageController implements Controller {
     private final List<String> idSelectedImages = new ArrayList<>();
     private final CollectionReference collection;
     private ImageModel currentModel;
+    private boolean complete = false;
 
     public ImageController(Activity activity) {
         this.activity = activity;
@@ -76,6 +77,10 @@ public class ImageController implements Controller {
 
     public Activity getActivity() {
         return activity;
+    }
+
+    public void setComplete(boolean complete) {
+        this.complete = complete;
     }
 
     public FirebaseManager getFirebaseManager() {
@@ -112,7 +117,16 @@ public class ImageController implements Controller {
         int end = where.lastIndexOf("'");
         String id = where.substring(start, end);
         Log.v(TAG, "Updating document with ID: " + id + " " + data.toString());
-        firebaseManager.getFirebaseHelper().update(TAG, data, id, firebaseManager.getFirebaseAuth().getCurrentUser().getUid());
+        firebaseManager.getFirebaseHelper().update(TAG, data, id, firebaseManager.getFirebaseAuth().getCurrentUser().getUid())
+                .continueWith(task -> {
+                    if (task.isSuccessful()) {
+                        complete = true;
+                        activity.runOnUiThread(() -> {
+                            ((MainFragmentController) activity).onBackgroundTaskCompleted();
+                        });
+                    }
+                    return null;
+                });
     }
 
     @Override
@@ -240,13 +254,7 @@ public class ImageController implements Controller {
                 if (task1.isSuccessful()) {
                     try {
                         Uri uriImage = task1.getResult(); // The uri with the location of the file in firebase
-                        Log.v("Image", "Image uploaded" + " " + uriImage + " " + idSelectedImages.get(uploadTasks.indexOf(task)));
                         this.update("ref", uriImage.toString(), "id = '" + idSelectedImages.get(uploadTasks.indexOf(task)) + "'");
-                        if (allTasksCompleted(uploadTasks)) {
-                            activity.runOnUiThread(() -> {
-                                ((MainFragmentController) activity).onBackgroundTaskCompleted();
-                            });
-                        }
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
@@ -264,7 +272,6 @@ public class ImageController implements Controller {
             uploadTask.addOnCompleteListener(task -> {
                 if (task.isSuccessful()) {
                     Uri firebaseURI = task.getResult();
-                    Log.v("Image", "Image uploaded" + " " + firebaseURI + " " + currentModel.getId());
                     update("ref", firebaseURI.toString(), "id = '" + currentModel.getId() + "'");
                     if (requestCode == REQUEST_CODE_CAMERA) {
                         activity.runOnUiThread(() -> {
@@ -395,12 +402,18 @@ public class ImageController implements Controller {
                                                     activity.runOnUiThread(() -> {
                                                         ((MainFragmentController) activity).onBackgroundTaskCompleted();
                                                     });
+
+//                                                    activity.runOnUiThread(() -> {
+//                                                        ((MainFragmentController) activity).onBackgroundTaskCompleted();
+//                                                    });
                                                 }
                                             });
                                 }
                             }
                         }
-
+//                        activity.runOnUiThread(() -> {
+//                            ((MainFragmentController) activity).initiateVariable(String.valueOf(firebaseManager.getFirebaseAuth().getCurrentUser().getPhotoUrl()));
+//                        });
 
 //                        if (allTasksCompleted(uploadTasks)) {
 //                            activity.runOnUiThread(() -> {
@@ -671,6 +684,7 @@ public class ImageController implements Controller {
     public List<String> selectImagesByNotice(String notice) {
         return dbHelper.selectImagesByNotice(notice);
     }
+
     public List<String> selectImageNamesByNotice(String notice) {
         return dbHelper.selectImageNamesByNotice(notice);
     }

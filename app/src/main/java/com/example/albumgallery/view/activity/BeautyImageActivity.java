@@ -1,6 +1,7 @@
 package com.example.albumgallery.view.activity;
 
 import static com.example.albumgallery.utils.Constant.REQUEST_CODE_EDIT_IMAGE;
+import static com.example.albumgallery.utils.Utilities.bitmapToByteArray;
 import static com.example.albumgallery.utils.Utilities.byteArrayToBitmap;
 
 import android.annotation.SuppressLint;
@@ -287,6 +288,7 @@ public class BeautyImageActivity extends AppCompatActivity {
     }
     @Override
     public void onBackPressed() {
+        super.onBackPressed();
         showSaveChangesDialog();
     }
 
@@ -298,21 +300,26 @@ public class BeautyImageActivity extends AppCompatActivity {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 // Save changes here
-                Intent intent = new Intent();
-                intent.putExtra("update", true);
-                intent.putExtra("adjustedBitmap", adjustedBitmap);
+                Intent intent = new Intent(BeautyImageActivity.this, EditImageActivity.class);
+                intent.putExtra("adjustedBitmap", bitmapToByteArray(adjustedBitmap));
                 setResult(RESULT_OK, intent);
                 finish();
+//                finish();
+//                // Save changes here
+//                Intent intent = new Intent();
+//                intent.putExtra("update", true);
+//                intent.putExtra("adjustedBitmap", adjustedBitmap);
+//                setResult(RESULT_OK, intent);
             }
         });
         builder.setNegativeButton("Discard", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
+                finish();
                 // Discard changes and go back
                 Intent intent = new Intent();
                 intent.putExtra("update", true);
                 setResult(RESULT_OK, intent);
-                finish();
             }
         });
         builder.setNeutralButton("Cancel", new DialogInterface.OnClickListener() {

@@ -17,9 +17,8 @@
             android:id="@+id/bin"
             android:layout_width="30dp"
             android:layout_height="30dp"
-            android:layout_marginRight="50dp"
+            android:layout_marginRight="25dp"
             android:src="@drawable/trash_bin">
-
         </ImageView>
 
         <!-- Title, secondary and supporting text -->

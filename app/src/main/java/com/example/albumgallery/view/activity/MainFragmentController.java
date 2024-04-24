@@ -42,9 +42,6 @@ import com.google.android.material.imageview.ShapeableImageView;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 
 
 public class MainFragmentController extends AppCompatActivity implements BackgroundProcessingCallback, ImageAdapterListener, FragToActivityListener {
@@ -89,8 +86,7 @@ public class MainFragmentController extends AppCompatActivity implements Backgro
                 replaceFragment(new HomeScreenFragment());
             } else if (itemId == R.id.albums) {
                 replaceFragment(fragments.get(1));
-            }
-            else if (itemId == R.id.search) {
+            } else if (itemId == R.id.search) {
                 replaceFragment(fragments.get(4));
             }
             return true;
@@ -134,13 +130,23 @@ public class MainFragmentController extends AppCompatActivity implements Backgro
         Fragment currentFragment = getSupportFragmentManager().findFragmentById(R.id.fragment_container);
 
         MainController mainController = new MainController(this);
-        ScheduledExecutorService executorService = Executors.newSingleThreadScheduledExecutor();
-        executorService.schedule(() -> {
+//        ScheduledExecutorService executorService = Executors.newSingleThreadScheduledExecutor();
+//        executorService.schedule(() -> {
+//            initiateVariable(mainController.getUserController().getUser().getPicture());
+//        }, 1, TimeUnit.SECONDS);
+
+//        mainController.getImageController().loadFromFirestore();
+        Log.v("MainFragmentController", "onResume" +mainController.getImageController().getAllImageIds().size());
+        if(mainController.getImageController().getAllImageIds().size() > 0){
+            onBackgroundTaskCompleted();
             initiateVariable(mainController.getUserController().getUser().getPicture());
-        }, 1, TimeUnit.SECONDS);
-
-        mainController.getImageController().loadFromFirestore();
-
+        }
+        else{
+            mainController.getImageController().loadFromFirestore();
+        }
+//        if(mainController.getImageController().getAllImageIds()==null){
+//
+//        }
     }
 
     @Override
