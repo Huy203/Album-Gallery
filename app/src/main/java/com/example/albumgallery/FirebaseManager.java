@@ -13,7 +13,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
 
 public class FirebaseManager {
-
+    private static final String STORAGE_URL = "YOUR_FIREBASE_STORAGE_URL";
     private static FirebaseManager instance;
     private FirebaseDatabase database;
     private FirebaseAnalytics mFirebaseAnalytics;
@@ -37,7 +37,7 @@ public class FirebaseManager {
 
         mFirebaseAnalytics = FirebaseAnalytics.getInstance(activity);
         database = FirebaseDatabase.getInstance();
-        storage = FirebaseStorage.getInstance("gs://album-gallery-70d05.appspot.com");
+        storage = FirebaseStorage.getInstance(STORAGE_URL);
         firestore = FirebaseFirestore.getInstance();
         firebaseHelper = new FirebaseHelper();
     }

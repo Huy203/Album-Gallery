@@ -15,9 +15,10 @@ Album Gallery is an Android application for organizing and viewing photo albums.
 ## Technologies Used
 
 - **Language**: Java
-- **Database**: Firebase Realtime Database
+- **Database**: Firebase Firestore Database
+- **Cloud Storage**: Firebase Cloud Storage
 - **Authentication**: Firebase Authentication
-- **Image Processing**: Firebase ML Kit for text recognition and image labeling
+- **Image Processing**: Firebase ML Kit for text recognition
 - **UI**: Android XML layout files
 
 ## Installation
@@ -34,7 +35,15 @@ To run the application locally, follow these steps:
 - Connect the project to your Android app by following the setup instructions and downloading the `google-services.json` file.
 - Place the `google-services.json` file in the `app` directory of your project.
 
-4. Build and run the project on an Android device or emulator.
+4. Enable Firebase Cloud Storage:
+- In the Firebase Console, navigate to your project.
+- Go to the "Storage" section and follow the instructions to enable Firebase Cloud Storage.
+
+5. Update FirebaseManager.java:
+- Open the `FirebaseManager.java` file located in `src/java/com/example/albumgallery`.
+- Replace `"YOUR_FIREBASE_STORAGE_URL"` with the actual URL of your Firebase Cloud Storage. This URL can be found in your Firebase Console under the "Storage" section.
+
+6. Build and run the project on an Android device or emulator.
 
 ## Usage
 
