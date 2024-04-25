@@ -2,16 +2,10 @@ package com.example.albumgallery.view.fragment;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -29,12 +23,6 @@ import com.example.albumgallery.view.activity.PasswordAlbumActivity;
 import com.example.albumgallery.view.adapter.AlbumAdapter;
 import com.example.albumgallery.view.adapter.AlbumAdapterListener;
 
-import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.firebase.firestore.CollectionReference;
-import com.google.firebase.firestore.DocumentReference;
-import com.google.firebase.firestore.DocumentSnapshot;
-
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -44,11 +32,6 @@ public class AlbumsMainFragment extends Fragment implements AlbumAdapterListener
     private List<String> albumNames;
     private List<String> thumbnails;
     private MainController mainController;
-    private AlbumAdapterListener listener;
-    private FirebaseManager firebaseManager;
-    private final static String TAG = "Album";
-
-
 
     public AlbumsMainFragment() {
         // Required empty public constructor
@@ -70,15 +53,9 @@ public class AlbumsMainFragment extends Fragment implements AlbumAdapterListener
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         mainController = new MainController(getActivity());
-        firebaseManager = FirebaseManager.getInstance(getActivity());
         handleInteractions(view);
 
         initializeData();
-//        for (int i = 0; i < thumbnails.size(); i++) {
-//            Log.d("albumfrag", thumbnails.get(i));
-//            Log.d("albumfrag", albumNames.get(i));
-//        }
-
         recyclerView = (RecyclerView) view.findViewById(R.id.albumsRecyclerView);
         recyclerView.setLayoutManager(new GridLayoutManager(view.getContext(), 2, GridLayoutManager.HORIZONTAL, false));
 

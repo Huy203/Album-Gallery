@@ -15,10 +15,6 @@ public class DatabaseManager {
         context = ctx;
     }
 
-    public DatabaseHelper getDbHelper() {
-        return dbHelper;
-    }
-
     public void open() throws SQLiteException {
         dbHelper = new DatabaseHelper(context);
         SQLiteDatabase database = dbHelper.getWritableDatabase();
@@ -27,9 +23,5 @@ public class DatabaseManager {
         } else {
             Log.e("Database Manager", "Failed to connect to database");
         }
-    }
-
-    public void close() {
-        dbHelper.close();
     }
 }

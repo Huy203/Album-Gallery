@@ -1,7 +1,6 @@
 package com.example.albumgallery.view.activity;
 
 import static com.example.albumgallery.utils.Utilities.bitmapToByteArray;
-import static com.example.albumgallery.utils.Utilities.convertFromUriToBitmap;
 
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -10,7 +9,6 @@ import android.graphics.Rect;
 import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.AdapterView;
@@ -31,13 +29,12 @@ import com.example.albumgallery.R;
 import com.example.albumgallery.controller.MainController;
 
 public class CropImageActivity extends AppCompatActivity {
+    Bitmap croppedBitmap;
     private MainController mainController;
     private ImageView cropImageView;
     private Spinner aspectRatioSpinner;
-    private boolean hasChanges = false;
     private View overlayView;
     private Rect cropRect;
-    Bitmap croppedBitmap;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -135,14 +132,12 @@ public class CropImageActivity extends AppCompatActivity {
 
         String id = getIntent().getStringExtra("id");
         String imageURL = mainController.getImageController().getImageById(id).getRef();
-        Log.d("CropImageActivity", "Image URL: " + imageURL); // Check if imageURL is correct
         Glide.with(this)
                 .asBitmap()
                 .load(Uri.parse(imageURL))
                 .addListener(new RequestListener<Bitmap>() {
                     @Override
                     public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Bitmap> target, boolean isFirstResource) {
-                        Log.e("CropImageActivity", "Failed to load image: " + e.getMessage()); // Log error
                         return false;
                     }
 
@@ -159,20 +154,6 @@ public class CropImageActivity extends AppCompatActivity {
         setupAspectRatioSpinner();
     }
 
-
-//    private void showAcceptChangesDialog() {
-//        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-//        builder.setTitle("Accept Changes");
-//        builder.setMessage("Do you want to accept changes?");
-//        builder.setPositiveButton("Yes", (dialog, which) -> goBack(true));
-//        builder.setNegativeButton("No", (dialog, which) -> goBack(false));
-//        if (hasChanges) {
-//            builder.show();
-//        } else {
-//            goBack(false);
-//        }
-//    }
-
     private void setupAspectRatioSpinner() {
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
                 R.array.aspect_ratios, android.R.layout.simple_spinner_item);
@@ -183,7 +164,6 @@ public class CropImageActivity extends AppCompatActivity {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 String selectedRatio = (String) parent.getItemAtPosition(position);
-                Log.v("CropImageActivity", "Selected ratio: " + selectedRatio);
                 setCropAspectRatio(selectedRatio);
                 updateCrop();
             }
@@ -194,6 +174,7 @@ public class CropImageActivity extends AppCompatActivity {
             }
         });
     }
+
     private void setCropAspectRatio(String ratio) {
         int width = cropImageView.getWidth();
         int height = cropImageView.getHeight();

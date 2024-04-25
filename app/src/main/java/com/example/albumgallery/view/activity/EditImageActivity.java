@@ -4,9 +4,10 @@ import static com.example.albumgallery.utils.Constant.REQUEST_CODE_EDIT_IMAGE;
 import static com.example.albumgallery.utils.Utilities.byteArrayToBitmap;
 
 import android.annotation.SuppressLint;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
@@ -15,7 +16,6 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
-import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
@@ -24,13 +24,6 @@ import androidx.core.view.GestureDetectorCompat;
 import com.bumptech.glide.Glide;
 import com.example.albumgallery.R;
 import com.example.albumgallery.controller.MainController;
-
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-
-import android.app.AlertDialog;
-import android.content.DialogInterface;
 
 
 public class EditImageActivity extends AppCompatActivity {
@@ -102,11 +95,10 @@ public class EditImageActivity extends AppCompatActivity {
         super.onResume();
         mImageView.setScaleX(scaleFactor);
         mImageView.setScaleY(scaleFactor);
-        //Toast.makeText(this, "Double tap to zoom in/out", Toast.LENGTH_SHORT).show();
     }
 
     private void appBarAction() {
-        int[] buttonIds = {R.id.action_zoom_in, R.id.action_zoom_out, R.id.action_rotate, R.id.action_crop, R.id.action_beautify,  R.id.action_back};
+        int[] buttonIds = {R.id.action_zoom_in, R.id.action_zoom_out, R.id.action_rotate, R.id.action_crop, R.id.action_beautify, R.id.action_back};
 
         for (int buttonId : buttonIds) {
             Button button = findViewById(buttonId);
@@ -133,8 +125,10 @@ public class EditImageActivity extends AppCompatActivity {
             });
         }
     }
+
     @Override
     public void onBackPressed() {
+        super.onBackPressed();
         showSaveChangesDialog();
     }
 
@@ -179,14 +173,9 @@ public class EditImageActivity extends AppCompatActivity {
         builder.show();
     }
 
-//    private void saveChangesAndGoBack() {
-//        goBackToDetailScreen();
-//    }
-
     private void startImageCropActivity() {
         Intent intent = new Intent(EditImageActivity.this, CropImageActivity.class);
         String id = getIntent().getStringExtra("id");
-        Log.v("EditImageActivity", "id: " + id);
         intent.putExtra("id", id);
         startActivityForResult(intent, 100);
     }
@@ -202,7 +191,6 @@ public class EditImageActivity extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        Log.v("EditImageActivity", "onActivityResult");
         if (requestCode == 100 && resultCode == RESULT_OK && data != null) {
             try {
                 byte[] byteArray = data.getByteArrayExtra("imageByteArray");
@@ -219,10 +207,7 @@ public class EditImageActivity extends AppCompatActivity {
             try {
                 Bitmap adjustedBitmap = data.getParcelableExtra("adjustedBitmap");
                 if (adjustedBitmap != null) {
-                    // Hiển thị ảnh đã chỉnh sửa trên ImageView
                     mImageView.setImageBitmap(adjustedBitmap);
-                    // Lưu lại ảnh đã chỉnh sửa hoặc thực hiện các hành động khác
-                    // ...
                 }
             } catch (Exception e) {
                 Log.e("EditImageActivity", "Error loading image: " + e.getMessage());

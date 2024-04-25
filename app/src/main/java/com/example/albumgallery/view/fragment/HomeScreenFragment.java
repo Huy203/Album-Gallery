@@ -5,7 +5,6 @@ import static com.example.albumgallery.utils.Constant.REQUEST_CODE_DETAIL_IMAGE;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.ColorStateList;
 import android.net.Uri;
@@ -20,12 +19,10 @@ import android.view.ViewGroup;
 import android.widget.PopupMenu;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.widget.SearchView;
 import androidx.core.app.ActivityOptionsCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
@@ -42,7 +39,6 @@ import com.example.albumgallery.view.listeners.BackgroundProcessingCallback;
 import com.example.albumgallery.view.listeners.FragToActivityListener;
 import com.example.albumgallery.view.listeners.ImageAdapterListener;
 import com.google.android.gms.tasks.Task;
-import com.google.android.gms.tasks.Tasks;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
@@ -59,12 +55,10 @@ public class HomeScreenFragment extends Fragment {
     List<String> selectedImageURLs;
     List<Task> selectedImageURLsTask;
     private View view;
-    private SearchView searchView;
     private FragToActivityListener fragToActivityListener;
     private boolean isSelectAll = false;
 
     public HomeScreenFragment() {
-        // Required empty public constructor
     }
 
     @Override
@@ -189,9 +183,7 @@ public class HomeScreenFragment extends Fragment {
             isSelectAll = true;
         }
         // if no items are selected, clear the selected items and return false
-        Log.v("HomeScreenFragment", "Length " + length);
         if (length == 0) {
-            Log.v("HomeScreenFragment", "No items selected");
             imageAdapter.clearSelectedItems();
             unChooseBtn.setVisibility(View.GONE);
             changeColorChoiceAll(tickBtn);
@@ -205,29 +197,14 @@ public class HomeScreenFragment extends Fragment {
         return true;
     }
 
-    @SuppressLint("SetTextI18n")
-    public void getSelectedItemsCount(int count) {
-        for (int i = 0; i < count; i++) {
-            selectedImageURLsTask.add(Tasks.forResult(Uri.parse(imageURIs.get(i))));
-            Log.d("Deleted images task", selectedImageURLsTask.get(i).getResult().toString());
-        }
-
-        for (int i = 0; i < count; i++) {
-            selectedImageURLs.add(imageURIs.get(i));
-            Log.d("Deleted images", selectedImageURLs.get(i));
-        }
-    }
-
     @SuppressLint("NotifyDataSetChanged")
     @Override
     public void onResume() {
-        Toast.makeText(requireContext(), "onResume of Homesscreen", Toast.LENGTH_SHORT).show();
         super.onResume();
     }
 
     @Override
     public void onPause() {
-        Toast.makeText(requireContext(), "onPause of Homesscreen", Toast.LENGTH_SHORT).show();
         super.onPause();
     }
 
@@ -249,30 +226,11 @@ public class HomeScreenFragment extends Fragment {
     }
 
     public void updateUI() {
-        Log.v("HomeScreenFragment", "updateUI");
         List<String> allImage = mainController.getImageController().getAllImageURLsUndeleted();
         List<String> imageURLsFavourited = mainController.getImageController().getAllImageURLsFavourited();
-//        if (allImage.size() > imageURIs.size()) {
-//            for (int i = 0; i < allImage.size(); i++) {
-//                if (!imageURIs.contains(allImage.get(i))) {
-//                    imageURIs.add(allImage.get(i));
-//                    imageAdapter.setImageURIs(imageURIs);
-//                    imageAdapter.notifyItemInserted(i);
-//                }
-//            }
-//        } else if (allImage.size() < imageURIs.size()){
-//            for (int i = 0; i < imageURIs.size(); i++) {
-//                if (!allImage.contains(imageURIs.get(i))) {
-//                    imageURIs.remove(i);
-//                    imageAdapter.setImageURIs(imageURIs);
-//                    imageAdapter.notifyItemRemoved(i);
-//                }
-//            }
-//        }
 
-        for(int i = 0; i < imageURIs.size(); i++) {
-            Log.v("HomeScreenFragment", "Image URI: " + imageURIs.get(i));
-            if (Objects.equals(imageURIs.get(i), "")){
+        for (int i = 0; i < imageURIs.size(); i++) {
+            if (Objects.equals(imageURIs.get(i), "")) {
                 imageURIs.remove(i);
                 imageAdapter.notifyItemRemoved(i);
             }
@@ -280,12 +238,6 @@ public class HomeScreenFragment extends Fragment {
 
         imageURIs.clear();
         imageURIs.addAll(allImage);
-//        imageAdapter = new ImageAdapter(getActivity(), imageURIs);
-//        imageURIs.addAll(mainController.getImageController().getAllImageURLsUndeleted());
-//        // lấy ảnh sort theo date (mới nhất xếp trước).
-////        imageURIs.addAll(mainController.getImageController().getAllImageURLsSortByDate());
-//        imageURIs.addAll();
-//
         imageAdapter = new ImageAdapter(getActivity(), imageURIs);
         imageAdapter.setImageURLsFavourite(imageURLsFavourited);
         // Switch to list display
@@ -304,7 +256,6 @@ public class HomeScreenFragment extends Fragment {
                 getActivity().runOnUiThread(() -> {
 
                     AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-                    Log.v("HomeScreenFragment", "showDeleteConfirmationDialog" + getActivity());
 
                     builder.setTitle("Confirm Deletion");
                     builder.setMessage("Are you sure you want to delete this image?");
@@ -320,7 +271,6 @@ public class HomeScreenFragment extends Fragment {
                         onResume();
                         fragToActivityListener.onFragmentAction("Delete", true);
                         updateUI();
-//                        this.mainController.getImageController().deleteSelectedImageAtHomeScreeen(selectedImageURLsTask);
                     });
 
                     builder.setNegativeButton("Cancel", null);
@@ -339,7 +289,6 @@ public class HomeScreenFragment extends Fragment {
             options = ActivityOptionsCompat.makeSceneTransitionAnimation(activity, view, "image");
         }
         if (imageURIs.contains(uri)) {
-            Log.v("HomeScreenFragment", "Image selected: " + uri);
             String id = mainController.getImageController().getIdByRef(uri);
             intent.putExtra("id", id);
             intent.putExtra("position", position);
@@ -347,7 +296,7 @@ public class HomeScreenFragment extends Fragment {
                 startActivityForResult(intent, REQUEST_CODE_DETAIL_IMAGE, options.toBundle());
             }
         } else {
-            Log.v("HomeScreenFragment", "Image not found: " + uri);
+            Log.d("HomeScreenFragment", "handleImagePick: Image not found");
         }
     }
 
@@ -361,14 +310,12 @@ public class HomeScreenFragment extends Fragment {
     @Override
     public void onDetach() {
         super.onDetach();
-        Log.v("HomeScreenFragment", "onDetach");
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
         mainController = null;
-        Log.v("HomeScreenFragment", "onDestroy");
     }
 
     public void ActivityToFragListener(String action) {
@@ -377,15 +324,10 @@ public class HomeScreenFragment extends Fragment {
                 showDeleteConfirmationDialog();
                 onPause();
                 break;
-//            case "Share":
-////                Intent intent = new Intent(getActivity(), MainFragmentController.class);
-////                intent.putExtra("key", data); // Replace "key" with your desired key
-////                getActivity().startActivity(intent);
             case "Camera":
                 openCamera();
                 break;
             case "Select":
-//                pickImagesFromDevice();
                 break;
             case "Share":
                 List<Uri> tempUri = new ArrayList<>();
@@ -409,20 +351,10 @@ public class HomeScreenFragment extends Fragment {
                 List<String> ids = new ArrayList<>();
                 for (String uri : imageAdapter.getSelectedImageURLs()) {
                     ids.add(mainController.getImageController().getIdByRef(uri));
-                    Log.d("Action Add", mainController.getImageController().getIdByRef(uri));
                 }
                 handleAddMultipleImagesToAlbum(ids);
                 break;
         }
-    }
-
-    public void searchImages(String query) {
-        imageURIs.clear();
-        imageURIs.addAll(mainController.getImageController().selectImagesByNotice(query));
-        imageAdapter = new ImageAdapter(getActivity(), imageURIs);
-        recyclerMediaView.setLayoutManager(new GridLayoutManager(getContext(), 3));
-        recyclerMediaView.setAdapter(imageAdapter);
-        imageAdapter.notifyDataSetChanged();
     }
 
     private void handleAddMultipleImagesToAlbum(List<String> images_id) {
@@ -440,26 +372,18 @@ public class HomeScreenFragment extends Fragment {
         MaterialAlertDialogBuilder albumsDialog = new MaterialAlertDialogBuilder(getContext());
         albumsDialog.setView(dialogView)
                 .setTitle("Choose an album")
-                .setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                        int selectedRadioButtonId = albumGroup.getCheckedRadioButtonId();
-                        RadioButton selectedRadioBtn = dialogView.findViewById(selectedRadioButtonId);
-                        if (selectedRadioBtn != null) {
-                            String selectedAlbum = selectedRadioBtn.getText().toString();
-                            String album_id = mainController.getAlbumController().getAlbumIdByName(selectedAlbum);
-                            for (String image_id : images_id) {
-                                mainController.getImageAlbumController().addImageAlbum(image_id, album_id);
-                            }
+                .setPositiveButton("OK", (dialogInterface, i) -> {
+                    int selectedRadioButtonId = albumGroup.getCheckedRadioButtonId();
+                    RadioButton selectedRadioBtn = dialogView.findViewById(selectedRadioButtonId);
+                    if (selectedRadioBtn != null) {
+                        String selectedAlbum = selectedRadioBtn.getText().toString();
+                        String album_id = mainController.getAlbumController().getAlbumIdByName(selectedAlbum);
+                        for (String image_id : images_id) {
+                            mainController.getImageAlbumController().addImageAlbum(image_id, album_id);
                         }
                     }
                 })
-                .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                        dialogInterface.dismiss();
-                    }
-                });
+                .setNegativeButton("Cancel", (dialogInterface, i) -> dialogInterface.dismiss());
         albumsDialog.show();
     }
 }

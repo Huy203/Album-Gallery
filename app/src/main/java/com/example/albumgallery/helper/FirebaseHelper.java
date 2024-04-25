@@ -6,7 +6,6 @@ import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.Map;
@@ -53,20 +52,6 @@ public class FirebaseHelper {
         return imageRef.delete();
     }
 
-    // Method to get document ID by reference value
-    public Task<String> getDocumentIdByRef(String collection, String refValue) {
-        CollectionReference imagesRef = db.collection(collection);
-        Query query = imagesRef.whereEqualTo("ref", refValue).limit(1);
-        return query.get().continueWith(task -> {
-            QuerySnapshot querySnapshot = task.getResult();
-            if (querySnapshot != null && !querySnapshot.isEmpty()) {
-                return querySnapshot.getDocuments().get(0).getId();
-            } else {
-                return null;
-            }
-        });
-    }
-
 
     public Task<DocumentSnapshot> getById(String collection, String documentId, String userId) {
         // Get a reference to the document
@@ -79,10 +64,5 @@ public class FirebaseHelper {
             // Fetch the document
             return docRef.get();
         }
-    }
-
-    public Task<QuerySnapshot> getAll(String collection) {
-        CollectionReference imagesRef = db.collection(collection);
-        return imagesRef.get();
     }
 }

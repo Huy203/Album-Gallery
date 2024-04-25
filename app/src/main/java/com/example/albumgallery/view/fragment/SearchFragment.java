@@ -3,20 +3,17 @@ package com.example.albumgallery.view.fragment;
 import static com.example.albumgallery.utils.Constant.REQUEST_CODE_DETAIL_IMAGE;
 
 import android.annotation.SuppressLint;
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.ColorStateList;
 import android.net.Uri;
 import android.os.Bundle;
-import android.provider.MediaStore;
 import android.util.Log;
 import android.util.SparseBooleanArray;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.PopupMenu;
@@ -42,10 +39,7 @@ import com.example.albumgallery.view.listeners.BackgroundProcessingCallback;
 import com.example.albumgallery.view.listeners.FragToActivityListener;
 import com.example.albumgallery.view.listeners.ImageAdapterListener;
 import com.google.android.gms.tasks.Task;
-import com.google.android.gms.tasks.Tasks;
 import com.google.android.material.button.MaterialButton;
-
-import org.checkerframework.framework.qual.DefaultQualifier;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -128,7 +122,6 @@ public class SearchFragment extends Fragment {
             public boolean onQueryTextSubmit(String query) {
                 // Perform search when the user submits the query (e.g., presses Enter)
                 searchImagesSubmit(query);
-                Log.d("query seach", query);
                 return true;
             }
 
@@ -136,21 +129,16 @@ public class SearchFragment extends Fragment {
             public boolean onQueryTextChange(String newText) {
                 // Perform search as the user types
                 searchImagesQuerying(newText);
-                Log.d("new text search", newText);
                 return true;
             }
         });
         listView = view.findViewById(R.id.listView);
         arrayAdapter = new ArrayAdapter<String>(requireContext(), android.R.layout.simple_list_item_1);
         listView.setAdapter(arrayAdapter);
-        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Log.d("imageURIs", String.valueOf(imageURIsTemp.size()));
-                // String query = searchView.getQuery().toString();
-                String selectedImageURI = imageURIsTemp.get(position);
-                getImage(selectedImageURI);
-            }
+        listView.setOnItemClickListener((parent, view12, position, id) -> {
+            // String query = searchView.getQuery().toString();
+            String selectedImageURI = imageURIsTemp.get(position);
+            getImage(selectedImageURI);
         });
     }
 
@@ -219,7 +207,6 @@ public class SearchFragment extends Fragment {
         }
         // if no items are selected, clear the selected items and return false
         if (length == 0) {
-            Log.v("HomeScreenFragment", "No items selected");
             imageAdapter.clearSelectedItems();
             unChooseBtn.setVisibility(View.GONE);
             isSelectAll = false;
@@ -242,7 +229,6 @@ public class SearchFragment extends Fragment {
     }
 
     public void updateUI() {
-        Log.v("HomeScreenFragment", "updateUI");
         String searchText = searchView.getQuery().toString().trim();
         if (!searchText.isEmpty()) {
             // If the search box contains text, perform the search
@@ -267,9 +253,7 @@ public class SearchFragment extends Fragment {
         if (isAdded() && getActivity() != null) {
             if (!getActivity().isFinishing()) {
                 getActivity().runOnUiThread(() -> {
-
                     AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-                    Log.v("HomeScreenFragment", "showDeleteConfirmationDialog" + getActivity());
 
                     builder.setTitle("Confirm Deletion");
                     builder.setMessage("Are you sure you want to delete this image?");
@@ -285,7 +269,6 @@ public class SearchFragment extends Fragment {
                         onResume();
                         fragToActivityListener.onFragmentAction("Delete", true);
                         updateUI();
-//                        this.mainController.getImageController().deleteSelectedImageAtHomeScreeen(selectedImageURLsTask);
                     });
 
                     builder.setNegativeButton("Cancel", null);
@@ -303,7 +286,6 @@ public class SearchFragment extends Fragment {
             options = ActivityOptionsCompat.makeSceneTransitionAnimation(activity, view, "image");
         }
         if (imageURIs.contains(uri)) {
-            Log.v("HomeScreenFragment", "Image selected: " + uri);
             String id = mainController.getImageController().getIdByRef(uri);
             intent.putExtra("id", id);
             intent.putExtra("position", position);
@@ -321,19 +303,13 @@ public class SearchFragment extends Fragment {
                 showDeleteConfirmationDialog();
                 onPause();
                 break;
-//            case "Share":
-////                Intent intent = new Intent(getActivity(), MainFragmentController.class);
-////                intent.putExtra("key", data); // Replace "key" with your desired key
-////                getActivity().startActivity(intent);
             case "Select":
-//                pickImagesFromDevice();
                 break;
             case "Share":
                 List<Uri> tempUri = new ArrayList<>();
                 for (String url : imageAdapter.getSelectedImageURLs()) {
                     tempUri.add(Uri.parse(url));
                 }
-                // Frag to activity listener
                 fragToActivityListener.onFragmentAction("Share", tempUri);
                 break;
             case "Like":
@@ -355,7 +331,6 @@ public class SearchFragment extends Fragment {
 
         imageURIs.clear();
         imageURIs.addAll(mainController.getImageController().selectImagesByNotice(query));
-        Log.d("Size of image uris", String.valueOf(imageURIs.size()));
         imageAdapter = new ImageAdapter(getActivity(), imageURIs);
         recyclerMediaView.setLayoutManager(new GridLayoutManager(getContext(), 4));
         recyclerMediaView.setAdapter(imageAdapter);
@@ -366,7 +341,7 @@ public class SearchFragment extends Fragment {
     public void searchImagesQuerying(String query) {
         imageURIsTemp.clear();
         arrayAdapter.clear();
-        if(mainController.getImageController().selectImagesByNotice(query) != null){
+        if (mainController.getImageController().selectImagesByNotice(query) != null) {
             arrayAdapter.addAll(mainController.getImageController().selectImageNamesByNotice(query));
             imageURIsTemp.addAll(mainController.getImageController().selectImagesByNotice(query));
         }
@@ -375,7 +350,7 @@ public class SearchFragment extends Fragment {
 
     }
 
-    public void getImage(String selectedImageURI){
+    public void getImage(String selectedImageURI) {
         List<String> selectedImageURIs = new ArrayList<>();
         selectedImageURIs.add(selectedImageURI);
 

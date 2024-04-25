@@ -3,7 +3,6 @@ package com.example.albumgallery.view.adapter;
 import android.app.Activity;
 import android.content.Context;
 import android.graphics.drawable.Drawable;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -39,6 +38,7 @@ public class AlbumAdapter extends RecyclerView.Adapter<AlbumAdapter.ViewHolder> 
     public void setAlbumAdapterListener(AlbumAdapterListener listener) {
         this.listener = listener;
     }
+
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -60,6 +60,7 @@ public class AlbumAdapter extends RecyclerView.Adapter<AlbumAdapter.ViewHolder> 
                         holder.progressIndicator.setVisibility(View.GONE);
                         return false;
                     }
+
                     @Override
                     public boolean onResourceReady(@NonNull Drawable resource, @NonNull Object model, Target<Drawable> target, @NonNull DataSource dataSource, boolean isFirstResource) {
                         holder.progressIndicator.setVisibility(View.GONE);
@@ -71,7 +72,7 @@ public class AlbumAdapter extends RecyclerView.Adapter<AlbumAdapter.ViewHolder> 
 
     @Override
     public int getItemCount() {
-        if(albumNames != null) {
+        if (albumNames != null) {
             return albumNames.size();
         }
         return 0;
@@ -82,25 +83,22 @@ public class AlbumAdapter extends RecyclerView.Adapter<AlbumAdapter.ViewHolder> 
         ImageView thumbnailImageView;
 
         CircularProgressIndicator progressIndicator;
+
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
             albumNameTxtView = (TextView) itemView.findViewById(R.id.albumNameItemAlbum);
             thumbnailImageView = (ImageView) itemView.findViewById(R.id.albumThumbnail);
             progressIndicator = (CircularProgressIndicator) itemView.findViewById(R.id.circularProgressIndicatorForAlbum);
             progressIndicator.setVisibility(View.VISIBLE);
-            itemView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    if(listener != null) {
-                        int position = getAdapterPosition();
-                        if (position != RecyclerView.NO_POSITION) {
-                            String albumName = albumNames.get(position);
-                            listener.onAlbumClicked(albumName);
-                        }
+            itemView.setOnClickListener(view -> {
+                if (listener != null) {
+                    int position = getAdapterPosition();
+                    if (position != RecyclerView.NO_POSITION) {
+                        String albumName = albumNames.get(position);
+                        listener.onAlbumClicked(albumName);
                     }
                 }
             });
         }
     }
-
 }

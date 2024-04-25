@@ -32,7 +32,6 @@ public class FirebaseManager {
 
         FirebaseUser user = firebaseAuth.getCurrentUser();
         if (user != null) {
-            Log.v("Firebase", "User is signed in");
             signInUser(user);
         }
 
@@ -50,20 +49,12 @@ public class FirebaseManager {
         return instance;
     }
 
-    public FirebaseDatabase getDatabase() {
-        return database;
-    }
-
     public FirebaseStorage getStorage() {
         return storage;
     }
 
     public FirebaseAuth getFirebaseAuth() {
         return firebaseAuth;
-    }
-
-    public FirebaseFirestore getFirestore() {
-        return firestore;
     }
 
     public FirebaseHelper getFirebaseHelper() {

@@ -1,7 +1,6 @@
 package com.example.albumgallery.view.activity;
 
 import android.app.ProgressDialog;
-import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -29,7 +28,6 @@ public class Auth extends AppCompatActivity {
     ProgressDialog loadingBar;
     private FirebaseManager firebaseManager;
     private MainController mainController;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -190,12 +188,11 @@ public class Auth extends AppCompatActivity {
                             user.updateProfile(profileUpdates)
                                     .addOnCompleteListener(task1 -> {
                                         if (task1.isSuccessful()) {
-                                            Log.v("Firebase", "User profile updated.");
+                                            Log.d("Auth", "User profile updated.");
                                         }
                                     });
                             String created_at = new Date(Objects.requireNonNull(user.getMetadata()).getCreationTimestamp()).toString();
                             mainController.getUserController().insert(new UserModel(user.getUid(), username, email, phone, dateOfBirth, created_at, "android.resource://com.example.albumgallery/drawable/blank_profile_picture"));
-                            Log.v("Firebase", mainController.getUserController().getUser().getPicture());
                         }
                     } else {
                         // If sign in fails, display a message to the user.

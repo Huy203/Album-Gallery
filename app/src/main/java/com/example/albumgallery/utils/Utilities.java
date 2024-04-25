@@ -1,17 +1,10 @@
 package com.example.albumgallery.utils;
 
-import static java.text.DateFormat.getDateTimeInstance;
-
 import android.content.Context;
-import android.content.DialogInterface;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.provider.MediaStore;
-
-import androidx.appcompat.app.AlertDialog;
-
-import com.example.albumgallery.helper.SharePreferenceHelper;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -64,7 +57,4 @@ public class Utilities {
         return new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(currentTime);
     }
 
-    public static boolean isDarkModeEnabled(Context context) {
-        return SharePreferenceHelper.isDarkModeEnabled(context);
-    }
 }

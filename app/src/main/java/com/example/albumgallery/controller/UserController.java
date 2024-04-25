@@ -11,7 +11,6 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.TimeZone;
 
@@ -51,10 +50,6 @@ public class UserController implements Controller {
         dbHelper.close();
     }
 
-    private DatabaseHelper getDbHelper() {
-        return dbHelper;
-    }
-
     public Activity getActivity() {
         return activity;
     }
@@ -75,10 +70,6 @@ public class UserController implements Controller {
         return new UserModel(temp[0], temp[1], temp[2], temp[3], temp[4], temp[5], temp[6]);
     }
 
-    public List<String> getAllImageIds() {
-        return dbHelper.getFromImage("id");
-    }
-
     public void loadFromFirestore() {
         String uid = firebaseManager.getFirebaseAuth().getCurrentUser().getUid();
         String user = dbHelper.getById("User", uid);
@@ -86,13 +77,12 @@ public class UserController implements Controller {
             firebaseManager.getFirebaseHelper().getById("User", uid, uid)
                     .addOnSuccessListener(documentSnapshot -> {
                         if (documentSnapshot != null) {
-                            String created_at = new Date().toString();
                             dbHelper.insert("User", new UserModel(
                                     documentSnapshot.get("id").toString(),
                                     documentSnapshot.get("username").toString(),
                                     documentSnapshot.get("email").toString(),
                                     documentSnapshot.get("phone").toString(),
-                                    convertDateTime(documentSnapshot.get("created_at").toString()).toString(),
+                                    convertDateTime(documentSnapshot.get("created_at").toString()),
                                     documentSnapshot.get("birth").toString(),
                                     documentSnapshot.get("picture").toString()));
                         }
@@ -110,7 +100,6 @@ public class UserController implements Controller {
         try {
             Date date = inputFormat.parse(datetime);
             String outputDate = outputFormat.format(date);
-            System.out.println("Converted date: " + outputDate);
             return outputDate;
         } catch (ParseException e) {
             e.printStackTrace();

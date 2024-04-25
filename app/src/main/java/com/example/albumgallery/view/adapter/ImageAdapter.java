@@ -5,7 +5,6 @@ import android.content.Context;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.util.SparseBooleanArray;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -103,10 +102,6 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> 
         return selectedItems;
     }
 
-    public void emptySelectedItems() {
-        selectedItems.clear();
-    }
-
     public List<String> getSelectedImageURLs() {
         List<String> selectedImageURLs = new ArrayList<>();
         for (int i = 0; i < getSelectedItems().size(); i++) {
@@ -134,26 +129,9 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> 
         return selectedImageURLsTask;
     }
 
-
-    public boolean toggleMultipleChoiceImagesEnabled() {
-        if (listener != null) {
-            setMultipleChoiceEnabled(!isMultipleChoice);
-            notifyDataSetChanged(); // Notify adapter to update views
-        } else {
-            Log.v("ImageAdapter", "toggleMultipleChoiceImagesEnabled: listener is null");
-        }
-        return isMultipleChoice;
-    }
-
     public void clearSelectedItems() {
         getSelectedItems().clear();
         isMultipleChoice = false;
-    }
-
-    public void setSizeImage(int width, int height) {
-        for (ViewHolder holder : holderList) {
-            holder.setImageSize(width, height);
-        }
     }
 
     public void toggleAll() {
@@ -161,10 +139,6 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> 
             holder.toggleSelection();
         }
         listener.toggleMultipleChoice();
-    }
-
-    public void setImageURIs(List<String> imageURIs) {
-        this.imageURLs = imageURIs;
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {
@@ -187,17 +161,13 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> 
 
             checkbox.setOnClickListener(view -> {
                 toggleSelection();
-//                listener.toggleMultipleChoice();
             });
 
             itemView.setOnClickListener(view -> {
                 if (!isMultipleChoice) {
                     listener.handleImagePick(imageView, imageURL, getAdapterPosition());
                 } else {
-//                    listener.getInteractedURIs(imageURL);
                     toggleSelection();
-//                    listener.toggleMultipleChoice();
-//                    Log.d("justclick", imageURL);
                     listener.getInteractedURIs(imageURL);
                 }
             });
@@ -205,7 +175,6 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> 
             itemView.setOnLongClickListener(view -> {
                 isMultipleChoice = true;
                 toggleSelection();
-//                listener.getInteractedURIs(imageURL);
                 return true;
             });
         }
@@ -290,25 +259,6 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> 
                         .into(imageView);
             }
         }
-
-        public void setImageSize(int width, int height) {
-            ViewGroup.LayoutParams params = imageView.getLayoutParams();
-            params.height = height;
-            params.width = width;
-            imageView.setLayoutParams(params);
-        }
     }
 }
-
-//
-//    // Xử lý sắp xếp hình ảnh theo date
-//    public void sortImageByDate() {
-//        Collections.sort(getImageURLs(), (path_1, path_2) -> Long.compare(getImageDate(path_1), getImageDate(path_2)));
-//        notifyDataSetChanged();
-//    }
-//
-//    private long getImageDate(String imageURL) {
-//        File imageFile = new File(imageURL);
-//        return imageFile.exists() ? imageFile.lastModified() : 0;
-//    }
 

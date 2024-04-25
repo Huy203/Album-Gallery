@@ -1,16 +1,9 @@
 package com.example.albumgallery.model;
 
-import android.content.Context;
-
-import com.example.albumgallery.helper.DatabaseHelper;
-
-import java.util.Date;
 import java.util.Calendar;
-import java.util.List;
 
-public class AlbumModel implements Model{
+public class AlbumModel implements Model {
     // AlbumModel class is used to store the data of the album.
-//    private DatabaseHelper dbHelper;
     private String thumbnail;
     private String id; // id of the album
     private String name; // name of the album
@@ -21,10 +14,6 @@ public class AlbumModel implements Model{
     private String password;
     private int num_of_images;   // number of images
     private int is_deleted; // is album deleted
-
-//    public DatabaseHelper getDbHelper() {
-//        return dbHelper;
-//    }
 
     public String getId() {
         return id;
@@ -97,9 +86,7 @@ public class AlbumModel implements Model{
     public int getIs_deleted() {
         return is_deleted;
     }
-//    public AlbumModel(Context context) {
-//        dbHelper = new DatabaseHelper(context);
-//    }
+
 
     public AlbumModel(String id, String name, int capacity, String notice, String ref, int num_of_images) {
         this.id = id;
@@ -112,7 +99,8 @@ public class AlbumModel implements Model{
         this.num_of_images = num_of_images;
         this.thumbnail = "";
     }
-    public AlbumModel(String name, String password, int num_of_images){
+
+    public AlbumModel(String name, String password, int num_of_images) {
         this.name = name;
         this.capacity = 0;
         this.password = password;
@@ -149,12 +137,6 @@ public class AlbumModel implements Model{
         this.is_deleted = is_deleted;
         this.thumbnail = thumbnail;
     }
-
-    //    @Override
-//    public String insert() {
-//        return "INSERT INTO Album (name, capacity, created_at, notice, ref, is_deleted, num_of_images, password) " +
-//                "VALUES ('" + name + "', " + capacity + ", '" + created_at + "', '" + notice + "', '" + ref + "', " + is_deleted + ", " + num_of_images + ", '" + password + "')";
-//    }
 
     @Override
     public String insert() {

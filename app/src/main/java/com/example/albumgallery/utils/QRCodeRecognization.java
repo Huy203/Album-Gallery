@@ -46,39 +46,6 @@ public class QRCodeRecognization extends AsyncTask<String, Void, String> {
         return null;
     }
 
-    // This method is used to calculate the sample size of the image which is used to reduce the size of the image
-    private Bitmap downloadImage(String uri) {
-        try {
-            InputStream in = new URL(uri).openStream();
-            BitmapFactory.Options options = new BitmapFactory.Options();
-            options.inJustDecodeBounds = false;
-            options.inSampleSize = calculateInSampleSize(options, 1024, 1024); // Adjust this to a suitable size
-            Bitmap bitmap = BitmapFactory.decodeStream(in, null, options);
-            // Continue with your QR code recognition here
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
-
-    public static int calculateInSampleSize(BitmapFactory.Options options, int reqWidth, int reqHeight) {
-        final int height = options.outHeight;
-        final int width = options.outWidth;
-        Log.v("Image Size", "Root size: " + height + "x" + width);
-        int inSampleSize = 1;
-
-        if (height > reqHeight || width > reqWidth) {
-            final int halfHeight = height / 2;
-            final int halfWidth = width / 2;
-
-            while ((halfHeight / inSampleSize) >= reqHeight && (halfWidth / inSampleSize) >= reqWidth) {
-                inSampleSize *= 2;
-            }
-        }
-        Log.v("Image Size", "Sample size: " + inSampleSize);
-        return inSampleSize;
-    }
-
     private String recognizeQRCode(Bitmap bitmap) {
         bitmap = resizeBitmap(bitmap);
         // Recognize QR code from the bitmap
@@ -97,14 +64,12 @@ public class QRCodeRecognization extends AsyncTask<String, Void, String> {
         return null;
     }
 
-    private Bitmap resizeBitmap(Bitmap bitmap){
-        Log.v("Image Size", "Original size: " + bitmap.getHeight() + "x" + bitmap.getWidth());
+    private Bitmap resizeBitmap(Bitmap bitmap) {
         float scaleFactor = Math.min((float) MAX_BITMAP_DIMENSION / bitmap.getWidth(),
                 (float) MAX_BITMAP_DIMENSION / bitmap.getHeight());
 
         Matrix matrix = new Matrix();
         matrix.postScale(scaleFactor, scaleFactor);
-        Log.v("Image Size", "Scale factor: " + scaleFactor);
 
         return Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
     }
@@ -112,7 +77,7 @@ public class QRCodeRecognization extends AsyncTask<String, Void, String> {
     @Override
     protected void onPostExecute(String result) {
         if (result != null) {
-            Log.d("QRCodeRecognition", "QR Code data: " + result);
+            Log.d("QRCodeRecognition", "Recognized QR code: " + result);
         } else {
             Log.d("QRCodeRecognition", "Failed to recognize QR code");
         }

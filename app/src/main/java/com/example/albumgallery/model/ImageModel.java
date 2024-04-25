@@ -40,20 +40,6 @@ public class ImageModel implements Model {
         this.is_favourited = false;
     }
 
-    public ImageModel(int id, String name, int width, int height, long capacity, String created_at, String notice, String ref, String remain_time, boolean is_deleted, boolean is_favourited) {
-        this.id = "";
-        this.name = name;
-        this.width = width;
-        this.height = height;
-        this.capacity = capacity;
-        this.created_at = created_at;
-        this.notice = notice;
-        this.ref = ref;
-        this.remain_time = remain_time;
-        this.is_deleted = is_deleted;
-        this.is_favourited = is_favourited;
-    }
-
     public ImageModel(String id, String name, int width, int height, long capacity, String created_at, String notice, String ref, String remain_time, boolean is_deleted, boolean is_favourited) {
         this.id = id;
         this.name = name;

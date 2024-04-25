@@ -62,15 +62,9 @@ android {
             "src/main/res",
             "src/main/res/drawable",
             "src/main/res/drawable-v24",
-            "src/main/res/layout/activity/user",
-            "src/main/res/layout/activity/albums",
-            "src/main/res/layout/activity/album_detail",
-            "src/main/res/layout/activity/images",
-            "src/main/res/layout/activity/image_detail",
-            "src/main/res/layout/activity/images",
-            "src/main/res/layout/activity/auth",
             "src/main/res/layout/activity",
             "src/main/res/layout/fragment",
+            "src/main/res/layout/navbar",
             "src/main/res/menu",
             "src/main/res/mipmap-anydpi-v26",
             "src/main/res/mipmap-hdpi",
@@ -121,15 +115,10 @@ dependencies {
 //    Google Play services Auth SDK
     implementation("com.google.android.gms:play-services-auth:21.0.0")
     implementation("com.google.android.gms:play-services-vision:20.1.3")
-//    androidTestImplementation(platform("androidx.compose:compose-bom:2023.08.00"))
-//    androidTestImplementation("androidx.compose.ui:ui-test-junit4")
-//    androidTestImplementation(platform("androidx.compose:compose-bom:2023.08.00"))
     debugImplementation("androidx.compose.ui:ui-tooling")
     debugImplementation("androidx.compose.ui:ui-test-manifest")
 
     implementation("com.github.bumptech.glide:glide:4.16.0")
-
-
     implementation("com.google.android.gms:play-services-vision:20.1.3")
 
     // QR Code Scanner

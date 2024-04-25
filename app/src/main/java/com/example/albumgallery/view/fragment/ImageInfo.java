@@ -12,7 +12,6 @@ import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
@@ -34,7 +33,7 @@ public class ImageInfo extends Fragment {
         if (context instanceof ImageInfoListener) {
             listener = (ImageInfoListener) context;
         } else {
-            throw new RuntimeException(context.toString() + " must implement ImageInfoListener");
+            throw new RuntimeException(context + " must implement ImageInfoListener");
         }
     }
 
@@ -56,10 +55,6 @@ public class ImageInfo extends Fragment {
                 imageCreatedAt.setFocusableInTouchMode(true);
                 imageCreatedAt.setFocusable(true);
                 imageCreatedAt.requestFocus(); // Set focus to the EditText
-
-                // Log.d("image created at", imageCreatedAt.getText().toString());
-
-                // sendTimeDataToActivity(imageCreatedAt.getText().toString());
             }
         });
 
@@ -69,25 +64,20 @@ public class ImageInfo extends Fragment {
                 imm.hideSoftInputFromWindow(imageCreatedAt.getWindowToken(), 0);
 
                 String editedText = imageCreatedAt.getText().toString();
-
                 // Send the edited text to the activity
                 sendTimeDataToActivity(editedText);
-
                 return true;
             }
-            // Return false to indicate that the action has not been handled
             return false;
         });
 
         notice.setOnEditorActionListener((v, actionId, event) -> {
-            Log.v("ImageInfo", "Action ID: " + actionId);
             if (actionId == EditorInfo.IME_ACTION_DONE) {
                 InputMethodManager imm = (InputMethodManager) requireActivity().getSystemService(INPUT_METHOD_SERVICE);
                 imm.hideSoftInputFromWindow(notice.getWindowToken(), 0);
 
                 // Save notice to database
                 sendDataToActivity(notice.getText().toString());
-
                 return true;
             }
             return false;
@@ -104,7 +94,6 @@ public class ImageInfo extends Fragment {
             } else if (image.getCapacity() > 1024 * 1024 * 1024) {
                 capacity.setText(image.getCapacity() / (1024 * 1024 * 1024) + " GB");
             } else capacity.setText(image.getCapacity() + " bytes");
-            Log.v("ImageInfo", "Created at: " + image.getCreated_at());
             created_at.setText(image.getCreated_at());
             notice.setText(image.getNotice());
             return view;

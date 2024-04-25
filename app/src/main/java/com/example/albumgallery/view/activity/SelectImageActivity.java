@@ -1,9 +1,7 @@
 package com.example.albumgallery.view.activity;
 
-import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
@@ -20,7 +18,6 @@ import com.example.albumgallery.controller.MainController;
 import com.example.albumgallery.view.adapter.ImageAdapter;
 import com.example.albumgallery.view.listeners.ImageAdapterListener;
 import com.google.android.gms.tasks.Task;
-import com.google.android.material.button.MaterialButton;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -35,6 +32,7 @@ public class SelectImageActivity extends AppCompatActivity implements ImageAdapt
     List<Task> selectedImageURLsTask;
     List<String> selectedImageURIs;
     String albumName;
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -49,7 +47,6 @@ public class SelectImageActivity extends AppCompatActivity implements ImageAdapt
         selectedImageURIs = new ArrayList<>();
         numberOfImagesSelected = findViewById(R.id.numberOfSelectedImagesInSelectActivity);
 
-//        imageURIs.addAll(mainController.getImageController().getAllImageURLsSortByDate());
         imageURIs.addAll(mainController.getImageController().getAllImageURLsUndeleted());
 
         imageAdapter = new ImageAdapter(this, imageURIs);
@@ -70,24 +67,20 @@ public class SelectImageActivity extends AppCompatActivity implements ImageAdapt
 
     private void handleInteractions() {
         Button btnCreateAlbum = (Button) findViewById(R.id.btnCreateAlbum);
-        btnCreateAlbum.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent = new Intent(SelectImageActivity.this, CreateAlbumActivity.class);
-                // send the number of images to CreateAlbumActivity
-                intent.putExtra("numOfImages", numberOfImagesSelected.getText().toString());
-                // send the list of URLS to CreateAlbumActivity
-                intent.putStringArrayListExtra("selectedImageURIs", (ArrayList<String>) selectedImageURIs);
-                // set the afterSelectImage
-                intent.putExtra("isSelected", true);
+        btnCreateAlbum.setOnClickListener(view -> {
+            Intent intent = new Intent(SelectImageActivity.this, CreateAlbumActivity.class);
+            // send the number of images to CreateAlbumActivity
+            intent.putExtra("numOfImages", numberOfImagesSelected.getText().toString());
+            // send the list of URLS to CreateAlbumActivity
+            intent.putStringArrayListExtra("selectedImageURIs", (ArrayList<String>) selectedImageURIs);
+            // set the afterSelectImage
+            intent.putExtra("isSelected", true);
 
-                // set the albumName
-                Log.d("Keep album name in select", albumName);
-                intent.putExtra("albumName", albumName);
+            // set the albumName
+            intent.putExtra("albumName", albumName);
 
-                startActivity(intent);
-                finish();
-            }
+            startActivity(intent);
+            finish();
         });
 
         ImageButton btnBack = (ImageButton) findViewById(R.id.backButtonSelectImageActivity);
@@ -108,23 +101,6 @@ public class SelectImageActivity extends AppCompatActivity implements ImageAdapt
         imageAdapter.setMultipleChoiceEnabled(true);
     }
 
-    @SuppressLint("SetTextI18n")
-    @Override
-    public void getSelectedItemsCount() {
-//        Log.v("SelectedItems", count + " items selected");
-//        numberOfImagesSelected.setText(count + " images selected");
-//
-//        for (int i = 0; i < count; i++) {
-//            selectedImageURLsTask.add(Tasks.forResult(Uri.parse(imageURIs.get(i))));
-//            Log.d("Deleted images task", selectedImageURLsTask.get(i).getResult().toString());
-//        }
-//
-//        for (int i = 0; i < count; i++) {
-//            selectedImageURLs.add(imageURIs.get(i));
-//            Log.d("Deleted images", selectedImageURLs.get(i));
-//        }
-    }
-
     @Override
     public void handleImagePick(View itemView, String uri, int position) {
         Intent intent = new Intent(this, DetailPicture.class);
@@ -132,7 +108,6 @@ public class SelectImageActivity extends AppCompatActivity implements ImageAdapt
         String id = mainController.getImageController().getIdByRef(uri);
         intent.putExtra("id", id);
         intent.putExtra("position", position);
-        Log.v("ImageAdapter", "Image selected: " + itemView);
         startActivity(intent, options.toBundle());
     }
 
@@ -140,20 +115,14 @@ public class SelectImageActivity extends AppCompatActivity implements ImageAdapt
     public void getInteractedURIs(String uri) {
         if (!selectedImageURIs.contains(uri)) {
             selectedImageURIs.add(uri);
-
-            Log.d("justadded", uri);
         } else {
             selectedImageURIs.remove(uri);
-            Log.d("justremove", uri);
-        }
-        for(String u: selectedImageURIs) {
-            Log.d("current uris", u);
         }
     }
 
     @Override
     public void toggleMultipleChoice() {
         int length = imageAdapter.getSelectedItems().size(); // get the number of selected items
-        numberOfImagesSelected.setText(length+ " images selected");
+        numberOfImagesSelected.setText(length + " images selected");
     }
 }

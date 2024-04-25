@@ -1,10 +1,10 @@
 package com.example.albumgallery.view.activity;
 
-import static com.example.albumgallery.utils.Constant.REQUEST_CODE_EDIT_IMAGE;
 import static com.example.albumgallery.utils.Utilities.bitmapToByteArray;
-import static com.example.albumgallery.utils.Utilities.byteArrayToBitmap;
 
 import android.annotation.SuppressLint;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
@@ -12,12 +12,9 @@ import android.graphics.Color;
 import android.graphics.ColorMatrix;
 import android.graphics.ColorMatrixColorFilter;
 import android.graphics.Paint;
-import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
@@ -25,29 +22,16 @@ import android.widget.ImageView;
 import android.widget.SeekBar;
 import android.widget.Toast;
 
-import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.view.GestureDetectorCompat;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.DataSource;
 import com.bumptech.glide.load.engine.GlideException;
 import com.bumptech.glide.request.RequestListener;
-import com.bumptech.glide.request.target.CustomTarget;
 import com.bumptech.glide.request.target.Target;
-import com.bumptech.glide.request.transition.Transition;
 import com.example.albumgallery.R;
 import com.example.albumgallery.controller.MainController;
-
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-
-import android.app.AlertDialog;
-import android.content.DialogInterface;
-
-
 
 public class BeautyImageActivity extends AppCompatActivity {
     private MainController mainController;
@@ -67,6 +51,7 @@ public class BeautyImageActivity extends AppCompatActivity {
     SeekBar seekBarContrast;
     SeekBar seekBarWarm;
     SeekBar seekBarTones;
+
     @SuppressLint("ClickableViewAccessibility")
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -213,7 +198,7 @@ public class BeautyImageActivity extends AppCompatActivity {
     }
 
     private void appBarAction() {
-        int[] buttonIds = {R.id.action_pen,R.id.action_brightness, R.id.action_contrast, R.id.action_warm, R.id.action_tones, R.id.action_back};
+        int[] buttonIds = {R.id.action_pen, R.id.action_brightness, R.id.action_contrast, R.id.action_warm, R.id.action_tones, R.id.action_back};
 
         for (int buttonId : buttonIds) {
             Button button = findViewById(buttonId);
@@ -257,28 +242,24 @@ public class BeautyImageActivity extends AppCompatActivity {
 
                     isDrawingEnabled = false;
                     isBrightnessActionClicked = false;
-                    isContrastActionClicked=false;
+                    isContrastActionClicked = false;
                     isTonesActionClicked = false;
 
                     seekBarBrightness.setVisibility(View.GONE);
                     seekBarContrast.setVisibility(View.GONE);
                     seekBarTones.setVisibility(View.GONE);
-                }else if (buttonId == buttonIds[4]) {
+                } else if (buttonId == buttonIds[4]) {
                     toggleTonesMode();
 
                     isDrawingEnabled = false;
                     isBrightnessActionClicked = false;
-                    isContrastActionClicked=false;
+                    isContrastActionClicked = false;
                     isWarmActionClicked = false;
 
                     seekBarBrightness.setVisibility(View.GONE);
                     seekBarContrast.setVisibility(View.GONE);
                     seekBarWarm.setVisibility(View.GONE);
                 } else if (buttonId == buttonIds[5]) {
-//                    Intent intent = new Intent();
-//                    intent.putExtra("update", true);
-//                    setResult(RESULT_OK, intent);
-//                    finish();
                     showSaveChangesDialog();
                 }
             });
@@ -286,6 +267,7 @@ public class BeautyImageActivity extends AppCompatActivity {
 
 
     }
+
     @Override
     public void onBackPressed() {
         super.onBackPressed();
@@ -304,12 +286,6 @@ public class BeautyImageActivity extends AppCompatActivity {
                 intent.putExtra("adjustedBitmap", bitmapToByteArray(adjustedBitmap));
                 setResult(RESULT_OK, intent);
                 finish();
-//                finish();
-//                // Save changes here
-//                Intent intent = new Intent();
-//                intent.putExtra("update", true);
-//                intent.putExtra("adjustedBitmap", adjustedBitmap);
-//                setResult(RESULT_OK, intent);
             }
         });
         builder.setNegativeButton("Discard", new DialogInterface.OnClickListener() {
@@ -331,6 +307,7 @@ public class BeautyImageActivity extends AppCompatActivity {
         });
         builder.show();
     }
+
     private void toggleDrawingMode() {
         isDrawingEnabled = !isDrawingEnabled;
         if (isDrawingEnabled) {
@@ -344,6 +321,7 @@ public class BeautyImageActivity extends AppCompatActivity {
         }
 
     }
+
     private void toggleBrightnessMode() {
         isBrightnessActionClicked = !isBrightnessActionClicked;
         if (isBrightnessActionClicked) {
@@ -354,6 +332,7 @@ public class BeautyImageActivity extends AppCompatActivity {
             Toast.makeText(this, "Brightness mode disabled", Toast.LENGTH_SHORT).show();
         }
     }
+
     private void toggleContrastMode() {
         isContrastActionClicked = !isContrastActionClicked;
         if (isContrastActionClicked) {
@@ -364,6 +343,7 @@ public class BeautyImageActivity extends AppCompatActivity {
             Toast.makeText(this, "Contrast mode disabled", Toast.LENGTH_SHORT).show();
         }
     }
+
     private void toggleWarmMode() {
         isWarmActionClicked = !isWarmActionClicked;
         if (isWarmActionClicked) {
@@ -374,6 +354,7 @@ public class BeautyImageActivity extends AppCompatActivity {
             Toast.makeText(this, "Warm mode disabled", Toast.LENGTH_SHORT).show();
         }
     }
+
     private void toggleTonesMode() {
         isTonesActionClicked = !isTonesActionClicked;
         if (isTonesActionClicked) {
@@ -384,11 +365,13 @@ public class BeautyImageActivity extends AppCompatActivity {
             Toast.makeText(this, "Tones mode disabled", Toast.LENGTH_SHORT).show();
         }
     }
+
     private void touchStart(float x, float y) {
         mCanvas = new Canvas(mBitmap);
         mX = x;
         mY = y;
     }
+
     private void touchMove(float x, float y) {
         float dx = Math.abs(x - mX);
         float dy = Math.abs(y - mY);
@@ -399,9 +382,11 @@ public class BeautyImageActivity extends AppCompatActivity {
             mImageView.setImageBitmap(mBitmap);
         }
     }
+
     private void touchUp() {
         mCanvas.drawLine(mX, mY, mX, mY, mPaint);
     }
+
     private void updateBrightness(int progress) {
         // Chuyển đổi giá trị progress từ khoảng [0, 100] thành mức độ độ sáng phù hợp
         float brightnessLevel = (progress - 50) * 2; // Điều chỉnh giá trị từ -100 đến 100
@@ -417,7 +402,7 @@ public class BeautyImageActivity extends AppCompatActivity {
 
         // Thiết lập sự thay đổi độ sáng thông qua ColorMatrix
         ColorMatrix colorMatrix = new ColorMatrix();
-        colorMatrix.set(new float[] {
+        colorMatrix.set(new float[]{
                 1, 0, 0, 0, brightnessLevel,
                 0, 1, 0, 0, brightnessLevel,
                 0, 0, 1, 0, brightnessLevel,
@@ -432,6 +417,7 @@ public class BeautyImageActivity extends AppCompatActivity {
         // Hiển thị Bitmap đã được điều chỉnh lên ImageView
         mImageView.setImageBitmap(adjustedBitmap);
     }
+
     private void updateContrast(int progress) {
         // Chuyển đổi giá trị progress từ khoảng [0, 100] thành mức độ độ tương phản phù hợp
         float contrastLevel = progress / 50f; // Điều chỉnh giá trị từ 0 đến 2
@@ -447,7 +433,7 @@ public class BeautyImageActivity extends AppCompatActivity {
 
         // Thiết lập sự thay đổi độ tương phản thông qua ColorMatrix
         ColorMatrix colorMatrix = new ColorMatrix();
-        colorMatrix.set(new float[] {
+        colorMatrix.set(new float[]{
                 contrastLevel, 0, 0, 0, 128 * (1 - contrastLevel),
                 0, contrastLevel, 0, 0, 128 * (1 - contrastLevel),
                 0, 0, contrastLevel, 0, 128 * (1 - contrastLevel),
@@ -463,6 +449,7 @@ public class BeautyImageActivity extends AppCompatActivity {
         // Hiển thị Bitmap đã được điều chỉnh lên ImageView
         mImageView.setImageBitmap(adjustedBitmap);
     }
+
     private void updateWarm(int progress) {
         // Chuyển đổi giá trị progress từ khoảng [0, 100] thành mức độ warmth phù hợp
         float warmthLevel = progress / 50f; // Điều chỉnh giá trị từ 0 đến 2
@@ -478,7 +465,7 @@ public class BeautyImageActivity extends AppCompatActivity {
 
         // Thiết lập sự thay đổi warmth thông qua ColorMatrix
         ColorMatrix colorMatrix = new ColorMatrix();
-        colorMatrix.set(new float[] {
+        colorMatrix.set(new float[]{
                 warmthLevel, 0, 0, 0, 0,
                 0, warmthLevel, 0, 0, 0,
                 0, 0, warmthLevel, 0, 0,
@@ -531,5 +518,4 @@ public class BeautyImageActivity extends AppCompatActivity {
         // Display the adjusted Bitmap on the ImageView
         mImageView.setImageBitmap(adjustedBitmap);
     }
-
 }

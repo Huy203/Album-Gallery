@@ -32,7 +32,6 @@ public class FavoriteFragment extends Fragment {
     private MainController mainController;
 
     public FavoriteFragment() {
-        // Required empty public constructor
     }
 
     @Override

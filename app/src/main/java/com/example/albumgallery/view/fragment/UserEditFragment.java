@@ -1,8 +1,7 @@
-package com.example.albumgallery.presentations.user;
+package com.example.albumgallery.view.fragment;
 
 import android.app.Dialog;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -81,13 +80,7 @@ public class UserEditFragment extends DialogFragment {
         return dialog;
     }
 
-    private String getTextFromInput(View view, int id) {
-        TextInputEditText inputField = view.findViewById(id);
-        return inputField != null ? inputField.getText().toString() : null;
-    }
-
     private void updateField(String fieldName, String value, String uid) {
-        Log.v("UserEditFragment", "Updating field: " + fieldName + " with value: " + value + " for UID: " + uid);
         if (value != null) {
             String where = "id = '" + uid + "'";
             userController.update(fieldName, value, where);

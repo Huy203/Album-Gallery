@@ -29,9 +29,8 @@ import com.example.albumgallery.R;
 import com.example.albumgallery.controller.MainController;
 import com.example.albumgallery.databinding.ActivityFragmentControllerBinding;
 import com.example.albumgallery.helper.SharePreferenceHelper;
-import com.example.albumgallery.presentations.bin.BinFragment;
-import com.example.albumgallery.presentations.user.UserActivity;
 import com.example.albumgallery.view.fragment.AlbumsMainFragment;
+import com.example.albumgallery.view.fragment.BinFragment;
 import com.example.albumgallery.view.fragment.FavoriteFragment;
 import com.example.albumgallery.view.fragment.HomeScreenFragment;
 import com.example.albumgallery.view.fragment.SearchFragment;
@@ -96,7 +95,6 @@ public class MainFragmentController extends AppCompatActivity implements Backgro
     public void initiateVariable(String picture) {
         ShapeableImageView avatar = findViewById(R.id.action_user);
         if (!picture.contains("android")) {
-            Log.v("UserActivity", "Picture: " + picture);
             Glide.with(this).asBitmap()
                     .load(picture)
                     .addListener(new RequestListener<Bitmap>() {
@@ -130,23 +128,11 @@ public class MainFragmentController extends AppCompatActivity implements Backgro
         Fragment currentFragment = getSupportFragmentManager().findFragmentById(R.id.fragment_container);
 
         MainController mainController = new MainController(this);
-//        ScheduledExecutorService executorService = Executors.newSingleThreadScheduledExecutor();
-//        executorService.schedule(() -> {
-//            initiateVariable(mainController.getUserController().getUser().getPicture());
-//        }, 1, TimeUnit.SECONDS);
-
-//        mainController.getImageController().loadFromFirestore();
-        Log.v("MainFragmentController", "onResume" +mainController.getImageController().getAllImageIds().size());
-        if(mainController.getImageController().getAllImageIds().size() > 0){
+        if (mainController.getImageController().getAllImageIds().size() > 0) {
             onBackgroundTaskCompleted();
-            initiateVariable(mainController.getUserController().getUser().getPicture());
-        }
-        else{
+        } else {
             mainController.getImageController().loadFromFirestore();
         }
-//        if(mainController.getImageController().getAllImageIds()==null){
-//
-//        }
     }
 
     @Override
@@ -181,8 +167,6 @@ public class MainFragmentController extends AppCompatActivity implements Backgro
     @Override
     public void onBackgroundTaskCompleted() {
         isBackgroundTaskCompleted = true;
-        Log.v("MainFragmentController", "Background task completed");
-
         // Find the fragment by its ID
         Fragment fragment = getSupportFragmentManager().findFragmentById(R.id.fragment_container);
 
@@ -190,12 +174,10 @@ public class MainFragmentController extends AppCompatActivity implements Backgro
         if (fragment != null && fragment.isAdded()) {
             // Check if the fragment is HomeScreenFragment
             if (fragment instanceof HomeScreenFragment) {
-                Log.v("MainFragmentController", "HomeScreenFragment: " + fragment);
                 ((HomeScreenFragment) fragment).updateUI();
             }
             // Check if the fragment is BinFragment
             else if (fragment instanceof BinFragment) {
-                Log.v("MainFragmentController", "BinFragment: " + fragment);
                 ((BinFragment) fragment).updateUI();
             }
         }
@@ -204,14 +186,8 @@ public class MainFragmentController extends AppCompatActivity implements Backgro
     }
 
     @Override
-    public void getSelectedItemsCount() {
-
-    }
-
-    @Override
     public void handleImagePick(View itemView, String uri, int position) {
         Fragment currentFragment = getSupportFragmentManager().findFragmentById(R.id.fragment_container);
-        Log.v("MainFragmentController", "Current fragment: " + currentFragment);
         if (currentFragment instanceof HomeScreenFragment) {
             HomeScreenFragment fragment = (HomeScreenFragment) getSupportFragmentManager().findFragmentById(R.id.fragment_container);
             if (fragment != null) {
@@ -240,40 +216,30 @@ public class MainFragmentController extends AppCompatActivity implements Backgro
 
     }
 
-    /**
-     * This method is used to toggle multiple choice mode in the fragment
-     */
     @Override
     public void toggleMultipleChoice() {
         Fragment fragment = getSupportFragmentManager().findFragmentById(R.id.fragment_container);
         if (fragment instanceof HomeScreenFragment) {
-            Log.d("Fragment homescreen", "ok");
             changeBottomMenu(((HomeScreenFragment) fragment).toggleMultipleChoice());
         } else if (fragment instanceof BinFragment) {
-            Log.d("Fragment bin", "ok");
             changeBottomMenu(((BinFragment) fragment).toggleMultipleChoice());
         } else if (fragment instanceof SearchFragment) {
-            Log.d("Fragment search", "ok");
             changeBottomMenu(((SearchFragment) fragment).toggleMultipleChoice());
         }
     }
 
     private void changeBottomMenu(boolean isMultipleChoiceEnabled) {
         Fragment fragment = getSupportFragmentManager().findFragmentById(R.id.fragment_container);
-        Log.v("MainFragmentController", "Change bottom menu" + fragment);
         if (isMultipleChoiceEnabled) {
             if (fragment instanceof HomeScreenFragment) {
-                Log.v("MainFragmentController", "HomeScreenFragment");
                 binding.bottomNavigationView.setVisibility(View.GONE);
                 findViewById(R.id.bottomMenuMain1).setVisibility(View.VISIBLE);
                 findViewById(R.id.bottomMenuMain2).setVisibility(View.GONE);
             } else if (fragment instanceof BinFragment) {
-                Log.v("MainFragmentController", "BinFragment");
                 binding.bottomNavigationView.setVisibility(View.GONE);
                 findViewById(R.id.bottomMenuMain1).setVisibility(View.GONE);
                 findViewById(R.id.bottomMenuMain2).setVisibility(View.VISIBLE);
             } else if (fragment instanceof SearchFragment) {
-                Log.v("MainFragmentController", "SearchFragment");
                 binding.bottomNavigationView.setVisibility(View.GONE);
                 findViewById(R.id.bottomMenuMain1).setVisibility(View.GONE);
                 findViewById(R.id.bottomMenuMain2).setVisibility(View.VISIBLE);
@@ -286,13 +252,6 @@ public class MainFragmentController extends AppCompatActivity implements Backgro
     }
 
     public void shareAction(View view) {
-//        HomeScreenFragment fragment = (HomeScreenFragment) getSupportFragmentManager().findFragmentById(R.id.fragment_container);
-//        if (fragment != null && fragment.isAdded()) {
-//            fragment.ActivityToFragListener("Share");
-//        } else {
-//            Log.e("MainFragmentController", "Fragment is null or not added");
-//        }
-
         Fragment fragment = getSupportFragmentManager().findFragmentById(R.id.fragment_container);
         if (fragment instanceof HomeScreenFragment && fragment.isAdded()) {
             ((HomeScreenFragment) fragment).ActivityToFragListener("Share");
@@ -308,17 +267,9 @@ public class MainFragmentController extends AppCompatActivity implements Backgro
         } else {
             Log.e("MainFragmentController", "Fragment is null or not added");
         }
-
     }
 
     public void likeAction(View view) {
-//        HomeScreenFragment fragment = (HomeScreenFragment) getSupportFragmentManager().findFragmentById(R.id.fragment_container);
-//        if (fragment != null && fragment.isAdded()) {
-//            fragment.ActivityToFragListener("Like");
-//        } else {
-//            Log.e("MainFragmentController", "Fragment is null or not added");
-//        }
-
         Fragment fragment = getSupportFragmentManager().findFragmentById(R.id.fragment_container);
         if (fragment instanceof HomeScreenFragment && fragment.isAdded()) {
             ((HomeScreenFragment) fragment).ActivityToFragListener("Like");
@@ -328,13 +279,6 @@ public class MainFragmentController extends AppCompatActivity implements Backgro
     }
 
     public void deleteAction(View view) {
-//        Fragment fragment = getSupportFragmentManager().findFragmentById(R.id.fragment_container);
-//        if (fragment instanceof HomeScreenFragment) {
-//            ((HomeScreenFragment) fragment).ActivityToFragListener("Delete");
-//        } else {
-//            ((BinFragment) fragment).ActivityToFragListener("Delete");
-//        }
-
         Fragment fragment = getSupportFragmentManager().findFragmentById(R.id.fragment_container);
         if (fragment instanceof HomeScreenFragment) {
             ((HomeScreenFragment) fragment).ActivityToFragListener("Delete");
@@ -346,7 +290,6 @@ public class MainFragmentController extends AppCompatActivity implements Backgro
     }
 
     public void cameraAction(View view) {
-        Log.v("MainFragmentController", "Camera action");
         HomeScreenFragment fragment = (HomeScreenFragment) getSupportFragmentManager().findFragmentById(R.id.fragment_container);
         if (fragment != null && fragment.isAdded()) {
             fragment.ActivityToFragListener("Camera");
@@ -385,7 +328,6 @@ public class MainFragmentController extends AppCompatActivity implements Backgro
                 break;
             case "Delete":
                 boolean isDeleted = (boolean) data;
-                Log.v("MainFragmentController", "Is deleted: " + isDeleted);
                 if (isDeleted) {
                     toggleMultipleChoice();
                 } else {
@@ -394,7 +336,6 @@ public class MainFragmentController extends AppCompatActivity implements Backgro
                 break;
             case "Restore":
                 boolean isRestored = (boolean) data;
-                Log.v("MainFragmentController", "Is restored: " + isRestored);
                 if (isRestored) {
                     toggleMultipleChoice();
                 } else {
@@ -403,7 +344,6 @@ public class MainFragmentController extends AppCompatActivity implements Backgro
                 break;
             case "Like":
                 boolean isLiked = (boolean) data;
-                Log.v("MainFragmentController", "Is liked: " + isLiked);
                 if (isLiked) {
                     toggleMultipleChoice();
                 } else {

@@ -1,20 +1,16 @@
-package com.example.albumgallery.presentations.bin;
+package com.example.albumgallery.view.fragment;
 
 import static com.example.albumgallery.utils.Constant.REQUEST_CODE_DETAIL_IMAGE;
 
-import android.annotation.SuppressLint;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.ColorStateList;
-import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.util.SparseBooleanArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
@@ -30,13 +26,13 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.albumgallery.R;
 import com.example.albumgallery.controller.MainController;
 import com.example.albumgallery.helper.SharePreferenceHelper;
+import com.example.albumgallery.view.activity.DetailDeletedPicture;
 import com.example.albumgallery.view.activity.MainFragmentController;
 import com.example.albumgallery.view.adapter.ImageAdapter;
 import com.example.albumgallery.view.listeners.BackgroundProcessingCallback;
 import com.example.albumgallery.view.listeners.FragToActivityListener;
 import com.example.albumgallery.view.listeners.ImageAdapterListener;
 import com.google.android.gms.tasks.Task;
-import com.google.android.gms.tasks.Tasks;
 import com.google.android.material.button.MaterialButton;
 
 import java.util.ArrayList;
@@ -104,13 +100,10 @@ public class BinFragment extends Fragment {
 
     private void handleInteractions(View view) {
         ImageButton backBtn = (ImageButton) view.findViewById(R.id.backButtonBin);
-        backBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent mainFragment = new Intent(getContext(), MainFragmentController.class);
-                mainFragment.putExtra("fragmentToLoad", "AlbumMain");
-                startActivity(mainFragment);
-            }
+        backBtn.setOnClickListener(view12 -> {
+            Intent mainFragment = new Intent(getContext(), MainFragmentController.class);
+            mainFragment.putExtra("fragmentToLoad", "AlbumMain");
+            startActivity(mainFragment);
         });
 
         MaterialButton unChooseBtn = view.findViewById(R.id.unChooseBtn);
@@ -162,7 +155,6 @@ public class BinFragment extends Fragment {
             options = ActivityOptionsCompat.makeSceneTransitionAnimation(activity, view, "image");
         }
         if (imageURIs.contains(uri)) {
-            Log.v("BinFragment", "Image found: " + uri);
             String id = mainController.getImageController().getIdByRef(uri);
             intent.putExtra("id", id);
             intent.putExtra("position", position);
@@ -170,29 +162,9 @@ public class BinFragment extends Fragment {
                 startActivityForResult(intent, REQUEST_CODE_DETAIL_IMAGE, options.toBundle());
             }
         } else {
-            Log.v("HomeScreenFragment", "Image not found: " + uri);
+            Log.e("BinFragment", "Image not found");
         }
     }
-
-//    private void showDeleteConfirmationDialog() {
-//        Log.d("size of image urls before delete", String.valueOf(selectedImageURLsTask.size()));
-//        for (Task taskImageURL : selectedImageURLsTask) {
-//            String imageURL = taskImageURL.getResult().toString();
-//            Log.d("image url", imageURL);
-//        }
-//        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-//        builder.setTitle("Confirm Deletion");
-//        builder.setMessage("Are you sure you want to delete this image forever?");
-//        builder.setPositiveButton("Delete", new DialogInterface.OnClickListener() {
-//            @Override
-//            public void onClick(DialogInterface dialog, int which) {
-//                // Call deleteSelectedImage() method from ImageController
-//                mainController.getImageController().deleteSelectedImageAtBin(selectedImageURLsTask);
-//            }
-//        });
-//        builder.setNegativeButton("Cancel", null);
-//        builder.show();
-//    }
 
     public void showDeleteConfirmationDialog() {
         if (isAdded() && getActivity() != null) {
@@ -200,21 +172,11 @@ public class BinFragment extends Fragment {
                 getActivity().runOnUiThread(() -> {
 
                     AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-                    Log.v("HomeScreenFragment", "showDeleteConfirmationDialog" + getActivity());
 
                     builder.setTitle("Confirm Deletion");
                     builder.setMessage("Are you sure you want to delete these images forever?");
 
                     builder.setPositiveButton("Delete", (dialog, which) -> {
-//                        selectedImageURLsTask = imageAdapter.getSelectedImageURLsTask();
-//
-//                        mainController.getImageController().deleteSelectedImageAtBin(selectedImageURLsTask);
-//
-//                        imageAdapter.clearSelectedItems();
-//                        onResume();
-//                        fragToActivityListener.onFragmentAction("Delete", true);
-//                        updateUI();
-
                         for (String uri : imageAdapter.getSelectedImageURLs()) {
                             String id = mainController.getImageController().getIdByRef(uri);
                             String userID = mainController.getImageController().getFirebaseManager().getFirebaseAuth().getCurrentUser().getUid();
@@ -242,7 +204,6 @@ public class BinFragment extends Fragment {
                 getActivity().runOnUiThread(() -> {
 
                     AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-                    Log.v("HomeScreenFragment", "showRestoreConfirmationDialog" + getActivity());
 
                     builder.setTitle("Confirm Deletion");
                     builder.setMessage("Are you sure you want to restore these images?");
@@ -269,27 +230,8 @@ public class BinFragment extends Fragment {
         }
     }
 
-    @SuppressLint("SetTextI18n")
-    public void getSelectedItemsCount(int count) {
-        Log.v("SelectedItems", count + " items selected");
-        // numberOfImagesSelected.setText(count + " images selected");
-
-        selectedImageURLsTask.clear();
-        selectedImageURLs.clear();
-
-        for (int i = 0; i < count; i++) {
-            selectedImageURLsTask.add(Tasks.forResult(Uri.parse(imageURIs.get(i))));
-            Log.d("Deleted images task", selectedImageURLsTask.get(i).getResult().toString());
-        }
-
-        for (int i = 0; i < count; i++) {
-            selectedImageURLs.add(imageURIs.get(i));
-        }
-    }
-
     public void updateUI() {
         imageURIs.clear();
-//        imageURIs.addAll(mainController.getImageController().getAllImageURLs());
         // lấy ảnh sort theo date (mới nhất xếp trước).
         imageURIs.addAll(mainController.getImageController().getAllImageURLsSortByDateAtBin());
         imageAdapter = new ImageAdapter(getActivity(), imageURIs);
@@ -311,9 +253,7 @@ public class BinFragment extends Fragment {
         fragToActivityListener.onFragmentAction("ShowMultipleChoice", length);
 
         // if no items are selected, clear the selected items and return false
-        Log.v("BinFragment", "Length " + length);
         if (length == 0) {
-            Log.v("HomeScreenFragment", "No items selected");
             imageAdapter.clearSelectedItems();
             return false;
         }

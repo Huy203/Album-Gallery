@@ -9,16 +9,14 @@
         android:id="@+id/albumNotice"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_centerInParent="true"
         android:layout_margin="8dp"
         android:layout_marginTop="8dp"
         android:layout_marginBottom="8dp"
-        android:gravity="left"
-        android:hint="Thêm chú thích"
+        android:gravity="start"
+        android:hint="@string/add_notice"
         android:inputType="text"
         android:maxLength="20"
         android:padding="8dp"
-        
         android:textSize="20sp" />
 
     <LinearLayout
@@ -33,15 +31,14 @@
 
             <TextView
                 android:id="@+id/albumCreatedAt"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
                 android:layout_marginTop="8dp"
                 android:layout_weight="1"
-                android:gravity="left"
+                android:gravity="start"
                 android:padding="8dp"
                 android:text="Lúc 3giờ, ngày 20 tháng 2 năm 2021"
-                
                 android:textSize="16sp" />
         </LinearLayout>
 
@@ -53,8 +50,8 @@
 
             android:gravity="start"
             android:padding="8dp"
-            android:text="Tên album"
-            
+            android:text="@string/album_name"
+
             android:textSize="16sp" />
     </LinearLayout>
 
@@ -69,72 +66,56 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
             android:layout_marginTop="8dp"
-            android:gravity="left"
+            android:gravity="start"
             android:padding="8dp"
             android:text="X MP"
-            
             android:textSize="16sp" />
 
     </LinearLayout>
 
-    <TextView
-        android:id="@+id/albumLocation"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="30dp"
-        android:gravity="center"
-        android:onClick="addLocation"
-        android:padding="8dp"
-        android:text="Thêm vị trí"
-        android:textSize="20sp" />
-
     <Button
-        style="?attr/materialButtonOutlinedStyle"
         android:id="@+id/btnRemovePassword"
+        style="?attr/materialButtonOutlinedStyle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/remove_password"
         android:layout_gravity="center"
-        android:visibility="gone"
-        />
+        android:text="@string/remove_password"
+        android:visibility="gone" />
 
     <LinearLayout
+        android:id="@+id/setPasswordField"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
         android:layout_marginHorizontal="10dp"
-        android:id="@+id/setPasswordField"
+        android:orientation="horizontal"
         android:visibility="visible">
+
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/outlinedTextField"
             android:layout_width="220dp"
             android:layout_height="wrap_content"
-            app:endIconMode="password_toggle"
+            android:layout_gravity="start"
             android:hint="Add password..."
-            android:layout_gravity="left">
+            app:endIconMode="password_toggle">
 
             <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/passwordInputAlbumInfo"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:inputType="textPassword"
-                android:id="@+id/passwordInputAlbumInfo"
-                />
+                android:inputType="textPassword" />
 
         </com.google.android.material.textfield.TextInputLayout>
+
         <Button
-            style="?attr/materialButtonOutlinedStyle"
             android:id="@+id/applyPasswordAlbumInfo"
+            style="?attr/materialButtonOutlinedStyle"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            android:text="Apply Password"
             android:layout_gravity="center"
-            android:layout_marginLeft="10dp"
+            android:layout_marginStart="10dp"
             android:enabled="false"
-            />
-
+            android:text="Apply Password" />
     </LinearLayout>
-
-
 </LinearLayout>
 
 

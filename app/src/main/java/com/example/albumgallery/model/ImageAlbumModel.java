@@ -6,8 +6,8 @@ import android.util.Log;
 import com.example.albumgallery.helper.DatabaseHelper;
 
 public class ImageAlbumModel implements Model {
-    String image_id;
-    String album_id;
+    private String image_id;
+    private String album_id;
 
     public String getImage_id() {
         return image_id;
@@ -40,7 +40,6 @@ public class ImageAlbumModel implements Model {
     @Override
     public String insert() {
         String query = "INSERT INTO Image_Album (image_id, album_id) VALUES ('" + image_id + "', '" + album_id + "')";
-        Log.d("insert image album", query);
         return query;
     }
 

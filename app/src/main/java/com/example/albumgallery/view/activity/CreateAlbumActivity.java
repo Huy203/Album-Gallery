@@ -24,7 +24,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class CreateAlbumActivity extends AppCompatActivity {
-
     private MainController mainController;
     private TextView numOfImagesTextView;
     private MaterialButton backButton;
@@ -56,9 +55,6 @@ public class CreateAlbumActivity extends AppCompatActivity {
         isSelected = getIntent().getBooleanExtra("isSelected", false);
         if (isSelected) {
             numOfImagesTextView.setVisibility(View.VISIBLE);
-            for (String url : selectedImageURLs) {
-                Log.d("create album activity", url);
-            }
         }
     }
 
@@ -88,7 +84,6 @@ public class CreateAlbumActivity extends AppCompatActivity {
         albumNameInputTxt = (TextInputLayout) findViewById(R.id.albumName);
         String albumNameTemp = getIntent().getStringExtra("albumName");
         if (albumNameTemp != null) {
-            Log.d("Keep album name in create", albumNameTemp);
             albumNameInputTxt.getEditText().setText(albumNameTemp);
         } else {
             Log.d("Keep album name in create", "is null");
@@ -139,8 +134,6 @@ public class CreateAlbumActivity extends AppCompatActivity {
                 selectedImageURLs = getIntent().getStringArrayListExtra("selectedImageURIs");
                 // add album
                 mainController.getAlbumController().addAlbum(albumName, password, numOfImages, selectedImageURLs.get(0));
-
-
             }
         });
     }
@@ -165,7 +158,6 @@ public class CreateAlbumActivity extends AppCompatActivity {
         String id_album = mainController.getAlbumController().getLastAlbumId();
         List<String> ids = new ArrayList<>();
         for (String uri : selectedImageURLs) {
-            Log.d("Firebase content uri", mainController.getImageController().getIdByRef(uri));
             ids.add(mainController.getImageController().getIdByRef(uri));
         }
         for (String id : ids) {

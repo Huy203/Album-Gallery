@@ -1,15 +1,13 @@
-package com.example.albumgallery.presentations.user;
+package com.example.albumgallery.view.activity;
 
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
-import android.util.Log;
 import android.view.Menu;
 import android.view.View;
 import android.widget.PopupMenu;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -27,15 +25,13 @@ import com.example.albumgallery.R;
 import com.example.albumgallery.controller.MainController;
 import com.example.albumgallery.helper.SharePreferenceHelper;
 import com.example.albumgallery.model.auth.UserModel;
-import com.example.albumgallery.view.activity.Auth;
+import com.example.albumgallery.view.fragment.UserEditFragment;
 import com.example.albumgallery.view.listeners.FragToActivityListener;
-import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.imageview.ShapeableImageView;
 import com.google.android.material.switchmaterial.SwitchMaterial;
 import com.google.android.material.textview.MaterialTextView;
-import com.google.firebase.auth.UserProfileChangeRequest;
 
 public class UserActivity extends AppCompatActivity implements FragToActivityListener {
     private boolean isDarkMode;
@@ -57,7 +53,6 @@ public class UserActivity extends AppCompatActivity implements FragToActivityLis
     @Override
     protected void onResume() {
         super.onResume();
-        Toast.makeText(this, "onResume", Toast.LENGTH_SHORT).show();
     }
 
     public void darkMode() {
@@ -90,7 +85,6 @@ public class UserActivity extends AppCompatActivity implements FragToActivityLis
             String picture = userModel.getPicture();
             ShapeableImageView avatar = findViewById(R.id.avatarImageView);
             if (picture != null) {
-                Log.v("UserActivity", "Picture: " + picture);
                 Glide.with(this).asBitmap()
                         .load(picture)
                         .addListener(new RequestListener<Bitmap>() {
@@ -107,7 +101,6 @@ public class UserActivity extends AppCompatActivity implements FragToActivityLis
                         }).submit();
             }
         }
-        Log.v("UserActivity", "isDarkMode: " + isDarkMode);
     }
 
     public void darkModeAction(View view) {
@@ -198,7 +191,6 @@ public class UserActivity extends AppCompatActivity implements FragToActivityLis
             uploadTask.addOnCompleteListener(task -> {
                 if (task.isSuccessful()) {
                     Uri downloadUri = task.getResult();
-                    Log.v("UserActivity", "Download URI: " + downloadUri);
                     mainController.getUserController().update("picture", downloadUri.toString(), "id = '" + userModel.getId() + "'");
                     updateUI();
                 }

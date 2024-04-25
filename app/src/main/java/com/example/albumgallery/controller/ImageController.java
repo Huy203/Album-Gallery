@@ -19,9 +19,6 @@ import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.provider.MediaStore;
 import android.util.Log;
-import android.widget.Toast;
-
-import androidx.annotation.NonNull;
 
 import com.example.albumgallery.FirebaseManager;
 import com.example.albumgallery.helper.DatabaseHelper;
@@ -30,13 +27,8 @@ import com.example.albumgallery.model.Model;
 import com.example.albumgallery.utils.QRCodeRecognization;
 import com.example.albumgallery.utils.textRecognization.TextRecognization;
 import com.example.albumgallery.view.activity.MainFragmentController;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
-import com.google.firebase.firestore.CollectionReference;
-import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageMetadata;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
@@ -59,15 +51,12 @@ public class ImageController implements Controller {
     private final DatabaseHelper dbHelper;
     private final FirebaseManager firebaseManager;
     private final List<String> idSelectedImages = new ArrayList<>();
-    private final CollectionReference collection;
     private ImageModel currentModel;
-    private boolean complete = false;
 
     public ImageController(Activity activity) {
         this.activity = activity;
         this.dbHelper = new DatabaseHelper(activity);
         this.firebaseManager = FirebaseManager.getInstance(activity);
-        this.collection = firebaseManager.getFirestore().collection(TAG);
         this.currentModel = new ImageModel();
     }
 
@@ -79,10 +68,6 @@ public class ImageController implements Controller {
         return activity;
     }
 
-    public void setComplete(boolean complete) {
-        this.complete = complete;
-    }
-
     public FirebaseManager getFirebaseManager() {
         return firebaseManager;
     }
@@ -90,21 +75,13 @@ public class ImageController implements Controller {
     @Override
     public void insert(Model model) {
         firebaseManager.getFirebaseHelper().add(TAG, model, firebaseManager.getFirebaseAuth().getCurrentUser().getUid())
-                .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
-                    @Override
-                    public void onSuccess(DocumentReference documentReference) {
-                        currentModel.setId(documentReference.getId());
-                        idSelectedImages.add(dbHelper.insert("Image", currentModel));
-                        update("id", documentReference.getId(), "id = '" + documentReference.getId() + "'");
-                        dbHelper.close();
-                    }
+                .addOnSuccessListener(documentReference -> {
+                    currentModel.setId(documentReference.getId());
+                    idSelectedImages.add(dbHelper.insert("Image", currentModel));
+                    update("id", documentReference.getId(), "id = '" + documentReference.getId() + "'");
+                    dbHelper.close();
                 })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        Log.w(TAG, "Error adding document", e);
-                    }
-                });
+                .addOnFailureListener(e -> Log.w(TAG, "Error adding document", e));
     }
 
     @Override
@@ -116,11 +93,9 @@ public class ImageController implements Controller {
         int start = where.indexOf("'") + 1;
         int end = where.lastIndexOf("'");
         String id = where.substring(start, end);
-        Log.v(TAG, "Updating document with ID: " + id + " " + data.toString());
         firebaseManager.getFirebaseHelper().update(TAG, data, id, firebaseManager.getFirebaseAuth().getCurrentUser().getUid())
                 .continueWith(task -> {
                     if (task.isSuccessful()) {
-                        complete = true;
                         activity.runOnUiThread(() -> {
                             ((MainFragmentController) activity).onBackgroundTaskCompleted();
                         });
@@ -144,33 +119,15 @@ public class ImageController implements Controller {
         return new ImageModel(temp[0], temp[1], Integer.parseInt(temp[2]), Integer.parseInt(temp[3]), Long.parseLong(temp[4]), temp[5], temp[6], temp[7], temp[8], isDeleted, isFavourited);
     }
 
-//    public ImageModel getImageById(String id) {
-//        Task<Map<String, Object>> data = firebaseHelper.getById("Image", id);
-//        data.addOnSuccessListener(documentSnapshot -> {
-//            if (documentSnapshot != null) {
-//                if (!currentModel.getId().equals(id))
-//                    currentModel = new ImageModel(
-//                            documentSnapshot.get("id").toString(),
-//                            documentSnapshot.get("name").toString(),
-//                            Integer.parseInt(documentSnapshot.get("width").toString()),
-//                            Integer.parseInt(documentSnapshot.get("height").toString()),
-//                            Long.parseLong(documentSnapshot.get("capacity").toString()),
-//                            documentSnapshot.get("created_at").toString(),
-//                            documentSnapshot.get("notice").toString(),
-//                            documentSnapshot.get("ref").toString(),
-//                            documentSnapshot.get("remain_time").toString(),
-//                            (boolean) documentSnapshot.get("is_deleted"),
-//                            (boolean) documentSnapshot.get("is_favourited"));
-//            }
-//        });
-//        return currentModel;
-//    }
-
     public String getIdByRef(String ref) {
         if (currentModel.getRef().equals(ref))
             return currentModel.getId();
         else
             return dbHelper.getId("Image", "ref = '" + ref + "'");
+    }
+
+    public String getImageRefById(String imageId) {
+        return dbHelper.getImageRefById(imageId);
     }
 
     public List<String> getAllImageURLs() {
@@ -189,14 +146,9 @@ public class ImageController implements Controller {
         return dbHelper.getAllRef("Image", "is_favourited = 1");
     }
 
-    public List<String> getAllImageURLsSortByDate() {
-        return dbHelper.selectImagesSortByDate("Image", "ref", "descending");
-    }
-
     public List<String> getAllImageURLsSortByDateAtBin() {
         return dbHelper.selectImagesSortByDateAtBin("Image", "ref", "descending");
     }
-
 
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (resultCode == RESULT_OK && data != null) {
@@ -229,7 +181,6 @@ public class ImageController implements Controller {
     }
 
     private void handleImagePicked(Intent data) {
-        Log.v("Image", "Image picked" + " " + data.getData());
         List<Uri> imageUris = new ArrayList<>();
         if (data.getData() != null) {
             // Single image selected
@@ -245,7 +196,6 @@ public class ImageController implements Controller {
         List<Task<Uri>> uploadTasks = new ArrayList<>();
         for (Uri uri : imageUris) {
             retrieveDataImageFromURL(uri);
-            Log.v("Image", "Image selected" + " " + uri);
             uploadTasks.add(uploadImage(uri));
         }
 
@@ -258,8 +208,6 @@ public class ImageController implements Controller {
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
-                } else {
-
                 }
             });
         }
@@ -277,13 +225,11 @@ public class ImageController implements Controller {
                         activity.runOnUiThread(() -> {
                             ((MainFragmentController) activity).onBackgroundTaskCompleted();
                         });
-                    } else {
                     }
                 }
             });
         } catch (Exception e) {
             e.printStackTrace();
-            Log.d("Camera in app", "add and update image fail");
         }
     }
 
@@ -317,7 +263,6 @@ public class ImageController implements Controller {
     }
 
     public Task<Uri> uploadImage(Uri uri) {
-        Log.v("Image", "Uploading image" + " " + uri);
         String extensionName = getExtensionName(uri);
 
         // Create file metadata including the content type
@@ -337,18 +282,8 @@ public class ImageController implements Controller {
             }
 
             // Continue with the task to get the download URL
-            Log.v("Image", "Image uploaded" + " " + imageRef.getDownloadUrl());
             return imageRef.getDownloadUrl();
         });
-    }
-
-    private boolean allTasksCompleted(List<Task<Uri>> tasks) {
-        for (Task<Uri> task : tasks) {
-            if (!task.isSuccessful()) {
-                return false;
-            }
-        }
-        return true;
     }
 
     private boolean allTasksCompletedGeneric(List<Task> tasks) {
@@ -402,32 +337,14 @@ public class ImageController implements Controller {
                                                     activity.runOnUiThread(() -> {
                                                         ((MainFragmentController) activity).onBackgroundTaskCompleted();
                                                     });
-
-//                                                    activity.runOnUiThread(() -> {
-//                                                        ((MainFragmentController) activity).onBackgroundTaskCompleted();
-//                                                    });
                                                 }
                                             });
                                 }
                             }
                         }
-//                        activity.runOnUiThread(() -> {
-//                            ((MainFragmentController) activity).initiateVariable(String.valueOf(firebaseManager.getFirebaseAuth().getCurrentUser().getPhotoUrl()));
-//                        });
-
-//                        if (allTasksCompleted(uploadTasks)) {
-//                            activity.runOnUiThread(() -> {
-//                                ((MainFragmentController) activity).onBackgroundTaskCompleted();
-//                            });
-//                        }
                     }
                     return imageIdsInFirestore;
                 });
-    }
-
-
-    public String getImageRefById(String imageId) {
-        return dbHelper.getImageRefById(imageId);
     }
 
     public boolean toggleFavoriteImage(String imageId) {
@@ -437,59 +354,20 @@ public class ImageController implements Controller {
         return !isFavourited;
     }
 
-    public boolean isFavoriteImage(String imageId) {
-        return dbHelper.isFavoriteImage(imageId);
-    }
-
-    public List<String> getSelectedImageURLs() {
-        final String replace = idSelectedImages.toString().replace("[", "").replace("]", "");
-        Log.v("Image", "Selected images: " + "ref" + "id IN (" + replace + ")");
-        return dbHelper.select("Image", "ref", "id IN (" + replace + ")");
-    }
-
     private String parseURL(String url) {
         String filename = null;
         try {
             // Parse the URL
             URI uri = new URI(url);
-
             // Extract filename
             filename = Paths.get(uri.getPath()).getFileName().toString();
         } catch (URISyntaxException e) {
             e.printStackTrace();
         }
-        // filename = "images/" + filename;
-        // filename = "mdxa9wwR9Vbfo0XliX8ubCFY4Sz2/" + filename;
         filename = firebaseManager.getFirebaseAuth().getCurrentUser().getUid() + "/" + filename;
         return filename;
     }
 
-    public void deleteSelectedImage(String imageURL) {
-        String URL = parseURL(imageURL);
-        Log.d("URL", URL);
-
-        FirebaseStorage storage = FirebaseStorage.getInstance();
-        // Create a storage reference from our app
-        StorageReference storageRef = storage.getReference();
-
-        // Create a reference to the file to delete
-        StorageReference desertRef = storageRef.child(URL);
-
-        // Delete the file
-        desertRef.delete().addOnSuccessListener(aVoid -> {
-            // File deleted successfully
-            delete("ref = '" + imageURL + "'");
-            Toast.makeText(activity, "Image deleted successfully", Toast.LENGTH_SHORT).show();
-            // You may want to update your local data or UI here if necessary.
-
-//            Intent intent = new Intent(activity, MainFragmentController.class);
-//            activity.startActivity(intent);
-//            activity.finish();
-        }).addOnFailureListener(exception -> {
-            // Uh-oh, an error occurred!
-            Toast.makeText(activity, "Image deleted failed", Toast.LENGTH_SHORT).show();
-        });
-    }
 
     public void restoreSelectedImage(String imageURL) {
         String imageID = dbHelper.getImageIdByURL(imageURL);
@@ -501,123 +379,11 @@ public class ImageController implements Controller {
         activity.finish();
     }
 
-    public String checkExistURL(String longImageURL) {
-        String[] parts = longImageURL.split("/");
-        String imageURL = parts[parts.length - 1];
-
-        getDbHelper().select("image", "ref", null);
-
-        // Get all image URLs
-        List<String> imageURLs = getAllImageURLs();
-        Log.d("size", String.valueOf(imageURLs.size()));
-        Log.d("ImageURLs", "Image URLs: " + imageURLs);
-        Log.d("ImagePath", "Image Path: " + imageURL);
-
-        // Check if the current imageURL exists in the list
-        for (String url : imageURLs) {
-            if (url.contains(imageURL)) {
-                return url;
-            }
-        }
-        return null;
-    }
-
-    public List<String> getImagePaths() {
-        return getAllImageURLs();
-    }
-
-    public void deleteSelectedImageAtBin(List<Task> imageURLs) {
-        FirebaseStorage storage = FirebaseStorage.getInstance();
-        // Create a storage reference from our app
-        StorageReference storageRef = storage.getReference();
-        try {
-            Log.v("Image", "Deleting images" + " " + imageURLs.size());
-            for (Task taskImageURL : imageURLs) {
-                if (taskImageURL.isSuccessful()) {
-                    String imageURL = taskImageURL.getResult().toString();
-                    Log.d("Image task", imageURL);
-                    String URL = parseURL(imageURL);
-                    Log.d("URL Image task", URL);
-
-                    // Create a reference to the file to delete
-                    StorageReference desertRef = storageRef.child(URL);
-                    Log.d("Executing", "ok");
-
-                    // Delete the file
-                    desertRef.delete().addOnSuccessListener(new OnSuccessListener<Void>() {
-                        @Override
-                        public void onSuccess(Void aVoid) {
-                            Log.d("Before delete on db", "ok");
-                            // File deleted successfully
-                            delete("ref = '" + imageURL + "'");
-                            Log.d("After delete on db", "ok");
-
-                            if (allTasksCompletedGeneric(imageURLs)) {
-                                Log.v("Image", "All images deleted" + activity);
-                                activity.runOnUiThread(() -> {
-                                    ((MainFragmentController) activity).onBackgroundTaskCompleted();
-                                });
-                            }
-                        }
-                    }).addOnFailureListener(new OnFailureListener() {
-                        @Override
-                        public void onFailure(@NonNull Exception exception) {
-                            // Uh-oh, an error occurred!
-                            Toast.makeText(activity, "Image deleted failed", Toast.LENGTH_SHORT).show();
-                        }
-                    });
-                }
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    public void deleteSelectedImageAtHomeScreeen(List<Task> imageURLs) {
-        Log.d("get into delete at homescreen function", String.valueOf(activity));
-        for (Task taskImageURL : imageURLs) {
-            if (taskImageURL.isSuccessful()) {
-                String imageURL = taskImageURL.getResult().toString();
-                Log.d("Image task", imageURL);
-                String URL = parseURL(imageURL);
-
-                String imageID = dbHelper.getId("Image", "ref = '" + imageURL + "'");
-
-                setDeleteAtHomeScreen(imageID, true);
-
-                Log.d("delete image url", imageURL);
-                Log.d("delete id", String.valueOf(imageID));
-
-                // Delete the file
-                if (allTasksCompletedGeneric(imageURLs)) {
-                    Log.v("Image", "All images deleted" + activity);
-//                    try{
-//                        activity.runOnUiThread(() -> {
-//                            ((MainFragmentController) activity).onBackgroundTaskCompleted();
-//                        });
-//                    } catch (Exception e) {
-//                        e.printStackTrace();
-//                    }
-                }
-            }
-        }
-    }
-
     public long getTotalCapacityFromImageIDs(List<String> imageIDs) {
         return dbHelper.getTotalCapacityFromImageIDs(imageIDs);
     }
 
-    public boolean toggleDeleteImage(String imageId) {
-        boolean isDeleted = getImageById(imageId).getIs_deleted();
-        update("is_deleted", isDeleted ? "0" : "1", imageId);
-        return !isDeleted;
-    }
-
     public void setDelete(String imageId, boolean isDelete) {
-        update("is_deleted", isDelete ? "1" : "0", "id = '" + imageId + "'");
-    }
-
-    public void setDeleteAtHomeScreen(String imageId, boolean isDelete) {
         update("is_deleted", isDelete ? "1" : "0", "id = '" + imageId + "'");
     }
 
@@ -642,43 +408,6 @@ public class ImageController implements Controller {
         } catch (Exception e) {
             e.printStackTrace();
         }
-    }
-
-//        FirebaseVisionImage image = null;
-//        try {
-//            image = FirebaseVisionImage.fromFilePath(activity, Uri.parse(uri));
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
-//
-//        FirebaseVisionTextRecognizer detector = FirebaseVision.getInstance()
-//                .getOnDeviceTextRecognizer();
-//
-//        Task<FirebaseVisionText> result =
-//                detector.processImage(image)
-//                        .addOnSuccessListener(new OnSuccessListener<FirebaseVisionText>() {
-//                            @Override
-//                            public void onSuccess(FirebaseVisionText result) {
-//
-//                            }
-//                        })
-//                        .addOnFailureListener(
-//                                new OnFailureListener() {
-//                                    @Override
-//                                    public void onFailure(@NonNull Exception e) {
-//                                        // Task failed with an exception
-//                                        // ...
-//                                    }
-//                                });
-
-    public Bitmap createQRCodeFromImage(String uri) {
-        QRCodeRecognization qrCodeRecognization = new QRCodeRecognization();
-        try {
-            return qrCodeRecognization.generateQRCodeFromImage(uri);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return null;
     }
 
     public List<String> selectImagesByNotice(String notice) {

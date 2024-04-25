@@ -28,32 +28,26 @@ public class PasswordAlbumActivity extends AppCompatActivity {
         mainController = new MainController(this);
         TextInputEditText inputPasswordEditTxt = (TextInputEditText) findViewById(R.id.inputAlbumPassword);
         Button enterButton = (Button) findViewById(R.id.enterAlbumPasswordBtn);
-        enterButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                String inputPassword = inputPasswordEditTxt.getText().toString();
-                String password = mainController.getAlbumController().getPasswordByAlbumName(albumName);
-                if (password.equals(inputPassword)) {
-                    Intent intent = new Intent(PasswordAlbumActivity.this, AlbumContentActivity.class);
-                    intent.putExtra("albumName", albumName);
-                    startActivity(intent);
-                    finish();
-                } else {
-                    TextView passwordError = (TextView) findViewById(R.id.passwordError);
-                    passwordError.setText("(*) Incorrect password");
-                    passwordError.setVisibility(View.VISIBLE);
-                }
+        enterButton.setOnClickListener(view -> {
+            String inputPassword = inputPasswordEditTxt.getText().toString();
+            String password = mainController.getAlbumController().getPasswordByAlbumName(albumName);
+            if (password.equals(inputPassword)) {
+                Intent intent = new Intent(PasswordAlbumActivity.this, AlbumContentActivity.class);
+                intent.putExtra("albumName", albumName);
+                startActivity(intent);
+                finish();
+            } else {
+                TextView passwordError = (TextView) findViewById(R.id.passwordError);
+                passwordError.setText("(*) Incorrect password");
+                passwordError.setVisibility(View.VISIBLE);
             }
         });
         MaterialButton backBtn = findViewById(R.id.backButtonAlbumPassword);
-        backBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent mainFragment = new Intent(PasswordAlbumActivity.this, MainFragmentController.class);
-                mainFragment.putExtra("fragmentToLoad", "AlbumMain");
-                startActivity(mainFragment);
-                finish();
-            }
+        backBtn.setOnClickListener(view -> {
+            Intent mainFragment = new Intent(PasswordAlbumActivity.this, MainFragmentController.class);
+            mainFragment.putExtra("fragmentToLoad", "AlbumMain");
+            startActivity(mainFragment);
+            finish();
         });
     }
 }

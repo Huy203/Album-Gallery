@@ -21,29 +21,19 @@ import java.util.Map;
 
 public class ImageAlbumController implements Controller {
     private final static String TAG = "ImageAlbum";
-    private ImageAlbumModel currentModel;
     private final DatabaseHelper dbHelper;
     private final FirebaseManager firebaseManager;
+    private ImageAlbumModel currentModel;
 
-
-    //    public ImageAlbumController(Context context) {
-//        ImageAlbum = new ImageAlbumModel(context);
-//        this.dbHelper = new DatabaseHelper(context);
-//    }
     public ImageAlbumController(Activity activity) {
         this.dbHelper = new DatabaseHelper(activity);
         this.currentModel = new ImageAlbumModel();
         this.firebaseManager = FirebaseManager.getInstance(activity);
     }
 
-    private DatabaseHelper getDbHelper() {
-        return dbHelper;
-    }
-
     public List<ImageAlbumModel> getAllImageAlbums() {
         // Get all ImageAlbums
         List<String> data = dbHelper.getAll("Image_Album");
-        Log.d("check delete data", String.valueOf(data));
         List<ImageAlbumModel> ImageAlbumModels = new ArrayList<>();
         for (String s : data) {
             String[] temp = s.split(",");
@@ -65,7 +55,7 @@ public class ImageAlbumController implements Controller {
                 .addOnFailureListener(new OnFailureListener() {
                     @Override
                     public void onFailure(@NonNull Exception e) {
-                        Log.w(TAG, "Error adding document", e);
+                        Log.e(TAG, "Error adding document", e);
                     }
                 });
     }
@@ -84,11 +74,7 @@ public class ImageAlbumController implements Controller {
 
     public void addImageAlbum(String id_image, String id_album) {
         // Add an ImageAlbum
-//        ImageAlbumModel imageAlbumModel = new ImageAlbumModel(id_image, id_album);
-//        this.insert(imageAlbumModel);
         this.currentModel = new ImageAlbumModel(id_image, id_album);
-        Log.d("Firebase curretn model", currentModel.getImage_id());
-        Log.d("Firebase curretn model", currentModel.getAlbum_id());
         this.insert(currentModel);
     }
 
@@ -99,26 +85,6 @@ public class ImageAlbumController implements Controller {
     public void deleteImageAlbum(String id_album) {
         // Delete an ImageAlbum
         this.delete("album_id = " + id_album);
-    }
-
-    public void editImageAlbum() {
-        // Edit an ImageAlbum
-    }
-
-    public void viewImageAlbum() {
-        // View an ImageAlbum
-    }
-
-    public void shareImageAlbum() {
-        // Share an ImageAlbum
-    }
-
-    public void favouriteImageAlbum() {
-        // Favourite an ImageAlbum
-    }
-
-    public void unfavouriteImageAlbum() {
-        // Unfavourite an ImageAlbum
     }
 
     public void loadFromFirestore() {

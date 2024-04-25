@@ -1,6 +1,5 @@
 package com.example.albumgallery.view.activity;
 
-import static android.app.ProgressDialog.show;
 import static com.example.albumgallery.utils.Constant.REQUEST_CODE_EDIT_IMAGE;
 import static com.example.albumgallery.utils.Utilities.convertFromBitmapToUri;
 
@@ -17,13 +16,10 @@ import android.graphics.Rect;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
-import android.text.InputType;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
@@ -51,8 +47,6 @@ import com.example.albumgallery.view.listeners.OnSwipeTouchListener;
 import com.example.albumgallery.view.listeners.TextRecognitionListener;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
-
-import org.w3c.dom.Text;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -100,9 +94,9 @@ public class DetailPicture extends AppCompatActivity implements ImageInfoListene
     private void initializeViews() {
         mainController = new MainController(this);
         imagePathsAlbum = getIntent().getStringArrayListExtra("imagePathsAlbum");
-        if(imagePathsAlbum!=null){
+        if (imagePathsAlbum != null) {
             imagePaths = imagePathsAlbum;
-        }else{
+        } else {
             imagePaths = mainController.getImageController().getAllImageURLsUndeleted();
         }
 
@@ -161,7 +155,6 @@ public class DetailPicture extends AppCompatActivity implements ImageInfoListene
                 .addListener(new RequestListener<Bitmap>() {
                     @Override
                     public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Bitmap> target, boolean isFirstResource) {
-                        Log.e("DetailPicture", "Failed to load image: " + e.getMessage());
                         Toast.makeText(DetailPicture.this, "Failed to set wallpaper", Toast.LENGTH_SHORT).show();
                         return false;
                     }
@@ -173,13 +166,10 @@ public class DetailPicture extends AppCompatActivity implements ImageInfoListene
                             wallpaperManager.setBitmap(resource);
                             //Toast.makeText(DetailPicture.this, "Wallpaper set successfully", Toast.LENGTH_SHORT).show();
                         } catch (IOException e) {
-                            Log.e("DetailPicture", "Failed to set wallpaper: " + e.getMessage());
                             Toast.makeText(DetailPicture.this, "Failed to set wallpaper", Toast.LENGTH_SHORT).show();
                         }
                         return false;
                     }
-
-
                 })
                 .submit();
         Toast.makeText(DetailPicture.this, "Wallpaper set successfully", Toast.LENGTH_SHORT).show();
@@ -237,25 +227,7 @@ public class DetailPicture extends AppCompatActivity implements ImageInfoListene
 
     private void loadRecognizeText() {
         String uri = imageModel.getRef();
-        Log.v("DetailPicture", "uriImage: " + uri);
         mainController.getImageController().recognizeText(uri);
-    }
-
-    private void launchEditImageActivity() {
-    }
-
-    private void deleteImage() {
-    }
-
-    protected void toggleImageInfo() {
-        isImageInfoVisible = !isImageInfoVisible;
-        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-        if (isImageInfoVisible) {
-            imageInfoView.setVisibility(View.VISIBLE);
-        } else {
-            imageInfoView.setVisibility(View.GONE);
-        }
-        transaction.commit();
     }
 
     private void shareImageAndText(Bitmap bitmap) {
@@ -286,7 +258,6 @@ public class DetailPicture extends AppCompatActivity implements ImageInfoListene
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 finish();
-                Log.v("DetailPicture", "Image deleted successfully");
                 isDeleted = mainController.getImageController().isDeleteImage(imageModel.getId());
                 toggleDeleteImage(imageModel.getId());
             }
@@ -310,32 +281,22 @@ public class DetailPicture extends AppCompatActivity implements ImageInfoListene
         MaterialAlertDialogBuilder albumsDialog = new MaterialAlertDialogBuilder(DetailPicture.this);
         albumsDialog.setView(dialogView)
                 .setTitle("Choose an album")
-                .setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                        int selectedRadioButtonId = albumGroup.getCheckedRadioButtonId();
-                        RadioButton selectedRadioBtn = dialogView.findViewById(selectedRadioButtonId);
-                        if (selectedRadioBtn != null) {
-                            String selectedAlbum = selectedRadioBtn.getText().toString();
-                            String album_id = mainController.getAlbumController().getAlbumIdByName(selectedAlbum);
-                            String image_id = mainController.getImageController().getIdByRef(imagePaths.get(currentPosition));
-//                            Log.d("add to album", Long.toString(album_id) + " " + image_id);
-                            mainController.getImageAlbumController().addImageAlbum(image_id, album_id);
-                        }
+                .setPositiveButton("OK", (dialogInterface, i) -> {
+                    int selectedRadioButtonId = albumGroup.getCheckedRadioButtonId();
+                    RadioButton selectedRadioBtn = dialogView.findViewById(selectedRadioButtonId);
+                    if (selectedRadioBtn != null) {
+                        String selectedAlbum = selectedRadioBtn.getText().toString();
+                        String album_id = mainController.getAlbumController().getAlbumIdByName(selectedAlbum);
+                        String image_id = mainController.getImageController().getIdByRef(imagePaths.get(currentPosition));
+                        mainController.getImageAlbumController().addImageAlbum(image_id, album_id);
                     }
                 })
-                .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                        dialogInterface.dismiss();
-                    }
-                });
+                .setNegativeButton("Cancel", (dialogInterface, i) -> dialogInterface.dismiss());
         albumsDialog.show();
     }
 
     private void update() {
         String id = getIntent().getStringExtra("id");
-        Log.v("DetailPicture", "id: " + id);
         imageModel = mainController.getImageController().getImageById(id);
     }
 
@@ -353,6 +314,7 @@ public class DetailPicture extends AppCompatActivity implements ImageInfoListene
         String where = "id = '" + getIntent().getStringExtra("id") + "'";
         mainController.getImageController().update("notice", data, where);
     }
+
     @Override
     public void onTimePassed(String data) {
         String where = "id = '" + getIntent().getStringExtra("id") + "'";
@@ -420,7 +382,6 @@ public class DetailPicture extends AppCompatActivity implements ImageInfoListene
                 optionsDialog.dismiss();
             }
         });
-
         optionsDialog.show();
     }
 
@@ -431,8 +392,6 @@ public class DetailPicture extends AppCompatActivity implements ImageInfoListene
                 .addListener(new RequestListener<Bitmap>() {
                     @Override
                     public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Bitmap> target, boolean isFirstResource) {
-                        Log.e("DetailPicture", "Failed to load image: " + e.getMessage());
-                        Toast.makeText(DetailPicture.this, "Failed to share image", Toast.LENGTH_SHORT).show();
                         return false;
                     }
 
@@ -473,21 +432,15 @@ public class DetailPicture extends AppCompatActivity implements ImageInfoListene
         }
     }
 
-    public void ocrAction(View view){
+    public void ocrAction(View view) {
         loadRecognizeText();
     }
 
     private void toggleDeleteImage(String id) {
-        Log.d("update delete successfully 2", "ok");
         isDeleted = !isDeleted;
         mainController.getImageController().setDelete(id, isDeleted);
     }
 
-    protected ImageModel getImageModel() {
-        String id = getIntent().getStringExtra("id");
-        Log.d("image content id", String.valueOf(id));
-        return mainController.getImageController().getImageById(id);
-    }
     @Override
     public void onTextRecognized(List<String> textRecognized, List<Rect> boundingBoxes, Bitmap bitmap) {
         // You can also draw bounding boxes on an ImageView
@@ -552,6 +505,4 @@ public class DetailPicture extends AppCompatActivity implements ImageInfoListene
         }
         return bitmapWithBoxes;
     }
-
-
 }

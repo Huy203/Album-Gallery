@@ -1,7 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<com.google.android.material.card.MaterialCardView
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/card"
     android:layout_width="200dp"
     android:layout_height="wrap_content"
@@ -17,13 +15,12 @@
             android:layout_height="wrap_content">
             <!-- Media -->
             <ImageView
-                android:layout_width="match_parent"
                 android:id="@+id/albumThumbnail"
+                android:layout_width="match_parent"
                 android:layout_height="150dp"
-                android:src="@drawable/border_bottom"
                 android:scaleType="centerCrop"
-                android:contentDescription="thumbnail"
-                />
+                android:src="@drawable/border_bottom" />
+
             <com.google.android.material.progressindicator.CircularProgressIndicator
                 android:id="@+id/circularProgressIndicatorForAlbum"
                 android:layout_width="wrap_content"
@@ -32,8 +29,6 @@
                 android:indeterminate="true"
                 android:visibility="invisible" />
         </FrameLayout>
-
-
 
 
         <LinearLayout
@@ -48,30 +43,9 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/album_name"
-                android:textSize="20sp"
                 android:textAppearance="?attr/textAppearanceTitleMedium"
-                />
+                android:textSize="20sp" />
         </LinearLayout>
-
-        <!-- Buttons -->
-<!--        <LinearLayout-->
-<!--            android:layout_width="wrap_content"-->
-<!--            android:layout_height="wrap_content"-->
-<!--            android:orientation="horizontal">-->
-<!--            <com.google.android.material.button.MaterialButton-->
-<!--                android:layout_width="wrap_content"-->
-<!--                android:layout_height="wrap_content"-->
-<!--                android:layout_marginEnd="8dp"-->
-<!--                android:text="action 1"-->
-<!--                style="?attr/borderlessButtonStyle"-->
-<!--                />-->
-<!--            <com.google.android.material.button.MaterialButton-->
-<!--                android:layout_width="wrap_content"-->
-<!--                android:layout_height="wrap_content"-->
-<!--                android:text="action 2"-->
-<!--                style="?attr/borderlessButtonStyle"-->
-<!--                />-->
-<!--        </LinearLayout>-->
     </LinearLayout>
 
 </com.google.android.material.card.MaterialCardView>
